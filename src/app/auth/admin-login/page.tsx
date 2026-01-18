@@ -2,7 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth";
+
 export default function AdminLoginPage() {
+    const { setUser } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +15,7 @@ export default function AdminLoginPage() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ identifier: email, password }),
     });
     const data = await res.json();
@@ -20,6 +24,7 @@ export default function AdminLoginPage() {
     if (data.user.role !== "ADMIN")
       return toast.error("This login is for teachers only");
     toast.success("Welcome back");
+    setUser(data.user);
     router.push("/admin/dashboard");
   }
   return (

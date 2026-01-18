@@ -2,7 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth";
+
 export default function StudentLoginPage() {
+    const { setUser } = useAuth();
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +15,7 @@ export default function StudentLoginPage() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ identifier: username, password }),
     });
     const data = await res.json();
@@ -20,6 +24,7 @@ export default function StudentLoginPage() {
     if (data.user.role !== "STUDENT")
       return toast.error("This login is for students only");
     toast.success("Login successful");
+    setUser(data.user);
     router.push("/student/dashboard");
   }
   return (

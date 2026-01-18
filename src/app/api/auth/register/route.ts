@@ -11,10 +11,12 @@ export async function POST(req: Request) {
 
     const res = NextResponse.json({ user });
     res.cookies.set("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-    });
+  httpOnly: true,
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+});
+
 
     return res;
   } catch (err: any) {
