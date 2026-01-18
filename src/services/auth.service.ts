@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import { signToken } from "@/lib/auth";
+
 export async function registerAdmin(data: {
   name: string;
   email: string;
@@ -22,6 +23,7 @@ export async function registerAdmin(data: {
   const token = signToken({ userId: user._id.toString(), role: "ADMIN" });
   return { user, token };
 }
+
 export async function loginUser(data: {
   identifier: string;
   password: string;

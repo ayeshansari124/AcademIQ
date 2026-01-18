@@ -10,7 +10,6 @@ export interface TokenPayload {
 }
 
 export function signToken(payload: TokenPayload) {
-  // persistent session (until logout)
   return jwt.sign(payload, JWT_SECRET);
 }
 

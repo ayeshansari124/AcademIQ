@@ -24,12 +24,13 @@ export function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/auth/student-login", req.url));
 
     return NextResponse.next();
-  } catch {
-    const res = NextResponse.redirect(
-      new URL("/auth/admin-login", req.url)
-    );
+  } catch(error) {
+    console.log("Middleware error:", error);
+    // const res = NextResponse.redirect(
+    //   new URL("/", req.url)
+    // );
     // res.cookies.delete("token");
-    return res;
+    // return res;
   }
 }
 

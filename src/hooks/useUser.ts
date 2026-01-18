@@ -1,6 +1,6 @@
-import { useAuth } from "./useAuth";
+// import { useAuth } from "./useAuth";
 
-export function useUser() {
-  const { user } = useAuth();
-  return user;
-}
+// export function useUser() {
+//   const { user } = useAuth();
+//   return user;
+// }
