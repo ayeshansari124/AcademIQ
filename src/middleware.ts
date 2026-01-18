@@ -28,7 +28,7 @@ export function middleware(req: NextRequest) {
     const res = NextResponse.redirect(
       new URL("/auth/admin-login", req.url)
     );
-    res.cookies.delete("token");
+    // res.cookies.delete("token");
     return res;
   }
 }

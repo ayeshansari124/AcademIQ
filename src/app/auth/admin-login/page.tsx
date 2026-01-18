@@ -24,8 +24,7 @@ export default function AdminLoginPage() {
     if (data.user.role !== "ADMIN")
       return toast.error("This login is for teachers only");
     toast.success("Welcome back");
-    setUser(data.user);
-    router.push("/admin/dashboard");
+    router.replace("/admin/dashboard");
   }
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6">
