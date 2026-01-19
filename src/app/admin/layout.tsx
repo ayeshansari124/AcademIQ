@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Header from "@/components/layout/Header";
-import AdminSidebar from "@/components/layout/AdminSidebar";
+import Sidebar from "@/components/layout/Sidebar";
+import{adminSidebarConfig } from "@/components/config/sidebar.config";
 
 export default function AdminLayout({
   children,
@@ -12,10 +13,16 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-50">
       <Header onMenuClick={() => setSidebarOpen(true)} />
-      <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      {children}
+
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        config={adminSidebarConfig}
+      />
+
+      <main>{children}</main>
     </div>
   );
 }

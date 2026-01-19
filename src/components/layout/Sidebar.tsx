@@ -2,39 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Users,
-  BookOpen,
-  ClipboardCheck,
-  BarChart3,
-  IndianRupee,
-  Bell,
-  NotebookText,
-  X,
-} from "lucide-react";
-
+import { X } from "lucide-react";
+import { SidebarConfig } from "@/components/config/sidebar.config";
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  config: SidebarConfig;
 }
 
-export default function AdminSidebar({ open, onClose }: Props) {
+export default function Sidebar({ open, onClose, config }: Props) {
   const pathname = usePathname();
-
- const items = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
-  { label: "Students", icon: Users, href: "/admin/students" },
-  { label: "Classes", icon: BookOpen, href: "/admin/classes" },
-  { label: "Attendance", icon: ClipboardCheck, href: "/admin/attendance" },
-  { label: "Marks", icon: BarChart3, href: "/admin/marks" },
-  { label: "Notifications", icon: Bell, href: "/admin/notifications" },
-  { label: "Assignments", icon: NotebookText, href: "/admin/assignments" },
-  { label: "Fees", icon: IndianRupee, href: "/admin/fees" },
-  { label: "Reports", icon: BarChart3, href: "/admin/reports" },
-];
-
 
   return (
     <>
@@ -56,9 +34,9 @@ export default function AdminSidebar({ open, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
           <div className="flex flex-col">
-            <h2 className="text-lg font-semibold">AcademIQ</h2>
+            <h2 className="text-lg font-semibold">{config.title}</h2>
             <span className="text-xs text-white/70">
-              Admin Dashboard
+              {config.subtitle}
             </span>
           </div>
           <X
@@ -69,7 +47,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
 
         {/* Menu */}
         <nav className="mt-4 space-y-1 px-3">
-          {items.map((item) => {
+          {config.items.map((item) => {
             const isActive = pathname.startsWith(item.href);
 
             return (
