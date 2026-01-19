@@ -9,8 +9,11 @@ import {
   ClipboardCheck,
   BarChart3,
   IndianRupee,
+  Bell,
+  NotebookText,
   X,
 } from "lucide-react";
+
 
 interface Props {
   open: boolean;
@@ -20,15 +23,18 @@ interface Props {
 export default function AdminSidebar({ open, onClose }: Props) {
   const pathname = usePathname();
 
-  const items = [
-    { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
-    { label: "Students", icon: Users, href: "/admin/students" },
-    { label: "Classes", icon: BookOpen, href: "/admin/classes" },
-    { label: "Attendance", icon: ClipboardCheck, href: "/admin/attendance" },
-    { label: "Marks", icon: BarChart3, href: "/admin/marks" },
-    { label: "Fees", icon: IndianRupee, href: "/admin/fees" },
-    { label: "Reports", icon: BarChart3, href: "/admin/reports" },
-  ];
+ const items = [
+  { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+  { label: "Students", icon: Users, href: "/admin/students" },
+  { label: "Classes", icon: BookOpen, href: "/admin/classes" },
+  { label: "Attendance", icon: ClipboardCheck, href: "/admin/attendance" },
+  { label: "Marks", icon: BarChart3, href: "/admin/marks" },
+  { label: "Notifications", icon: Bell, href: "/admin/notifications" },
+  { label: "Assignments", icon: NotebookText, href: "/admin/assignments" },
+  { label: "Fees", icon: IndianRupee, href: "/admin/fees" },
+  { label: "Reports", icon: BarChart3, href: "/admin/reports" },
+];
+
 
   return (
     <>

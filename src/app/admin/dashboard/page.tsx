@@ -1,10 +1,17 @@
 import Link from "next/link";
 import {
-  ClipboardCheck,Users, BookOpen,IndianRupee,BarChart3
+  ClipboardCheck,
+  Users,
+  BookOpen,
+  IndianRupee,
+  BarChart3,
+  Bell,
+  NotebookText,
 } from "lucide-react";
+import { title } from "process";
 
 export default async function AdminDashboard() {
- const tiles = [
+const tiles = [
   {
     title: "Students",
     icon: Users,
@@ -30,6 +37,18 @@ export default async function AdminDashboard() {
     href: "/admin/marks",
   },
   {
+    title: "Notifications",
+    icon: Bell,
+    color: "bg-purple-500",
+    href: "/admin/notifications",
+  },
+  {
+    title: "Assignments",
+    icon: NotebookText,
+    color: "bg-orange-500",
+    href: "/admin/assignments",
+  },
+  {
     title: "Fees",
     icon: IndianRupee,
     color: "bg-emerald-500",
@@ -42,7 +61,6 @@ export default async function AdminDashboard() {
     href: "/admin/reports",
   },
 ];
-
 
   return (
     <div>        
