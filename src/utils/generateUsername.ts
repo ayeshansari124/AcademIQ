@@ -1,17 +1,11 @@
-export function generateUsername(
-  fullName: string,
-  className?: string
-) {
+export function generateUsername(fullName: string): string {
   const base = fullName
     .toLowerCase()
-    .replace(/[^a-z]/g, "")
-    .slice(0, 6);
+    .trim()
+    .split(" ")[0]
+    .replace(/[^a-z]/g, "");
 
-  const suffix = Math.floor(1000 + Math.random() * 9000);
+  const randomNumber = Math.floor(10 + Math.random() * 90);
 
-  const classPart = className
-    ? className.toLowerCase().replace(/\s/g, "")
-    : "";
-
-  return `${base}${classPart}_${suffix}`;
+  return `${base}${randomNumber}`;
 }

@@ -5,7 +5,11 @@ export interface IStudent extends Document {
   fullName: string;
   parentName: string;
   phone: string;
-  classId: Types.ObjectId;
+  // classId: Types.ObjectId;
+  classId: string; //temp
+  subjects: string[];
+  days: string[];
+  monthlyFees: number;
   createdAt: Date;
 }
 
@@ -23,8 +27,24 @@ const StudentSchema = new Schema<IStudent>(
     phone: { type: String, required: true },
 
     classId: {
-      type: Schema.Types.ObjectId,
+      // type: Schema.Types.ObjectId,
+      type:String, //temp
       ref: "Class",
+      required: true,
+    },
+
+    subjects: {
+      type: [String],
+      required: true,
+    },
+
+    days: {
+      type: [String],
+      required: true,
+    },
+
+    monthlyFees: {
+      type: Number,
       required: true,
     },
   },
@@ -32,6 +52,7 @@ const StudentSchema = new Schema<IStudent>(
 );
 
 const Student: Model<IStudent> =
-  mongoose.models.Student || mongoose.model<IStudent>("Student", StudentSchema);
+  mongoose.models.Student ||
+  mongoose.model<IStudent>("Student", StudentSchema);
 
 export default Student;

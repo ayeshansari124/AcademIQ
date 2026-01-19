@@ -1,11 +1,11 @@
-export function generatePassword(length = 8) {
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#";
-  let password = "";
+export function generatePassword(fullName: string): string {
+  const base = fullName
+    .toLowerCase()
+    .trim()
+    .split(" ")[0]
+    .replace(/[^a-z]/g, "");
 
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
+  const randomNumber = Math.floor(10 + Math.random() * 90);
 
-  return password;
+  return `${base}@${randomNumber}`;
 }
