@@ -54,7 +54,7 @@ export default function StudentsPage() {
               className="block"
             >
               <div className="rounded-xl p-5 shadow-sm hover:shadow-neutral-500 transition cursor-pointer">
-                <h3 className="text-lg font-semibold text-slate-800">
+                <h3 className="text-lg font-semibold text-blue-800">
                   {student.fullName}
                 </h3>
 

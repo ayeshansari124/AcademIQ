@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db";
-
+import mongoose from "mongoose";
 import User from "@/models/User";
 import Student from "@/models/Student";
 
@@ -8,7 +8,7 @@ import { generateUsername } from "@/utils/generateUsername";
 import { generatePassword } from "@/utils/generatePassword";
 
 //GET STUDENT BY ID
-export async function getStudentById(studentId: string) {
+export async function getStudentByUserId(studentId: string) {
   await connectDB();
 
   const student = await Student.findById(studentId).populate(
@@ -22,6 +22,21 @@ export async function getStudentById(studentId: string) {
 
   return student;
 }
+
+export async function getStudentByStudentId(userId: string) {
+  await connectDB();
+
+  const student = await Student.findOne({
+    userId: new mongoose.Types.ObjectId(userId),
+  });
+
+  if (!student) {
+    throw new Error("STUDENT_NOT_FOUND");
+  }
+
+  return student;
+}
+
 
 //GET ALL STUDENTS
 export async function getAllStudents() {

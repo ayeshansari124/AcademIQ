@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStudentById } from "@/services/student.service";
+import { getStudentByUserId } from "@/services/student.service";
 
 export async function GET(
   req: Request,
@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { id } = await context.params;
 
-    const student = await getStudentById(id);
+    const student = await getStudentByUserId(id);
 
     return NextResponse.json({ student });
   } catch (error: any) {
