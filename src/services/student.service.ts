@@ -23,13 +23,9 @@ export async function getStudentByUserId(studentId: string) {
   return student;
 }
 
-
-export async function getStudentByStudentId(userId: string) {
-  await connectDB();
-
-  const student = await Student.findOne({
-    userId: new mongoose.Types.ObjectId(userId),
-  });
+export async function getStudentById(studentId: string) {
+  const student = await Student.findById(studentId)
+    .populate("class", "name");
 
   if (!student) {
     throw new Error("STUDENT_NOT_FOUND");
@@ -37,6 +33,18 @@ export async function getStudentByStudentId(userId: string) {
 
   return student;
 }
+
+export async function getStudentByStudentId(userId: string) {
+  const student = await Student.findOne({ userId })
+    .populate("class", "name"); // 👈 THIS IS THE FIX
+
+  if (!student) {
+    throw new Error("STUDENT_NOT_FOUND");
+  }
+
+  return student;
+}
+
 
 
 //GET ALL STUDENTS

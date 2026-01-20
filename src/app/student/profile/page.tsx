@@ -62,9 +62,10 @@ export default function StudentProfilePage() {
       <Section title="Academic Information">
         <InfoGrid>
           <Info
-            label="Class / Batch"
-            value={student.classId}
-          />
+  label="Class / Batch"
+  value={student.class?.name}
+/>
+
           <Info
             label="Subjects"
             value={student.subjects?.join(", ")}
