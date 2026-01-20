@@ -8,10 +8,14 @@ import AttendanceTab from "./tabs/AttendanceTab";
 import MarksTab from "./tabs/MarksTab";
 import FeesTab from "./tabs/FeesTab";
 import AssignmentsTab from "./tabs/AssignmentsTab";
+import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const TABS = ["Overview", "Attendance", "Marks", "Fees", "Assignments"] as const;
 
 export default function StudentProfilePage() {
+  const router = useRouter();
   const { id } = useParams();
   const [student, setStudent] = useState<any>(null);
   const [activeTab, setActiveTab] =
@@ -41,17 +45,52 @@ export default function StudentProfilePage() {
     Assignments: <AssignmentsTab />,
   };
 
+  async function handleDelete() {
+  const confirmed = confirm(
+    "Are you sure you want to delete this student? This action cannot be undone."
+  );
+
+  if (!confirmed) return;
+
+  const res = await fetch(`/api/admin/students/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    toast.error(data.error || "Failed to delete student");
+    return;
+  }
+
+  toast.success("Student deleted");
+  router.push("/admin/students");
+}
+
+
   return (
     <div className="p-6 space-y-6 max-w-3xl mx-auto">
       {/* Header */}
-      <div className="rounded-xl px-6 py-5 shadow-sm">
-        <h1 className="text-xl font-semibold text-blue-900">
-          {student.fullName}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Student Profile
-        </p>
-      </div>
+     <div className="flex items-center justify-between rounded-xl px-6 py-5 shadow-sm">
+  <div>
+    <h1 className="text-xl font-semibold text-blue-900">
+      {student.fullName}
+    </h1>
+    <p className="mt-1 text-sm text-slate-500">
+      Student Profile
+    </p>
+  </div>
+
+  <button
+    onClick={handleDelete}
+    className="rounded-lg p-2 text-red-600 hover:bg-red-50"
+    title="Delete student"
+  >
+    <Trash2 size={18} />
+  </button>
+</div>
+
 
       {/* Tabs */}
       <div className="overflow-x-auto no-scrollbar">

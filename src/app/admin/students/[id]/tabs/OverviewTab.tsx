@@ -24,8 +24,11 @@ export default function OverviewTab({ student }: { student: any }) {
 
       <Section title="Academic Information">
           <InfoGrid>
-            <Info 
-            label="Class / Batch" value={student.classId} />
+            <Info
+  label="Class / Batch"
+  value={student.class?.name || "—"}
+/>
+
             <Info label="Subjects" value={student.subjects?.join(", ")} />
             <Info label="Days Attending" value={student.days?.join(", ")} />
           </InfoGrid>

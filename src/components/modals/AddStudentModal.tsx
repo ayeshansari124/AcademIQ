@@ -46,15 +46,16 @@ const [subjects, setSubjects] = useState<string[]>([]);
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (
-      !form.fullName ||
-      !form.parentName ||
-      !form.phone ||
-      !form.classId ||
-      !form.subjects ||
-      !days.length ||
-      !form.monthlyFees
-    ) {
+   if (
+  !form.fullName ||
+  !form.parentName ||
+  !form.phone ||
+  !form.classId ||
+  subjects.length === 0 || // ✅ CORRECT
+  days.length === 0 ||
+  !form.monthlyFees
+) {
+
       toast.error("All fields are required");
       return;
     }
@@ -66,12 +67,15 @@ const [subjects, setSubjects] = useState<string[]>([]);
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({
-        ...form,
-        subjects: subjects.map((s) => s.trim()),
-        days,
-        monthlyFees: Number(form.monthlyFees),
-      }),
+     body: JSON.stringify({
+  fullName: form.fullName,
+  parentName: form.parentName,
+  phone: form.phone,
+  classId: form.classId,
+  subjects, // ✅ from state
+  days,
+  monthlyFees: Number(form.monthlyFees),
+}),
     });
 
     const data = await res.json();
@@ -91,8 +95,8 @@ const [subjects, setSubjects] = useState<string[]>([]);
     <>
       <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
 
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto">
+        <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-lg font-semibold">
               Add Student

@@ -32,7 +32,7 @@ export default function StudentsPage() {
 
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
         >
           <Plus className="h-4 w-4" />
           Add Student
@@ -42,7 +42,7 @@ export default function StudentsPage() {
       {loading ? (
         <p className="text-slate-500">Loading students...</p>
       ) : students.length === 0 ? (
-        <div className="rounded-lg border border-dashed  p-10 text-center text-slate-500">
+        <div className="rounded-lg border border-dashed  p-10 text-center text-slate-800">
           No students added yet
         </div>
       ) : (
@@ -57,23 +57,6 @@ export default function StudentsPage() {
                 <h3 className="text-lg font-semibold text-blue-800">
                   {student.fullName}
                 </h3>
-
-                <p className="text-sm text-slate-500">
-                  Class: {student.classId}
-                </p>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Parent: {student.parentName}
-                </p>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Phone: {student.phone}
-                </p>
-
-                <div className="mt-4 flex justify-between text-xs text-slate-500">
-                  <span>Fees: ₹{student.monthlyFees}</span>
-                  <span className="font-mono">{student.userId?.username}</span>
-                </div>
               </div>
             </Link>
           ))}

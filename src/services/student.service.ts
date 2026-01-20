@@ -12,10 +12,9 @@ import { generatePassword } from "@/utils/generatePassword";
 export async function getStudentByUserId(studentId: string) {
   await connectDB();
 
-  const student = await Student.findById(studentId).populate(
-    "userId",
-    "username role"
-  );
+  const student = await Student.findById(studentId)
+    .populate("userId", "username role")
+    .populate("class", "name"); // ✅ THIS FIXES IT
 
   if (!student) {
     throw new Error("STUDENT_NOT_FOUND");
@@ -23,6 +22,7 @@ export async function getStudentByUserId(studentId: string) {
 
   return student;
 }
+
 
 export async function getStudentByStudentId(userId: string) {
   await connectDB();

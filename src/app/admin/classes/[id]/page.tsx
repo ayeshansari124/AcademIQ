@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -52,7 +52,7 @@ export default function ClassProfilePage() {
       {/* Header */}
       
       <div className="mb-6 flex items-center justify-between rounded-xl p-4 shadow-lg">
-  <h1 className="text-xl font-bold text-blue-600">
+  <h1 className="text-xl font-bold text-blue-900">
     {cls.name}
   </h1>
 
@@ -68,16 +68,16 @@ export default function ClassProfilePage() {
        
        {/* Subjects */}       
  <div className="rounded-xl  p-4 shadow-lg">
-        <h2 className=" font-bold text-xl text-blue-600">Subjects:<p className="mt-2  text-sm text-slate-500">
+        <h2 className=" font-bold text-xl text-blue-900">Subjects:<p className="mt-2  text-sm text-slate-500">
             {cls.subjects.join(", ")}
           </p> </h2>
         </div>
       {/* Info */}
       <div className="rounded-xl  p-6 shadow-lg">
-        <h2 className="mb-4 font-bold text-xl text-blue-600">Students</h2>
+        <h2 className="mb-4 font-bold text-xl text-blue-900">Students</h2>
 
         {cls.students.length === 0 && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 ">
             No students enrolled
           </p>
         )}
@@ -85,11 +85,17 @@ export default function ClassProfilePage() {
         <ul className="space-y-2">
           {cls.students.map((s: any) => (
             <li
-              key={s._id}
-              className="rounded-lg border px-4 py-2"
-            >
-              {s.fullName}
-            </li>
+  key={s._id}
+  className="rounded-lg px-4 py-2 hover:bg-slate-50"
+>
+  <Link
+    href={`/admin/students/${s._id}`}
+    className="text-slate-700 hover:underline"
+  >
+    {s.fullName}
+  </Link>
+</li>
+
           ))}
         </ul>
       </div>

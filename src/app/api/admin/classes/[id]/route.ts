@@ -1,12 +1,15 @@
 import connectDB from "@/lib/db";
 import ClassModel from "@/models/Class";
+import "@/models/Student";
 
 export async function GET(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
-    const { id } = await context.params;
+
+  const { id } = await context.params; // ✅ REQUIRED
+
   const cls = await ClassModel.findById(id).populate(
     "students",
     "fullName"
@@ -24,7 +27,9 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
-const { id } = await context.params;
+
+  const { id } = await context.params; // ✅ REQUIRED
+
   const cls = await ClassModel.findById(id);
 
   if (!cls) {
