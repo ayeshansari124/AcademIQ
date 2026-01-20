@@ -5,8 +5,7 @@ export interface IStudent extends Document {
   fullName: string;
   parentName: string;
   phone: string;
-  // classId: Types.ObjectId;
-  classId: string; //temp
+  class: Types.ObjectId;
   subjects: string[];
   days: string[];
   monthlyFees: number;
@@ -26,9 +25,8 @@ const StudentSchema = new Schema<IStudent>(
     parentName: { type: String, required: true },
     phone: { type: String, required: true },
 
-    classId: {
-      // type: Schema.Types.ObjectId,
-      type:String, //temp
+    class: {
+      type: Schema.Types.ObjectId,
       ref: "Class",
       required: true,
     },

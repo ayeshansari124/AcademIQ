@@ -42,7 +42,7 @@ export default function StudentsPage() {
       {loading ? (
         <p className="text-slate-500">Loading students...</p>
       ) : students.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 p-10 text-center text-slate-500">
+        <div className="rounded-lg border border-dashed  p-10 text-center text-slate-500">
           No students added yet
         </div>
       ) : (

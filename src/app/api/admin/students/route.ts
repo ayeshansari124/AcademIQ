@@ -13,11 +13,10 @@ export async function POST(req: Request) {
     return NextResponse.json({
       message: "Student created successfully",
       student: {
-        id: student._id,
-        fullName: student.fullName,
-        classId: student.classId,
-      },
-      credentials,
+  id: student._id,
+  fullName: student.fullName,
+  class: student.class,
+},     credentials,
     });
   } catch (error: any) {
     if (error.message === "VALIDATION_ERROR") {

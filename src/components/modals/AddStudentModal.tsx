@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import FormInput from "@/components/ui/FormInput";
@@ -14,6 +14,9 @@ export default function AddStudentModal({
   onClose: () => void;
   onSuccess: (creds: { username: string; password: string }) => void;
 }) {
+  const [classes, setClasses] = useState<any[]>([]);
+const [selectedClass, setSelectedClass] = useState<any>(null);
+const [subjects, setSubjects] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [days, setDays] = useState<string[]>([]);
   const [form, setForm] = useState({
@@ -24,6 +27,13 @@ export default function AddStudentModal({
     subjects: "",
     monthlyFees: "",
   });
+
+  useEffect(() => {
+  fetch("/api/admin/classes")
+    .then(res => res.json())
+    .then(data => setClasses(data.classes));
+}, []);
+
 
   function toggleDay(day: string) {
     setDays((prev) =>
@@ -58,7 +68,7 @@ export default function AddStudentModal({
       credentials: "include",
       body: JSON.stringify({
         ...form,
-        subjects: form.subjects.split(",").map((s) => s.trim()),
+        subjects: subjects.map((s) => s.trim()),
         days,
         monthlyFees: Number(form.monthlyFees),
       }),
@@ -103,11 +113,54 @@ export default function AddStudentModal({
             <FormInput label="Phone Number" value={form.phone}
               onChange={(v) => setForm({ ...form, phone: v })} />
 
-            <FormInput label="Class / Batch" value={form.classId}
-              onChange={(v) => setForm({ ...form, classId: v })} />
+            <label className="text-sm font-medium">Class</label>
+<select
+  value={form.classId}
+  onChange={(e) => {
+    const cls = classes.find(c => c._id === e.target.value);
+    setSelectedClass(cls);
+    setSubjects([]);
+    setForm({ ...form, classId: e.target.value });
+  }}
+  className="w-full rounded-lg border px-3 py-2"
+>
+  <option value="">Select Class</option>
+  {classes.map(cls => (
+    <option key={cls._id} value={cls._id}>
+      {cls.name}
+    </option>
+  ))}
+</select>
 
-            <FormInput label="Subjects (comma separated)" value={form.subjects}
-              onChange={(v) => setForm({ ...form, subjects: v })} />
+
+            {selectedClass && (
+  <div>
+    <label className="text-sm font-medium">Subjects</label>
+    <div className="flex flex-wrap gap-2">
+      {selectedClass.subjects.map((sub: string) => (
+        <button
+          key={sub}
+          type="button"
+          onClick={() =>
+            setSubjects(prev =>
+              prev.includes(sub)
+                ? prev.filter(s => s !== sub)
+                : [...prev, sub]
+            )
+          }
+          className={`rounded-md border px-3 py-1 ${
+            subjects.includes(sub)
+              ? "bg-blue-600 text-white"
+              : ""
+          }`}
+        >
+          {sub}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+
 
             <div>
               <label className="mb-2 block text-sm font-medium">

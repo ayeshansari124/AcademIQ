@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import mongoose from "mongoose";
 import User from "@/models/User";
 import Student from "@/models/Student";
+import ClassModel from "@/models/Class";
 
 import { generateUsername } from "@/utils/generateUsername";
 import { generatePassword } from "@/utils/generatePassword";
@@ -71,7 +72,7 @@ export async function createStudent(data: CreateStudentInput) {
     monthlyFees,
   } = data;
 
-  // 1️⃣ Validation
+  // 1️⃣ Basic validation
   if (
     !fullName ||
     !parentName ||
@@ -84,7 +85,22 @@ export async function createStudent(data: CreateStudentInput) {
     throw new Error("VALIDATION_ERROR");
   }
 
-  // Generate unique username
+  // 2️⃣ Find the class
+  const cls = await ClassModel.findById(classId);
+  if (!cls) {
+    throw new Error("CLASS_NOT_FOUND");
+  }
+
+  // 3️⃣ Validate subjects belong to class
+  const invalidSubject = subjects.some(
+    (sub) => !cls.subjects.includes(sub)
+  );
+
+  if (invalidSubject) {
+    throw new Error("INVALID_SUBJECT");
+  }
+
+  // 4️⃣ Generate unique username
   let username = generateUsername(fullName);
   let exists = await User.findOne({ username });
 
@@ -93,11 +109,11 @@ export async function createStudent(data: CreateStudentInput) {
     exists = await User.findOne({ username });
   }
 
-  // Generate password
+  // 5️⃣ Generate password
   const plainPassword = generatePassword(fullName);
   const passwordHash = await bcrypt.hash(plainPassword, 10);
 
-  // Create User
+  // 6️⃣ Create User
   const user = await User.create({
     name: fullName,
     username,
@@ -105,17 +121,21 @@ export async function createStudent(data: CreateStudentInput) {
     role: "STUDENT",
   });
 
-  // Create Student
+  // 7️⃣ Create Student (NOTICE `class`, NOT `classId`)
   const student = await Student.create({
     userId: user._id,
     fullName,
     parentName,
     phone,
-    classId,
+    class: cls._id,
     subjects,
     days,
     monthlyFees,
   });
+
+  // 8️⃣ VERY IMPORTANT: push student into class
+  cls.students.push(student._id);
+  await cls.save();
 
   return {
     student,
@@ -125,3 +145,4 @@ export async function createStudent(data: CreateStudentInput) {
     },
   };
 }
+

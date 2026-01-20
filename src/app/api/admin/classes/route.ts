@@ -1,0 +1,20 @@
+import connectDB from "@/lib/db";
+import ClassModel from "@/models/Class";
+
+export async function GET() {
+  await connectDB();
+  const classes = await ClassModel.find();
+  return Response.json({ classes });
+}
+
+export async function POST(req: Request) {
+  await connectDB();
+  const { name, subjects } = await req.json();
+
+  if (!name || !subjects?.length) {
+    return Response.json({ error: "Invalid data" }, { status: 400 });
+  }
+
+  const cls = await ClassModel.create({ name, subjects });
+  return Response.json({ class: cls });
+}
