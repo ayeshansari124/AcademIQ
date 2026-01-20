@@ -1,44 +1,47 @@
-import mongoose, { Schema, Document, Model, Types } from "mongoose";
-
-export type AttendanceStatus = "PRESENT" | "ABSENT";
+import mongoose, { Schema, Types, Document } from "mongoose";
 
 export interface IAttendance extends Document {
-  studentId: Types.ObjectId;
-  classId: Types.ObjectId;
-  date: Date;
-  status: AttendanceStatus;
+  class: Types.ObjectId;
+  date: string;
+  records: {
+    student: Types.ObjectId;
+    status: "PRESENT" | "ABSENT";
+  }[];
 }
 
 const AttendanceSchema = new Schema<IAttendance>(
   {
-    studentId: {
-      type: Schema.Types.ObjectId,
-      ref: "Student",
-      required: true,
-    },
-
-    classId: {
+    class: {
       type: Schema.Types.ObjectId,
       ref: "Class",
       required: true,
     },
 
-    date: { type: Date, required: true },
-
-    status: {
+    date: {
       type: String,
-      enum: ["PRESENT", "ABSENT"],
       required: true,
     },
+
+    records: [
+      {
+        student: {
+          type: Schema.Types.ObjectId,
+          ref: "Student",
+          required: true,
+        },
+        status: {
+          type: String,
+          enum: ["PRESENT", "ABSENT"],
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
 
-// prevent duplicate attendance for same day
-AttendanceSchema.index({ studentId: 1, date: 1 }, { unique: true });
+// 🔒 Prevent duplicate attendance for same class + date
+AttendanceSchema.index({ class: 1, date: 1 }, { unique: true });
 
-const Attendance: Model<IAttendance> =
-  mongoose.models.Attendance ||
+export default mongoose.models.Attendance ||
   mongoose.model<IAttendance>("Attendance", AttendanceSchema);
-
-export default Attendance;

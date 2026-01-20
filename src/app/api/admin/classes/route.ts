@@ -1,9 +1,13 @@
 import connectDB from "@/lib/db";
 import ClassModel from "@/models/Class";
+import "@/models/Student";
 
 export async function GET() {
   await connectDB();
-  const classes = await ClassModel.find();
+
+  const classes = await ClassModel.find()
+    .populate("students", "fullName days");
+
   return Response.json({ classes });
 }
 

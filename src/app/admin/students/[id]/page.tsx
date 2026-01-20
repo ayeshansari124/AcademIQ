@@ -39,7 +39,7 @@ export default function StudentProfilePage() {
 
   const TAB_COMPONENTS: Record<string, ReactNode> = {
     Overview: <OverviewTab student={student} />,
-    Attendance: <AttendanceTab student={student} />,
+    Attendance: <AttendanceTab studentId={student._id} />,
     Marks: <MarksTab student={student} />,
     Fees: <FeesTab student={student} />,
     Assignments: <AssignmentsTab />,
