@@ -17,17 +17,16 @@ async function handleAbsentNotification(student: any, date: string) {
     message: `You were marked absent on ${date}.`,
   });
 
-  // Push notification
-  const sub = await PushSubscription.findOne({
-    userId: student.userId,
-  });
+  // Push notification for absent
+ const sub = await PushSubscription.findOne({ userId: student.userId });
 
-  if (sub) {
-    await sendPush(sub.subscription, {
-      title: "Absent Marked",
-      body: `You were marked absent on ${date}.`,
-    });
-  }
+if (sub) {
+  await sendPush(sub.subscription, {
+    title: "Absent Marked",
+    body: `You were marked absent on ${date}`,
+  });
+}
+
 }
 
 async function handleLowAttendance(
@@ -60,21 +59,19 @@ async function handleLowAttendance(
     message,
   });
 
-  // Push notification
-  const sub = await PushSubscription.findOne({
-    userId: student.userId,
-  });
+  // Push notification for low attendance
+  const sub = await PushSubscription.findOne({ userId: student.userId });
 
-  if (sub) {
-    await sendPush(sub.subscription, {
-      title: "Low Attendance Alert",
-      body:
-        percentage < 60
+if (sub) {
+  await sendPush(sub.subscription, {
+    title: "Low Attendance Alert",
+    body: percentage < 60
           ? "Your attendance is critically low (below 60%)."
           : "Your attendance has fallen below 75%.",
-    });
-  }
+  });
 }
+
+ }
 
 //MAIN SERVICE
 

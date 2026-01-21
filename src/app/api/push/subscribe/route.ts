@@ -5,17 +5,16 @@ import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   await connectDB();
-
-  const subscription = await req.json();
-  const cookieStore= await cookies();
+ const cookieStore= await cookies();
   const token = cookieStore.get("token")?.value;
   if (!token) return Response.json({}, { status: 401 });
 
   const payload: any = jwt.verify(token, process.env.JWT_SECRET!);
+  const body = await req.json();
 
   await PushSubscription.findOneAndUpdate(
     { userId: payload.userId },
-    { subscription },
+    { userId: payload.userId, subscription: body },
     { upsert: true }
   );
 

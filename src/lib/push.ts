@@ -1,16 +1,13 @@
-import webPush from "web-push";
+import webpush from "web-push";
 
-webPush.setVapidDetails(
-  "mailto:admin@academiq.com",
-  process.env.VAPID_PUBLIC_KEY!,
+webpush.setVapidDetails(
+  process.env.VAPID_SUBJECT!,
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!
 );
 
-export async function sendPush(
-  subscription: any,
-  payload: { title: string; body: string }
-) {
-  await webPush.sendNotification(
+export async function sendPush(subscription: any, payload: any) {
+  await webpush.sendNotification(
     subscription,
     JSON.stringify(payload)
   );
