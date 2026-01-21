@@ -4,6 +4,7 @@ import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import { studentSidebarConfig } from "@/components/config/sidebar.config";
+import { useBrowserNotifications } from "@/hooks/useBrowserNotifications";
 
 export default function StudentLayout({
   children,
@@ -11,7 +12,7 @@ export default function StudentLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+ useBrowserNotifications();
   return (
     <div className="min-h-screen bg-slate-50">
       <Header onMenuClick={() => setSidebarOpen(true)} />
