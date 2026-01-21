@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { registerPush } from "@/lib/push-client";
 
 export default function StudentNotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -17,14 +16,6 @@ export default function StudentNotificationsPage() {
       })
       .finally(() => setLoading(false));
   }, []);
-
-  //  useEffect(() => {
-  //   Notification.requestPermission().then(p => {
-  //     if (p === "granted") {
-  //       registerPush().catch(console.error);
-  //     }
-  //   });
-  // }, []);
 
   if (loading) {
     return (

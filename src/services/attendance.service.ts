@@ -4,19 +4,21 @@ import Student from "@/models/Student";
 import Notification from "@/models/Notification";
 import PushSubscription from "@/models/PushSubscription";
 import { sendPush } from "@/lib/push";
+import createUserNotification from "@/services/notification.service"
 
 const MIN_ATTENDANCE_PERCENTAGE = 75;
 
 //HELPERS
 
-async function handleAbsentNotification(student: any, date: string) {
+async function handleAbsentNotification(student: any, date: string, classId:String) {
   // DB notification
-  await Notification.create({
-    userId: student.userId,
-    scope:"USER",
-    title: "Absent Marked",
-    message: `You were marked absent on ${date}.`,
-  });
+   await createUserNotification({
+      userId: student.userId,
+      type: "ABSENT",
+      title: "Absent Marked",
+      message: `You were marked absent on ${date}.`,
+      metadata: { date, classId },
+    });
 
   // Push notification for absent
  const sub = await PushSubscription.findOne({ userId: student.userId });
@@ -40,7 +42,7 @@ async function handleLowAttendance(
   // Prevent spam: check last alert
   const lastAlert = await Notification.findOne({
     userId: student.userId,
-    title: "Low Attendance Alert",
+    type:"LOW_ATTENDANCE"
   }).sort({ createdAt: -1 });
 
   const shouldNotify =
@@ -54,12 +56,16 @@ async function handleLowAttendance(
       : "⚠️ Your attendance has fallen below the required 75%.";
 
   // DB notification
-  await Notification.create({
-    userId: student.userId,
-    scope:"USER",
-    title: "Low Attendance Alert",
-    message,
-  });
+ await createUserNotification({
+        userId: student.userId,
+        type: "LOW_ATTENDANCE",
+        title: "⚠️ Low Attendance Alert",
+        message:
+          percentage < 60
+            ? "Attendance critically low (below 60%)."
+            : "Attendance below required 75%.",
+        metadata: { percentage },
+      });
 
   // Push notification for low attendance
   const sub = await PushSubscription.findOne({ userId: student.userId });
@@ -127,7 +133,7 @@ export async function markAttendance({
 
     // ABSENT → notify immediately
     if (record.status === "ABSENT") {
-      await handleAbsentNotification(student, date);
+      await handleAbsentNotification(student, date, classId);
     }
 
     // 3️⃣ Recalculate attendance %
