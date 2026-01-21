@@ -17,7 +17,8 @@ export default function StudentLayout({
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js");
     }
-  }, []); useEffect(() => {
+  }, []);
+   useEffect(() => {
     registerPush();
   }, []);
 

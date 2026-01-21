@@ -15,9 +15,16 @@ export async function GET() {
 
   const payload: any = jwt.verify(token, JWT_SECRET);
 
-  const notifications = await Notification.find({
-    userId: payload.userId,
-  }).sort({ createdAt: -1 });
+ const notifications = await Notification.find({
+  $or: [
+    { scope: "ALL" },
+    { userId: payload.userId },
+  ],
+})
+.sort({ createdAt: -1 })
+.limit(50);
+
+
 
   return Response.json({ notifications });
 }

@@ -13,6 +13,7 @@ async function handleAbsentNotification(student: any, date: string) {
   // DB notification
   await Notification.create({
     userId: student.userId,
+    scope:"USER",
     title: "Absent Marked",
     message: `You were marked absent on ${date}.`,
   });
@@ -55,6 +56,7 @@ async function handleLowAttendance(
   // DB notification
   await Notification.create({
     userId: student.userId,
+    scope:"USER",
     title: "Low Attendance Alert",
     message,
   });

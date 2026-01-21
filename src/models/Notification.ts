@@ -4,17 +4,27 @@ const NotificationSchema = new Schema(
   {
     userId: {
       type: Types.ObjectId,
-      required: true,
+      ref: "User",
+      default: null, // null = broadcast
       index: true,
     },
+
+    scope: {
+      type: String,
+      enum: ["USER", "ALL"],
+      required: true,
+    },
+
     title: {
       type: String,
       required: true,
     },
+
     message: {
       type: String,
       required: true,
     },
+
     isRead: {
       type: Boolean,
       default: false,

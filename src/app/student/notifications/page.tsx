@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { registerPush } from "@/lib/push-client";
 
 export default function StudentNotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -16,6 +17,14 @@ export default function StudentNotificationsPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  //  useEffect(() => {
+  //   Notification.requestPermission().then(p => {
+  //     if (p === "granted") {
+  //       registerPush().catch(console.error);
+  //     }
+  //   });
+  // }, []);
 
   if (loading) {
     return (
@@ -36,27 +45,27 @@ export default function StudentNotificationsPage() {
           No notifications yet.
         </p>
       ) : (
-        <div className="space-y-3">
-          {notifications.map((n) => (
-            <div
-              key={n._id}
-              className="rounded-lg border p-4 bg-white"
-            >
-              <div className="flex justify-between items-start">
-                <h2 className="font-semibold text-sm">
-                  {n.title}
-                </h2>
-                <span className="text-xs text-slate-500">
-                  {new Date(n.createdAt).toLocaleString()}
-                </span>
-              </div>
+       <div className="space-y-3">
+  {notifications.map((n) => (
+    <div
+      key={n._id}
+      className="rounded-lg border p-4 bg-white"
+    >
+      <div className="flex justify-between items-start">
+        <h2 className="font-semibold text-sm">
+          {n.title}
+        </h2>
+        <span className="text-xs text-slate-500">
+          {new Date(n.createdAt).toLocaleString()}
+        </span>
+      </div>
 
-              <p className="text-sm text-slate-700 mt-1">
-                {n.message}
-              </p>
-            </div>
-          ))}
-        </div>
+      <p className="text-sm text-slate-700 mt-1">
+        {n.message}
+      </p>
+    </div>
+  ))}
+</div>
       )}
     </div>
   );
