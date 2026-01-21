@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { loginUser } from "@/services/auth.service";
+import {subscribeToPush }from "@/lib/push-client"
 
 export async function POST(req: Request) {
   await connectDB();
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
-
+  subscribeToPush();
   return res;
 }
 

@@ -2,10 +2,83 @@ import Attendance from "@/models/Attendance";
 import ClassModel from "@/models/Class";
 import Student from "@/models/Student";
 import Notification from "@/models/Notification";
+import PushSubscription from "@/models/PushSubscription";
+import { sendPush } from "@/lib/push";
 
 const MIN_ATTENDANCE_PERCENTAGE = 75;
 
-//admin: mark attendance
+//HELPERS
+
+async function handleAbsentNotification(student: any, date: string) {
+  // DB notification
+  await Notification.create({
+    userId: student.userId,
+    title: "Absent Marked",
+    message: `You were marked absent on ${date}.`,
+  });
+
+  // Push notification
+  const sub = await PushSubscription.findOne({
+    userId: student.userId,
+  });
+
+  if (sub) {
+    await sendPush(sub.subscription, {
+      title: "Absent Marked",
+      body: `You were marked absent on ${date}.`,
+    });
+  }
+}
+
+async function handleLowAttendance(
+  student: any,
+  percentage: number,
+  attendanceUpdatedAt: Date,
+) {
+  if (percentage >= MIN_ATTENDANCE_PERCENTAGE) return;
+
+  // Prevent spam: check last alert
+  const lastAlert = await Notification.findOne({
+    userId: student.userId,
+    title: "Low Attendance Alert",
+  }).sort({ createdAt: -1 });
+
+  const shouldNotify =
+    !lastAlert || lastAlert.createdAt < attendanceUpdatedAt;
+
+  if (!shouldNotify) return;
+
+  const message =
+    percentage < 60
+      ? "⚠️ Your attendance is critically low (below 60%). Immediate action required."
+      : "⚠️ Your attendance has fallen below the required 75%.";
+
+  // DB notification
+  await Notification.create({
+    userId: student.userId,
+    title: "Low Attendance Alert",
+    message,
+  });
+
+  // Push notification
+  const sub = await PushSubscription.findOne({
+    userId: student.userId,
+  });
+
+  if (sub) {
+    await sendPush(sub.subscription, {
+      title: "Low Attendance Alert",
+      body:
+        percentage < 60
+          ? "Your attendance is critically low (below 60%)."
+          : "Your attendance has fallen below 75%.",
+    });
+  }
+}
+
+//MAIN SERVICE
+
+// Admin: mark attendance
 export async function markAttendance({
   classId,
   date,
@@ -15,7 +88,7 @@ export async function markAttendance({
   date: string;
   records: { student: any; status: "PRESENT" | "ABSENT" }[];
 }) {
-  if (!classId || !date || !records || records.length === 0) {
+  if (!classId || !date || !records?.length) {
     throw new Error("INVALID_DATA");
   }
 
@@ -38,12 +111,14 @@ export async function markAttendance({
     { upsert: true, new: true },
   );
 
-  // 2️⃣ Process students once
+  // 2️⃣ Process each student once
   const processed = new Set<string>();
 
   for (const record of records) {
     const studentId =
-      typeof record.student === "string" ? record.student : record.student?._id;
+      typeof record.student === "string"
+        ? record.student
+        : record.student?._id;
 
     if (!studentId || processed.has(studentId)) continue;
     processed.add(studentId);
@@ -51,16 +126,12 @@ export async function markAttendance({
     const student = await Student.findById(studentId);
     if (!student) continue;
 
-    // ABSENT notification
+    // ABSENT → notify immediately
     if (record.status === "ABSENT") {
-      await Notification.create({
-        userId: student.userId,
-        title: "Absent Marked",
-        message: `You were marked absent on ${date}.`,
-      });
+      await handleAbsentNotification(student, date);
     }
 
-    // 3️ Recalculate attendance %
+    // 3️⃣ Recalculate attendance %
     const attendanceDocs = await Attendance.find({
       "records.student": student._id,
     });
@@ -78,33 +149,23 @@ export async function markAttendance({
     });
 
     const total = present + absent;
-    const percentage = total === 0 ? 100 : Math.round((present / total) * 100);
+    const percentage =
+      total === 0 ? 100 : Math.round((present / total) * 100);
 
-    // 🔔 LOW ATTENDANCE ALERT
-    const lastAlert = await Notification.findOne({
-      userId: student.userId,
-      title: "Low Attendance Alert",
-    }).sort({ createdAt: -1 });
-
-    const wasPreviouslyAbove =
-      !lastAlert || lastAlert.createdAt < attendance.updatedAt;
-
-    if (percentage < MIN_ATTENDANCE_PERCENTAGE && wasPreviouslyAbove) {
-      await Notification.create({
-        userId: student.userId,
-        title: "Low Attendance Alert",
-        message:
-          percentage < 60
-            ? "⚠️ Your attendance is critically low (below 60%). Immediate action required."
-            : "⚠️ Your attendance has fallen below the required 75%.",
-      });
-    }
+    // LOW ATTENDANCE → handled cleanly
+    await handleLowAttendance(
+      student,
+      percentage,
+      attendance.updatedAt,
+    );
   }
 
   return attendance;
 }
 
-//admin: get class attendance
+//READ OPERATIONS
+
+// Admin: get class attendance
 export async function getClassAttendance({
   classId,
   date,
@@ -122,7 +183,7 @@ export async function getClassAttendance({
   }).populate("records.student", "fullName");
 }
 
-//student attendance report
+// Student: attendance report
 export async function getStudentAttendanceReport(userId: string) {
   const student = await Student.findOne({ userId });
   if (!student) throw new Error("STUDENT_NOT_FOUND");
@@ -143,10 +204,7 @@ export async function getStudentAttendanceReport(userId: string) {
     );
     if (!record) return;
 
-    daily.push({
-      date: doc.date,
-      status: record.status,
-    });
+    daily.push({ date: doc.date, status: record.status });
 
     const month = doc.date.slice(0, 7);
     monthly[month] ??= { present: 0, total: 0 };
@@ -161,7 +219,8 @@ export async function getStudentAttendanceReport(userId: string) {
   });
 
   const total = present + absent;
-  const percentage = total === 0 ? 100 : Math.round((present / total) * 100);
+  const percentage =
+    total === 0 ? 100 : Math.round((present / total) * 100);
 
   return {
     student: {
