@@ -47,7 +47,7 @@ export default function AdminAttendancePage() {
     setStudents(selectedClass.students || []);
     setRecords([]);
     setHasAttendance(false);
-
+    console.log(selectedClass.students);
     fetch(
       `/api/admin/attendance?classId=${selectedClass._id}&date=${date}`,
       { credentials: "include" }
@@ -172,9 +172,6 @@ export default function AdminAttendancePage() {
       {!isSunday(date) && selectedClass && (
         <div className="space-y-2">
           {students
-            .filter((s) =>
-              s.days?.includes(getDayName(date))
-            )
             .map((s) => {
               const record = records.find(
                 (r) => getStudentId(r.student) === s._id

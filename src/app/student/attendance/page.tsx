@@ -74,7 +74,7 @@ export default function StudentAttendancePage() {
     ) : (
       <p>
         ⚠️ <b>Low attendance alert.</b><br />
-        Attendance is below the required 75%.
+        Attendance is below the required 75%. Immediate Actions Required.
       </p>
     )}
   </div>

@@ -6,7 +6,7 @@ export async function GET() {
   await connectDB();
 
   const classes = await ClassModel.find()
-    .populate("students", "fullName days");
+  .populate("_id fullName days");
 
   return Response.json({ classes });
 }
