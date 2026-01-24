@@ -10,7 +10,6 @@ export default function AdminAttendancePage() {
 
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedClass, setSelectedClass] = useState<any>(null);
-  const [students, setStudents] = useState<any[]>([]);
   const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasAttendance, setHasAttendance] = useState(false);
@@ -42,32 +41,25 @@ export default function AdminAttendancePage() {
   /* ---------------- LOAD STUDENTS + ATTENDANCE ---------------- */
 
   useEffect(() => {
-    if (!selectedClass) return;
+  if (!selectedClass) return;
 
-    setStudents(selectedClass.students || []);
-    setRecords([]);
-    setHasAttendance(false);
-    console.log(selectedClass.students);
-    fetch(
-      `/api/admin/attendance?classId=${selectedClass._id}&date=${date}`,
-      { credentials: "include" }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.attendance) {
-          setRecords(data.attendance.records);
-          setHasAttendance(true);
-        } else if (isToday) {
-          // Only auto-create records for TODAY
-          setRecords(
-            selectedClass.students.map((s: any) => ({
-              student: s._id,
-              status: "PRESENT",
-            }))
-          );
-        }
-      });
-  }, [selectedClass, date, isToday]);
+  setRecords([]);
+  setHasAttendance(false);
+
+  // 2️⃣ Fetch attendance
+  fetch(
+    `/api/admin/attendance?classId=${selectedClass._id}&date=${date}`,
+    { credentials: "include" }
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.attendance) {
+        setRecords(data.attendance.records);
+        setHasAttendance(true);
+      }
+    });
+}, [selectedClass, date, isToday]);
+
 
   /* ---------------- TOGGLE ---------------- */
 
@@ -169,41 +161,34 @@ export default function AdminAttendancePage() {
       )}
 
       {/* Student List */}
-      {!isSunday(date) && selectedClass && (
-        <div className="space-y-2">
-          {students
-            .map((s) => {
-              const record = records.find(
-                (r) => getStudentId(r.student) === s._id
-              );
+{!isSunday(date) && selectedClass && (
+  <div className="space-y-2">
+    {records.map((r) => {
+      const studentId = getStudentId(r.student);
 
-              if (!record && !isToday) return null;
+      return (
+        <div
+          key={studentId}
+          className="flex items-center justify-between rounded-lg border px-4 py-2"
+        >
+          <span>{r.student.fullName}</span>
 
-              const status = record?.status || "PRESENT";
-
-              return (
-                <div
-                  key={s._id}
-                  className="flex items-center justify-between rounded-lg border px-4 py-2"
-                >
-                  <span>{s.fullName}</span>
-
-                  <button
-                    disabled={!isToday}
-                    onClick={() => toggleStatus(s._id)}
-                    className={`rounded-md px-3 py-1 text-sm ${
-                      status === "PRESENT"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    } ${!isToday ? "opacity-60 cursor-not-allowed" : ""}`}
-                  >
-                    {status}
-                  </button>
-                </div>
-              );
-            })}
+          <button
+            disabled={!isToday}
+            onClick={() => toggleStatus(studentId)}
+            className={`rounded-md px-3 py-1 text-sm ${
+              r.status === "PRESENT"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            } ${!isToday ? "opacity-60 cursor-not-allowed" : ""}`}
+          >
+            {r.status}
+          </button>
         </div>
-      )}
+      );
+    })}
+  </div>
+)}
 
       {/* No past attendance */}
       {!isToday && selectedClass && !hasAttendance && (

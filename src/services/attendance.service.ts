@@ -182,10 +182,32 @@ export async function getClassAttendance({
     throw new Error("MISSING_PARAMS");
   }
 
-  return Attendance.findOne({
-    class: classId,
-    date,
-  }).populate("records.student", "fullName");
+ const attendance = await Attendance.findOne({
+  class: classId,
+  date,
+}).populate("records.student", "fullName");
+
+if (attendance) {
+  return attendance;
+}
+
+// ✅ NO ATTENDANCE YET → RETURN STUDENTS
+const students = await Student.find({ class: classId }).select(
+  "_id fullName"
+);
+
+return {
+  class: classId,
+  date,
+  records: students.map((s) => ({
+    student: {
+      _id: s._id,
+      fullName: s.fullName,
+    },
+    status: "PRESENT",
+  })),
+};
+
 }
 
 // Student: attendance report

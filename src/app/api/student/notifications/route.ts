@@ -26,9 +26,10 @@ const notifications = await Notification.find({
   $or: [
     { scope: "ALL" },
     { scope: "ROLE", role },
-    { scope: "USER", userId: new mongoose.Types.ObjectId('696f82915e63fd76502a714b') },
+    { scope: "USER", userId: new mongoose.Types.ObjectId(userId) },
   ],
 }).sort({ createdAt: -1 });
+
 
   return Response.json({ notifications });
 }
