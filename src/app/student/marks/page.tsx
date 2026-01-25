@@ -1,28 +1,31 @@
+"use client";
+import { useEffect, useState } from "react";
+import UploadMarksModal from "@/components/modals/AddExamModal";
+import MarksProgressChart from "@/components/charts/SubjectProgressChart";
+
 export default function StudentMarksPage() {
-  const marks = [
-    { subject: "Maths", score: 88 },
-    { subject: "Science", score: 92 },
-    { subject: "English", score: 85 },
-    { subject: "History", score: 78 },
-  ];
+  const [marks, setMarks] = useState<any[]>([]);
+
+  function load() {
+    fetch("/api/student/marks")
+      .then(res => res.json())
+      .then(setMarks);
+  }
+
+  useEffect(load, []);
+
+  function upload(data: any) {
+    fetch("/api/student/marks", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }).then(load);
+  }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
-      <h1 className="text-xl font-semibold text-blue-900">
-        Marks
-      </h1>
-
-      <div className="rounded-lg border bg-white overflow-hidden">
-        {marks.map((m) => (
-          <div
-            key={m.subject}
-            className="flex justify-between px-5 py-3 border-b last:border-b-0"
-          >
-            <span className="text-slate-700">{m.subject}</span>
-            <span className="font-medium">{m.score}</span>
-          </div>
-        ))}
-      </div>
+    <div>
+      <h1>My Marks</h1>
+      <UploadMarksModal onSubmit={upload} />
+      <MarksProgressChart data={marks} />
     </div>
   );
 }

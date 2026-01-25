@@ -1,41 +1,26 @@
-import mongoose, { Schema, Document, Model, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
-export type MarksType = "TEST" | "EXAM" | "PARENT";
-
-export interface IMarks extends Document {
-  studentId: Types.ObjectId;
-  subject: string;
-  type: MarksType;
-  score: number;
-  maxScore: number;
-  date: Date;
-}
-
-const MarksSchema = new Schema<IMarks>(
+const MarksSchema = new Schema(
   {
     studentId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Student",
       required: true,
     },
-
     subject: { type: String, required: true },
-
-    type: {
+    examName: { type: String, required: true },
+    marksObtained: { type: Number, required: true },
+    totalMarks: { type: Number, required: true },
+    percentage: { type: Number, required: true },
+    academicYear: { type: String, required: true },
+    uploadedBy: {
       type: String,
-      enum: ["TEST", "EXAM", "PARENT"],
+      enum: ["ADMIN", "STUDENT"],
       required: true,
     },
-
-    score: { type: Number, required: true },
-    maxScore: { type: Number, required: true },
-
-    date: { type: Date, required: true },
   },
   { timestamps: true }
 );
 
-const Marks: Model<IMarks> =
-  mongoose.models.Marks || mongoose.model<IMarks>("Marks", MarksSchema);
-
-export default Marks;
+export default mongoose.models.Marks ||
+  mongoose.model("Marks", MarksSchema);
