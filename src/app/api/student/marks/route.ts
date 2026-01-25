@@ -1,29 +1,52 @@
-import connectDB from "@/lib/db";
-import Marks from "@/models/Marks";
-import { getStudentId } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import connectDB from "@/lib/db";
+import Student from "@/models/Student";
+import Marks from "@/models/Marks";
+import { getStudentId } from "@/lib/auth"; 
 
 export async function GET() {
-  await connectDB();
-  const studentId = await getStudentId();
+  try {
+    await connectDB();
 
-  const marks = await Marks.find({ studentId }).sort({ createdAt: 1 });
-  return NextResponse.json(marks);
-}
+    // 1️⃣ Get USER id from JWT
+    const userId = await getStudentId();
 
-export async function POST(req: Request) {
-  await connectDB();
-  const studentId = await getStudentId();
-  const body = await req.json();
+    // 2️⃣ Find student by userId
+    const student = await Student.findOne({
+      userId,
+    }).select("fullName subjects");
 
-  const percentage = (body.marksObtained / body.totalMarks) * 100;
+    if (!student) {
+      return NextResponse.json(
+        { student: null, marks: [] },
+        { status: 200 }
+      );
+    }
 
-  const marks = await Marks.create({
-    ...body,
-    studentId,
-    percentage,
-    uploadedBy: "STUDENT",
-  });
+    // 3️⃣ Fetch marks using STUDENT._id
+    const marks = await Marks.find({
+      studentId: student._id,
+    }).sort({ createdAt: 1 });
 
-  return NextResponse.json(marks);
+    return NextResponse.json({
+      student,
+      marks,
+    });
+  } catch (err: any) {
+    if (
+      err.message === "UNAUTHORIZED" ||
+      err.message === "FORBIDDEN"
+    ) {
+      return NextResponse.json(
+        { error: err.message },
+        { status: 401 }
+      );
+    }
+
+    console.error("Student marks error:", err);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
