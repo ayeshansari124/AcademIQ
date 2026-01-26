@@ -8,8 +8,8 @@ export interface IStudent extends Document {
   class: Types.ObjectId;
   subjects: string[];
   days: string[];
-  monthlyFees: number;
-  createdAt: Date;
+  monthlyFee: number;
+  feeStartDate: Date;
 }
 
 const StudentSchema = new Schema<IStudent>(
@@ -31,20 +31,11 @@ const StudentSchema = new Schema<IStudent>(
       required: true,
     },
 
-    subjects: {
-      type: [String],
-      required: true,
-    },
+    subjects: { type: [String], required: true },
+    days: { type: [String], required: true },
 
-    days: {
-      type: [String],
-      required: true,
-    },
-
-    monthlyFees: {
-      type: Number,
-      required: true,
-    },
+    monthlyFee: { type: Number, required: true },
+    feeStartDate: { type: Date, required: true },
   },
   { timestamps: true }
 );

@@ -11,6 +11,8 @@ const NotificationSchema = new Schema(
         "ADMIN_BROADCAST",
         "ASSIGNMENT",
         "FEES_DUE",
+        "FEES_URGENT",
+         "FEES_OVERDUE",
         "FEES_PAID",
         "MARKS_UPLOADED",
       ],

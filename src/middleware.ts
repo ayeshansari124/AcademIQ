@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import FeeRecord from "@/models/FeeRecord";
+import connectDB from "@/lib/db";
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

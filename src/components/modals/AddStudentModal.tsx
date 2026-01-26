@@ -67,14 +67,14 @@ const [subjects, setSubjects] = useState<string[]>([]);
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-     body: JSON.stringify({
+    body: JSON.stringify({
   fullName: form.fullName,
   parentName: form.parentName,
   phone: form.phone,
   classId: form.classId,
-  subjects, // ✅ from state
+  subjects,
   days,
-  monthlyFees: Number(form.monthlyFees),
+  monthlyFee: Number(form.monthlyFees),
 }),
     });
 
