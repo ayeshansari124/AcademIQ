@@ -1,74 +1,54 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function AdminAttendancePage() {
+  const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
+
   const [date, setDate] = useState(today);
   const isToday = date === today;
 
   const [classes, setClasses] = useState<any[]>([]);
-  const [selectedClass, setSelectedClass] = useState<any>(null);
+  const [selectedClass, setSelectedClass] = useState<string>("");
+
   const [records, setRecords] = useState<any[]>([]);
+  const [allStudents, setAllStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [hasAttendance, setHasAttendance] = useState(false);
 
-  /* ---------------- HELPERS ---------------- */
-
-  function isSunday(dateStr: string) {
-    return new Date(dateStr).getDay() === 0;
-  }
-
-  function getDayName(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      weekday: "short",
-    });
-  }
-
-  function getStudentId(value: any) {
-    return typeof value === "string" ? value : value._id;
-  }
-
-  /* ---------------- LOAD CLASSES ---------------- */
-
+  /* LOAD CLASSES + ALL STUDENTS (ONCE) */
   useEffect(() => {
     fetch("/api/admin/classes", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => setClasses(data.classes || []));
+      .then(r => r.json())
+      .then(d => setClasses(d.classes || []));
+
+    fetch("/api/admin/students", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => setAllStudents(d.students || []));
   }, []);
 
-  /* ---------------- LOAD STUDENTS + ATTENDANCE ---------------- */
-
+  /* LOAD ATTENDANCE ONLY FOR MARKING */
   useEffect(() => {
-  if (!selectedClass) return;
+    if (!selectedClass) return;
 
-  setRecords([]);
-  setHasAttendance(false);
-
-  // 2️⃣ Fetch attendance
-  fetch(
-    `/api/admin/attendance?classId=${selectedClass._id}&date=${date}`,
-    { credentials: "include" }
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.attendance) {
-        setRecords(data.attendance.records);
-        setHasAttendance(true);
-      }
-    });
-}, [selectedClass, date, isToday]);
-
-
-  /* ---------------- TOGGLE ---------------- */
+    fetch(
+      `/api/admin/attendance?classId=${selectedClass}&date=${date}`,
+      { credentials: "include" }
+    )
+      .then(r => r.json())
+      .then(d => {
+        setRecords(d.attendance?.records || []);
+      });
+  }, [selectedClass, date]);
 
   function toggleStatus(studentId: string) {
     if (!isToday) return;
 
-    setRecords((prev) =>
-      prev.map((r) =>
-        getStudentId(r.student) === studentId
+    setRecords(prev =>
+      prev.map(r =>
+        String(r.student._id || r.student) === studentId
           ? {
               ...r,
               status: r.status === "PRESENT" ? "ABSENT" : "PRESENT",
@@ -78,10 +58,8 @@ export default function AdminAttendancePage() {
     );
   }
 
-  /* ---------------- SAVE ---------------- */
-
   async function saveAttendance() {
-    if (!selectedClass || !isToday || records.length === 0) return;
+    if (!selectedClass || records.length === 0) return;
 
     setLoading(true);
     const t = toast.loading("Saving attendance...");
@@ -91,7 +69,7 @@ export default function AdminAttendancePage() {
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        classId: selectedClass._id,
+        classId: selectedClass,
         date,
         records,
       }),
@@ -101,15 +79,20 @@ export default function AdminAttendancePage() {
     setLoading(false);
 
     if (!res.ok) {
-      toast.error("Failed to save attendance");
+      toast.error("Save failed");
       return;
     }
 
     toast.success("Attendance saved");
-    setHasAttendance(true);
+
+    // 🔥 RESET MARKING SECTION
+    setSelectedClass("");
+    setRecords([]);
   }
 
-  /* ---------------- RENDER ---------------- */
+  const visibleStudents = selectedClass
+    ? allStudents.filter(s => String(s.class) === selectedClass)
+    : allStudents;
 
   return (
     <div className="p-6 space-y-6 max-w-3xl mx-auto">
@@ -117,96 +100,91 @@ export default function AdminAttendancePage() {
         Attendance
       </h1>
 
-      {/* Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row">
+      {/* CONTROLS */}
+      <div className="flex gap-4 flex-col sm:flex-row">
         <input
           type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={e => setDate(e.target.value)}
           className="rounded-lg border px-3 py-2"
         />
 
         <select
-          value={selectedClass?._id || ""}
-          onChange={(e) =>
-            setSelectedClass(
-              classes.find((c) => c._id === e.target.value)
-            )
-          }
+          value={selectedClass}
+          onChange={e => setSelectedClass(e.target.value)}
           className="rounded-lg border px-3 py-2"
         >
           <option value="">Select Class</option>
-          {classes.map((cls) => (
-            <option key={cls._id} value={cls._id}>
-              {cls.name}
+          {classes.map(c => (
+            <option key={c._id} value={c._id}>
+              {c.name}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Mode indicator */}
-      {selectedClass && (
-        <p className={`text-sm ${isToday ? "text-green-600" : "text-slate-500"}`}>
-          {isToday
-            ? "Marking today’s attendance"
-            : "Viewing past attendance (read-only)"}
-        </p>
-      )}
-
-      {/* Sunday warning */}
-      {isSunday(date) && (
-        <p className="text-red-500 text-sm">
-          Attendance cannot be marked on Sundays
-        </p>
-      )}
-
-      {/* Student List */}
-{!isSunday(date) && selectedClass && (
-  <div className="space-y-2">
-    {records.map((r) => {
-      const studentId = getStudentId(r.student);
-
-      return (
-        <div
-          key={studentId}
-          className="flex items-center justify-between rounded-lg border px-4 py-2"
-        >
-          <span>{r.student.fullName}</span>
+      {/* MARK ATTENDANCE (TEMPORARY SECTION) */}
+      {selectedClass && records.length > 0 && (
+        <div className="space-y-2">
+          {records.map(r => (
+            <div
+              key={r.student._id || r.student}
+              className="flex justify-between border rounded-lg px-4 py-2"
+            >
+              <span>{r.student.fullName}</span>
+              <button
+                onClick={() =>
+                  toggleStatus(r.student._id || r.student)
+                }
+                className={`px-3 py-1 rounded text-sm ${
+                  r.status === "PRESENT"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {r.status}
+              </button>
+            </div>
+          ))}
 
           <button
-            disabled={!isToday}
-            onClick={() => toggleStatus(studentId)}
-            className={`rounded-md px-3 py-1 text-sm ${
-              r.status === "PRESENT"
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            } ${!isToday ? "opacity-60 cursor-not-allowed" : ""}`}
+            onClick={saveAttendance}
+            disabled={loading}
+            className="bg-blue-600 text-white px-5 py-2 rounded"
           >
-            {r.status}
+            Save Attendance
           </button>
         </div>
-      );
-    })}
-  </div>
-)}
-
-      {/* No past attendance */}
-      {!isToday && selectedClass && !hasAttendance && (
-        <p className="text-sm text-slate-500">
-          No attendance was recorded for this date.
-        </p>
       )}
 
-      {/* Save */}
-      {isToday && !isSunday(date) && selectedClass && (
-        <button
-          onClick={saveAttendance}
-          disabled={loading || records.length === 0}
-          className="rounded-lg bg-blue-600 px-5 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
-        >
-          Save Attendance
-        </button>
-      )}
+      {/* STUDENTS (ALWAYS PRESENT) */}
+      <div className="pt-6 border-t">
+        <h2 className="text-lg font-semibold mb-2">
+          Students
+        </h2>
+
+        {visibleStudents.length === 0 ? (
+          <p className="text-sm text-slate-500">
+            No students available
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {visibleStudents.map(s => (
+              <div
+                key={s._id}
+                onClick={() =>
+                  router.push(
+                    `/admin/attendance/student/${s._id}`
+                  )
+                }
+                className="cursor-pointer border rounded-lg px-4 py-2 hover:bg-slate-50"
+              >
+                {s.fullName}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
