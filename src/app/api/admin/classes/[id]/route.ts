@@ -1,49 +1,33 @@
-import connectDB from "@/lib/db";
-import ClassModel from "@/models/Class";
-import "@/models/Student";
+import { handleGetClass, handleDeleteClass } from "@/controllers/class.controller";
 
 export async function GET(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  await connectDB();
-
-  const { id } = await context.params; // ✅ REQUIRED
-
-  const cls = await ClassModel.findById(id).populate(
-    "students",
-    "fullName"
-  );
-
-  if (!cls) {
-    return Response.json({ error: "Not found" }, { status: 404 });
+  try {
+    const { id } = await params;
+    const cls = await handleGetClass(id);
+    return Response.json({ class: cls });
+  } catch {
+    return Response.json(
+      { error: "Not found" },
+      { status: 404 }
+    );
   }
-
-  return Response.json({ class: cls });
 }
 
 export async function DELETE(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  await connectDB();
-
-  const { id } = await context.params; // ✅ REQUIRED
-
-  const cls = await ClassModel.findById(id);
-
-  if (!cls) {
-    return Response.json({ error: "Class not found" }, { status: 404 });
-  }
-
-  if (cls.students.length > 0) {
+  try {
+    const { id } = await params;
+    await handleDeleteClass(id);
+    return Response.json({ message: "Class deleted" });
+  } catch (e: any) {
     return Response.json(
-      { error: "Cannot delete class with enrolled students" },
+      { error: e.message },
       { status: 400 }
     );
   }
-
-  await ClassModel.findByIdAndDelete(id);
-
-  return Response.json({ message: "Class deleted" });
 }

@@ -1,27 +1,19 @@
-import connectDB from "@/lib/db";
-import ClassModel from "@/models/Class";
+import { handleGetClasses, handleCreateClass } from "@/controllers/class.controller";
 
 export async function GET() {
-  await connectDB();
-
-  const classes = await ClassModel.find()
-    .select("_id name subjects");
-
+  const classes = await handleGetClasses();
   return Response.json({ classes });
 }
 
 export async function POST(req: Request) {
-  await connectDB();
-
-  const { name, subjects } = await req.json();
-
-  if (!name || !subjects?.length) {
+  try {
+    const { name, subjects } = await req.json();
+    const cls = await handleCreateClass(name, subjects);
+    return Response.json({ class: cls });
+  } catch (e: any) {
     return Response.json(
-      { error: "Invalid data" },
+      { error: e.message },
       { status: 400 }
     );
   }
-
-  const cls = await ClassModel.create({ name, subjects });
-  return Response.json({ class: cls });
 }
