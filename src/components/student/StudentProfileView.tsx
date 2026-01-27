@@ -65,7 +65,7 @@ export default function StudentProfileView({
       {/* FEES INFO */}
       <Section title="Fee Information">
         <InfoGrid>
-          <Info label="Monthly Fees" value={`₹${student.monthlyFees}`} />
+          <Info label="Monthly Fees" value={`₹${student.monthlyFee}`} />
           <Info label="Admission Date" value={joinedDate} />
         </InfoGrid>
       </Section>

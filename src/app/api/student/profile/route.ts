@@ -1,37 +1,18 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
-import { getStudentByStudentId } from "@/services/student.service";
+import { getStudentByUserId } from "@/services/student.service";
 
 export async function GET() {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
+  const cookieStore= await cookies();
+  const token = cookieStore.get("token")?.value;
+  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = verifyToken(token);
-
-    if (payload.role !== "STUDENT") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const student = await getStudentByStudentId(payload.userId);
-
-    return NextResponse.json({ student });
-  } catch (err: any) {
-    if (err.message === "STUDENT_NOT_FOUND") {
-      return NextResponse.json(
-        { error: "Student not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: "Failed to fetch profile" },
-      { status: 500 }
-    );
+  const payload = verifyToken(token);
+  if (payload.role !== "STUDENT") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const student = await getStudentByUserId(payload.userId);
+  return NextResponse.json({ student });
 }

@@ -4,39 +4,30 @@ import Student from "@/models/Student";
 import ClassModel from "@/models/Class";
 import User from "@/models/User";
 import FeeRecord from "@/models/FeeRecord";
-
 import { generateUsername } from "@/utils/generateUsername";
 import { generatePassword } from "@/utils/generatePassword";
 
-//GET STUDENT BY ID
-export async function getStudentByUserId(studentId: string) {
+/* ---------------- READ ---------------- */
+
+// STUDENT ID (Admin)
+export async function getStudentByStudentId(studentId: string) {
   await connectDB();
 
   const student = await Student.findById(studentId)
     .populate("userId", "username role")
-    .populate("class", "name"); // ✅ THIS FIXES IT
-
-  if (!student) {
-    throw new Error("STUDENT_NOT_FOUND");
-  }
-
-  return student;
-}
-
-export async function getStudentById(studentId: string) {
-  const student = await Student.findById(studentId)
     .populate("class", "name");
 
-  if (!student) {
-    throw new Error("STUDENT_NOT_FOUND");
-  }
-
+  if (!student) throw new Error("STUDENT_NOT_FOUND");
   return student;
 }
 
-export async function getStudentByStudentId(userId: string) {
+// USER ID (Student self)
+export async function getStudentByUserId(userId: string) {
+  await connectDB();
+
   const student = await Student.findOne({ userId })
-    .populate("class", "name"); // 👈 THIS IS THE FIX
+    .populate("class", "name")
+    .populate("userId", "username role"); // ✅ ADD THIS
 
   if (!student) {
     throw new Error("STUDENT_NOT_FOUND");
@@ -47,16 +38,17 @@ export async function getStudentByStudentId(userId: string) {
 
 
 
-// GET ALL STUDENTS (FOR ADMIN FEES PAGE)
 export async function getAllStudents() {
   await connectDB();
 
   return Student.find()
-    .populate("class", "name") 
-    .select("fullName class monthlyFee") 
+    .populate("class", "name")
+    .select("_id fullName class monthlyFee") // ✅ explicitly include _id
     .sort({ createdAt: -1 })
     .lean();
 }
+
+/* ---------------- CREATE ---------------- */
 
 interface CreateStudentInput {
   fullName: string;
@@ -96,10 +88,9 @@ export async function createStudent(data: CreateStudentInput) {
   const cls = await ClassModel.findById(classId);
   if (!cls) throw new Error("CLASS_NOT_FOUND");
 
-  const invalidSubject = subjects.some(
-    (s) => !cls.subjects.includes(s)
-  );
-  if (invalidSubject) throw new Error("INVALID_SUBJECT");
+  if (subjects.some(s => !cls.subjects.includes(s))) {
+    throw new Error("INVALID_SUBJECT");
+  }
 
   let username = generateUsername(fullName);
   while (await User.findOne({ username })) {
@@ -154,5 +145,3 @@ export async function createStudent(data: CreateStudentInput) {
     },
   };
 }
-
-

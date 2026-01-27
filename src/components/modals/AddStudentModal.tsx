@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import FormInput from "@/components/ui/FormInput";
+import { StudentCreationResult } from "@/types/student";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 
 export default function AddStudentModal({
   onClose,
   onSuccess,
 }: {
   onClose: () => void;
-  onSuccess: (creds: { username: string; password: string }) => void;
+  onSuccess: (result: StudentCreationResult) => void;
 }) {
   const [classes, setClasses] = useState<any[]>([]);
 const [selectedClass, setSelectedClass] = useState<any>(null);
@@ -88,7 +90,10 @@ const [subjects, setSubjects] = useState<string[]>([]);
     }
 
     toast.success("Student created");
-    onSuccess(data.credentials);
+    onSuccess({
+  student: data.student,
+  credentials: data.credentials,
+});
   }
 
   return (
