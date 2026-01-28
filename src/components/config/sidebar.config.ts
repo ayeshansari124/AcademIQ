@@ -35,11 +35,13 @@ export const studentSidebarConfig: SidebarConfig = {
   subtitle: "Student Dashboard",
   items: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/student/dashboard" },
+    { label: "Profile", icon: User, href: "/student/profile" },
+    { label: "Fees", icon: IndianRupee, href: "/student/fees" },
     { label: "Attendance", icon: ClipboardCheck, href: "/student/attendance" },
     { label: "Marks", icon: BarChart3, href: "/student/marks" },
-    { label: "Fees", icon: IndianRupee, href: "/student/fees" },
+    
     { label: "Assignments", icon: NotebookText, href: "/student/assignments" },
     { label: "Notifications", icon: Bell, href: "/student/notifications" },
-    { label: "Profile", icon: User, href: "/student/profile" },
+    
   ],
 };
