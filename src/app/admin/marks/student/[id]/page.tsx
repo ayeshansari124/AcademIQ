@@ -1,49 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import StudentMarksLayout from "@/components/marks/StudentMarksLayout";
-
-type Mark = {
-  _id: string;
-  examName: string;
-  subject: string;
-  marksObtained: number;
-  totalMarks: number;
-  createdAt: string;
-};
+import { useAdminStudentMarks } from "@/hooks/useAdminStudentMarks";
 
 export default function AdminStudentMarksPage() {
-  const { id: studentId } = useParams() as { id: string };
-
-  const [student, setStudent] = useState<any>(null);
-  const [marks, setMarks] = useState<Mark[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams() as { id: string };
+  const { data, loading } = useAdminStudentMarks(id);
+  const [marks, setMarks] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!studentId) return;
-
-    fetch(`/api/admin/marks/student/${studentId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
-      })
-      .then((data) => {
-        setStudent(data.student);
-        setMarks(data.marks);
-      })
-      .finally(() => setLoading(false));
-  }, [studentId]);
+    if (data?.marks) {
+      setMarks(data.marks);
+    }
+  }, [data]);
 
   if (loading) return <div className="p-6">Loading…</div>;
-  if (!student) return <div className="p-6">Student not found</div>;
+  if (!data?.student) return <div className="p-6">Student not found</div>;
 
   return (
     <StudentMarksLayout
-      student={student}
+      student={data.student}
       marks={marks}
-      canEdit={true} 
-      onMarksUpdate={(newMarks) =>
+      canEdit
+      onMarksAdded={(newMarks) =>
         setMarks((prev) => [...prev, ...newMarks])
       }
     />

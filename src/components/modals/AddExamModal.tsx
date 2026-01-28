@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function AddExamModal({
   student,
@@ -12,17 +13,15 @@ export default function AddExamModal({
   onSaved: (marks: any[]) => void;
 }) {
   const [examName, setExamName] = useState("");
-  const [marks, setMarks] = useState<Record<
-    string,
-    { marksObtained?: number; totalMarks?: number }
-  >>({});
+  const [marks, setMarks] = useState<
+    Record<string, { marksObtained?: number; totalMarks?: number }>
+  >({});
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   function handleChange(
     subject: string,
     field: "marksObtained" | "totalMarks",
-    value: string
+    value: string,
   ) {
     setMarks((prev) => ({
       ...prev,
@@ -35,38 +34,29 @@ export default function AddExamModal({
 
   function validate(): boolean {
     if (!examName.trim()) {
-      setError("Exam name is required.");
+      toast.error("Exam name is required");
       return false;
     }
 
     for (const subject of student.subjects) {
       const data = marks[subject];
 
-      if (
-        !data ||
-        data.marksObtained == null ||
-        data.totalMarks == null
-      ) {
-        setError(`Enter marks for ${subject}.`);
+      if (!data || data.marksObtained == null || data.totalMarks == null) {
+        toast.error(`Enter marks for ${subject}`);
         return false;
       }
 
       if (data.marksObtained < 0 || data.totalMarks <= 0) {
-        setError(
-          `Marks for ${subject} must be positive.`
-        );
+        toast.error(`Marks for ${subject} must be positive`);
         return false;
       }
 
       if (data.marksObtained > data.totalMarks) {
-        setError(
-          `Marks obtained cannot exceed total marks for ${subject}.`
-        );
+        toast.error(`Marks obtained cannot exceed total marks for ${subject}`);
         return false;
       }
     }
 
-    setError(null);
     return true;
   }
 
@@ -81,7 +71,7 @@ export default function AddExamModal({
       for (const subject of student.subjects) {
         const data = marks[subject];
 
-        const res = await fetch("/api/admin/marks", {
+        const res = await fetch("/api/admin/marks/add", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -94,14 +84,19 @@ export default function AddExamModal({
           }),
         });
 
+        if (!res.ok) {
+          throw new Error("Failed to save exam");
+        }
+
         const saved = await res.json();
         savedMarks.push(saved);
       }
 
+      toast.success("Marks added successfully");
       onSaved(savedMarks);
       onClose();
-    } catch (err) {
-      setError("Failed to save exam. Try again.");
+    } catch {
+      toast.error("Failed to save exam. Try again.");
     } finally {
       setSaving(false);
     }
@@ -110,7 +105,6 @@ export default function AddExamModal({
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white w-full max-w-lg rounded-lg p-6 relative">
-        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-black"
@@ -118,22 +112,10 @@ export default function AddExamModal({
           ✕
         </button>
 
-        <h3 className="text-lg font-semibold mb-5">
-          Add Exam
-        </h3>
+        <h3 className="text-lg font-semibold mb-5">Add Exam</h3>
 
-        {/* Error */}
-        {error && (
-          <div className="mb-4 text-sm text-red-600">
-            {error}
-          </div>
-        )}
-
-        {/* Exam Name */}
         <div className="mb-6 max-w-sm">
-          <label className="block text-sm font-medium mb-1">
-            Exam Name
-          </label>
+          <label className="block text-sm font-medium mb-1">Exam Name</label>
           <input
             value={examName}
             onChange={(e) => setExamName(e.target.value)}
@@ -142,7 +124,6 @@ export default function AddExamModal({
           />
         </div>
 
-        {/* Subjects */}
         {examName && (
           <div className="border-t pt-4">
             <div className="grid grid-cols-12 text-sm font-medium text-gray-600 mb-2">
@@ -156,20 +137,14 @@ export default function AddExamModal({
                 key={subject}
                 className="grid grid-cols-12 gap-2 items-center py-2 border-t text-sm"
               >
-                <div className="col-span-4 font-medium">
-                  {subject}
-                </div>
+                <div className="col-span-4 font-medium">{subject}</div>
 
                 <div className="col-span-4">
                   <input
                     type="number"
                     className="w-full border px-2 py-1"
                     onChange={(e) =>
-                      handleChange(
-                        subject,
-                        "marksObtained",
-                        e.target.value
-                      )
+                      handleChange(subject, "marksObtained", e.target.value)
                     }
                   />
                 </div>
@@ -179,11 +154,7 @@ export default function AddExamModal({
                     type="number"
                     className="w-full border px-2 py-1"
                     onChange={(e) =>
-                      handleChange(
-                        subject,
-                        "totalMarks",
-                        e.target.value
-                      )
+                      handleChange(subject, "totalMarks", e.target.value)
                     }
                   />
                 </div>
@@ -192,7 +163,6 @@ export default function AddExamModal({
           </div>
         )}
 
-        {/* Actions */}
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}
@@ -204,7 +174,7 @@ export default function AddExamModal({
           <button
             onClick={submit}
             disabled={saving}
-            className="bg-blue-600 text-white px-5 py-2 text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+            className="bg-blue-600 text-white px-5 py-2 text-sm rounded disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save Exam"}
           </button>

@@ -19,11 +19,14 @@ export default function StudentMarksLayout({
   student,
   marks,
   canEdit = false,
+  onMarksAdded,
 }: {
   student: any;
   marks: Mark[];
   canEdit?: boolean;
+  onMarksAdded?: (newMarks: Mark[]) => void;
 }) {
+
   const [openExam, setOpenExam] = useState<string | null>(null);
   const [sections, setSections] = useState({
     exams: false,
@@ -201,13 +204,17 @@ export default function StudentMarksLayout({
       </section>
 
       {/* ================= ADD EXAM MODAL ================= */}
-      {canEdit && showAddExam && (
-        <AddExamModal
-          student={student}
-          onClose={() => setShowAddExam(false)}
-          onSaved={() => setShowAddExam(false)}
-        />
-      )}
+     {canEdit && showAddExam && (
+  <AddExamModal
+    student={student}
+    onClose={() => setShowAddExam(false)}
+    onSaved={(newMarks) => {
+      onMarksAdded?.(newMarks);
+      setShowAddExam(false);
+    }}
+  />
+)}
+
     </div>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -13,21 +14,16 @@ export default function AdminMarksPage() {
   }, []);
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2>Students</h2>
+    <div className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Students</h2>
 
-      {students.map((s) => (
+      {students.map(s => (
         <div
           key={s._id}
           onClick={() => router.push(`/admin/marks/student/${s._id}`)}
-          style={{
-            padding: 10,
-            border: "1px solid #ccc",
-            marginBottom: 6,
-            cursor: "pointer",
-          }}
+          className="border p-3 mb-2 cursor-pointer hover:bg-gray-50"
         >
-          <strong>{s.fullName}</strong>
+          {s.fullName}
         </div>
       ))}
     </div>

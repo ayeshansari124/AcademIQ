@@ -1,9 +1,7 @@
-import  connectDB  from "@/lib/db";
-import Student from "@/models/Student";
-import { NextResponse } from "next/server";
+import connectDB from "@/lib/db";
+import { listStudentsController } from "@/controllers/marks.controller";
 
 export async function GET() {
   await connectDB();
-  const students = await Student.find().select("_id fullName");
-  return NextResponse.json(students);
+  return listStudentsController();
 }
