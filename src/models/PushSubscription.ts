@@ -2,8 +2,15 @@ import mongoose, { Schema } from "mongoose";
 
 const PushSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, required: true },
-    subscription: { type: Object, required: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+    },
+    subscription: {
+      type: Object,
+      required: true,
+    },
   },
   { timestamps: true }
 );

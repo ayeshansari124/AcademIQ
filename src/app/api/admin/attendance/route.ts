@@ -1,62 +1,26 @@
-import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import Attendance from "@/models/Attendance";
-import Student from "@/models/Student";
+import { NextResponse } from "next/server";
+import { AttendanceController } from "@/controllers/attendance.controller";
 
 export async function GET(req: Request) {
   await connectDB();
 
   const { searchParams } = new URL(req.url);
-  const classId = searchParams.get("classId");
-  const date = searchParams.get("date");
+  const classId = searchParams.get("classId")!;
+  const date = searchParams.get("date")!;
 
-  if (!classId || !date) {
-    return NextResponse.json(
-      { error: "classId and date required" },
-      { status: 400 }
-    );
-  }
+  const data =
+    await AttendanceController.getClassAttendance({ classId, date });
 
-  const students = await Student.find({ class: classId })
-    .select("_id fullName")
-    .lean();
-
-  const attendance = await Attendance.findOne({
-    class: classId,
-    date,
-  })
-    .populate("records.student", "fullName")
-    .lean();
-
-  return NextResponse.json({
-    attendance: attendance
-      ? { _id: attendance._id, records: attendance.records }
-      : null,
-    students,
-  });
+  return NextResponse.json(data);
 }
 
 export async function POST(req: Request) {
   await connectDB();
+  const body = await req.json();
 
-  const { classId, date, records } = await req.json();
+  const attendance =
+    await AttendanceController.markAttendance(body);
 
-  if (!classId || !date || !records) {
-    return NextResponse.json(
-      { error: "Missing fields" },
-      { status: 400 }
-    );
-  }
-
-  await Attendance.findOneAndUpdate(
-    { class: classId, date },
-    {
-      class: classId,
-      date,
-      records,
-    },
-    { upsert: true, new: true }
-  );
-
-  return NextResponse.json({ success: true });
+  return NextResponse.json(attendance);
 }

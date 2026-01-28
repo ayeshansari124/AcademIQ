@@ -1,9 +1,18 @@
-self.addEventListener("push", (event) => {
-  const data = event.data?.json();
+self.addEventListener("push", event => {
+  const data = event.data?.json() || {};
 
-  self.registration.showNotification(data.title, {
-    body: data.body,
-    icon: "/favicon.ico",
-    badge: "/favicon.ico",
-  });
+  event.waitUntil(
+    self.registration.showNotification(data.title || "AcademIQ", {
+      body: data.body,
+      icon: "/icon.png",
+      tag: "academiq-notification",
+    })
+  );
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow("/")
+  );
 });

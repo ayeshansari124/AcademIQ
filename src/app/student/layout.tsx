@@ -14,13 +14,11 @@ export default function StudentLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js");
-    }
-  }, []);
-   useEffect(() => {
-    registerPush();
-  }, []);
+  registerPush();
+}, []);
+
+
+
 
   return (
     <div className="min-h-screen bg-slate-50">

@@ -4,7 +4,7 @@ import Student from "@/models/Student";
 import Notification from "@/models/Notification";
 import { Types } from "mongoose";
 import PushSubscription from "@/models/PushSubscription";
-import { sendPush } from "@/lib/push";
+import { sendPush } from "@/lib/push-server";
 import createUserNotification from "@/services/notification.service"
 
 export async function ensureMonthlyFee({

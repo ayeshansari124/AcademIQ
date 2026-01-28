@@ -1,11 +1,11 @@
 import FeeProfile from "@/components/fees/FeeProfile";
-import { getStudentId } from "@/lib/auth";
+import { getStudentUserId } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Student from "@/models/Student";
 
 export default async function StudentFeesPage() {
   // ⚠️ This is USER ID, not student ID
-  const userId = await getStudentId();
+  const userId = await getStudentUserId();
 
   await connectDB();
 

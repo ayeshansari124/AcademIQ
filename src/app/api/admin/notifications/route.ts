@@ -3,7 +3,7 @@ import Notification from "@/models/Notification";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import PushSubscription from "@/models/PushSubscription";
-import { sendPush } from "@/lib/push";
+import { sendPush } from "@/lib/push-server";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
