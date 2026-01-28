@@ -10,23 +10,9 @@ import {
   User,
 } from "lucide-react";
 
-import { LucideIcon } from "lucide-react";
+import { SidebarConfig } from "@/types/sidebar";
 
-export interface SidebarItem {
-  label: string;
-  icon: LucideIcon;
-  href: string;
-}
-
-export interface SidebarConfig {
-  title: string;
-  subtitle: string;
-  items: SidebarItem[];
-}
-
-/* ======================
-   ADMIN SIDEBAR CONFIG
-====================== */
+/* ADMIN */
 export const adminSidebarConfig: SidebarConfig = {
   title: "AcademIQ",
   subtitle: "Admin Dashboard",
@@ -43,9 +29,7 @@ export const adminSidebarConfig: SidebarConfig = {
   ],
 };
 
-/* ======================
-   STUDENT SIDEBAR CONFIG
-====================== */
+/* STUDENT */
 export const studentSidebarConfig: SidebarConfig = {
   title: "AcademIQ",
   subtitle: "Student Dashboard",

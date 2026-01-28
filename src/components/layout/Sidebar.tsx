@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import { SidebarConfig } from "@/components/config/sidebar.config";
+import { SidebarConfig } from "@/types/sidebar";
 
 interface Props {
   open: boolean;
@@ -16,7 +16,6 @@ export default function Sidebar({ open, onClose, config }: Props) {
 
   return (
     <>
-      {/* Overlay */}
       {open && (
         <div
           onClick={onClose}
@@ -24,14 +23,12 @@ export default function Sidebar({ open, onClose, config }: Props) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed left-0 top-0 z-50 h-full w-72
         bg-blue-900/90 backdrop-blur-md text-white
         transform transition-transform duration-300
         ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
           <div className="flex flex-col">
             <h2 className="text-lg font-semibold">{config.title}</h2>
@@ -45,7 +42,6 @@ export default function Sidebar({ open, onClose, config }: Props) {
           />
         </div>
 
-        {/* Menu */}
         <nav className="mt-4 space-y-1 px-3">
           {config.items.map((item) => {
             const isActive = pathname.startsWith(item.href);
@@ -55,8 +51,7 @@ export default function Sidebar({ open, onClose, config }: Props) {
                 key={item.label}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-4 rounded-lg px-4 py-3 text-sm
-                transition
+                className={`flex items-center gap-4 rounded-lg px-4 py-3 text-sm transition
                 ${
                   isActive
                     ? "bg-white text-blue-900 font-semibold"
