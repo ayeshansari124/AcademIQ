@@ -17,14 +17,14 @@ export async function POST(req: Request) {
     } = await req.json();
 
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const expectedSignature = crypto
+    const expected = crypto
       .createHmac("sha256", process.env.RAZORPAY_SECRET!)
       .update(body)
       .digest("hex");
 
-    if (expectedSignature !== razorpay_signature) {
+    if (expected !== razorpay_signature) {
       return NextResponse.json(
-        { error: "Invalid payment signature" },
+        { error: "Invalid signature" },
         { status: 400 }
       );
     }
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const fee = await FeeRecord.findById(feeRecordId);
     if (!fee) {
       return NextResponse.json(
-        { error: "Fee record not found" },
+        { error: "Fee not found" },
         { status: 404 }
       );
     }
@@ -45,21 +45,19 @@ export async function POST(req: Request) {
     await fee.save();
 
     const student = await Student.findById(fee.studentId).select("userId");
+    if (student) {
+     await Notification.create({
+  userId: student.userId,
+  title: "Fee Payment Successful",
+  message: `₹${fee.amountDue} paid successfully.`,
+  type: "FEES_PAID",
+  scope: "USER", // ✅ FIXED
+});
 
-   if (student) {
-  await Notification.create({
-    userId: student.userId,
-    title: "Fee Payment Successful",
-    message: `Your fee of ₹${fee.amountDue} has been paid successfully.`,
-    type: "FEES_PAID",
-    scope: "USER",
-  });
-}
-
+    }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error("Verify payment error", err);
+  } catch {
     return NextResponse.json(
       { error: "Payment verification failed" },
       { status: 500 }

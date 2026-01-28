@@ -1,5 +1,3 @@
-"use client";
-
 import { use } from "react";
 import FeeProfile from "@/components/fees/FeeProfile";
 
@@ -8,10 +6,9 @@ export default function AdminStudentFeesPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  // ✅ unwrap params properly
+  // ✅ unwrap params
   const { id: studentId } = use(params);
 
-  // extra safety (optional but smart)
   if (!studentId) {
     return <div className="p-6">Invalid student</div>;
   }

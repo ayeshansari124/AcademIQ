@@ -2,10 +2,9 @@ import connectDB from "@/lib/db";
 import FeeRecord from "@/models/FeeRecord";
 import Student from "@/models/Student";
 import Notification from "@/models/Notification";
-import { Types } from "mongoose";
 import PushSubscription from "@/models/PushSubscription";
 import { sendPush } from "@/lib/push-server";
-import createUserNotification from "@/services/notification.service"
+import { Types } from "mongoose";
 
 export async function ensureMonthlyFee({
   studentId,
@@ -19,22 +18,13 @@ export async function ensureMonthlyFee({
   feeStartDate: Date;
 }) {
   const now = new Date();
-
-  const month = now.getMonth() + 1; // 1–12
-  const year = now.getFullYear();
-
-  // ❗ Do not generate fees before start date
   if (now < feeStartDate) return;
 
-  const existing = await FeeRecord.findOne({
-    studentId,
-    month,
-    year,
-  });
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
 
-  if (existing) return;
-
-  const dueDate = new Date(year, month - 1, 10); // 10th of month
+  const exists = await FeeRecord.findOne({ studentId, month, year });
+  if (exists) return;
 
   await FeeRecord.create({
     studentId,
@@ -44,69 +34,64 @@ export async function ensureMonthlyFee({
     amountDue: monthlyFee,
     amountPaid: 0,
     status: "PENDING",
-    dueDate,
+    dueDate: new Date(year, month - 1, 10),
   });
 }
- 
-function daysBetween(a: Date, b: Date) {
-  const diff = a.getTime() - b.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
 
-export async function feeReminder() {
+export async function markFeePaidCash(feeRecordId: string) {
   await connectDB();
 
+  const fee = await FeeRecord.findById(feeRecordId);
+  if (!fee) throw new Error("Fee not found");
+  if (fee.status === "PAID") throw new Error("Already paid");
+
+  fee.status = "PAID";
+  fee.amountPaid = fee.amountDue;
+  fee.paymentMethod = "CASH";
+  fee.paidAt = new Date();
+  await fee.save();
+
+  const student = await Student.findById(fee.studentId).select("userId");
+  if (student) {
+    await Notification.create({
+  userId: student.userId,
+  title: "Fee Payment Received",
+  message: `₹${fee.amountDue} fee marked as paid.`,
+  type: "FEES_PAID",
+  scope: "USER", 
+});
+
+  }
+}
+
+export async function runFeeReminder() {
+  await connectDB();
   const today = new Date();
 
   const fees = await FeeRecord.find({
     status: { $in: ["PENDING", "OVERDUE"] },
   });
-for (const fee of fees) {
-    const dueInDays = daysBetween(fee.dueDate, today);
+
+  for (const fee of fees) {
+    const diff =
+      Math.floor((fee.dueDate.getTime() - today.getTime()) / 86400000);
 
     const student = await Student.findById(fee.studentId).select("userId");
     if (!student) continue;
 
-    // D-7 REMINDER
-    if (dueInDays === 7) {
-       const sub = await PushSubscription.findOne({ userId: student.userId });
-      
-      if (sub) {
-        await sendPush(sub.subscription, {
-          title: "Fees Due",
-          body: `Your fees is Due on ${Date}. Seven Days from now`,
-        });
-      }
+    if (diff === 7 || diff === 3) {
       await Notification.create({
         userId: student.userId,
         title: "Fee Reminder",
-        message: `Your monthly fee of ₹${fee.amountDue} is due in 7 days.`,
+        message: `Fee ₹${fee.amountDue} due in ${diff} days`,
         type: "FEES_DUE",
         scope: "USER",
       });
     }
-    // D-3 URGENT
-    if (dueInDays === 3) {
-      await Notification.create({
-        userId: student.userId,
-        title: "Urgent Fee Reminder",
-        message: `Your fee of ₹${fee.amountDue} is due in 3 days. Please pay immediately.`,
-        type: "FEES_URGENT",
-        scope: "USER",
-      });
-    }
 
-    // D+1 OVERDUE
-    if (dueInDays < 0 && fee.status !== "OVERDUE") {
+    if (diff < 0 && fee.status !== "OVERDUE") {
       fee.status = "OVERDUE";
       await fee.save();
-       await Notification.create({
-        userId: student.userId,
-        title: "Fee Overdue",
-        message: `Your fee of ₹${fee.amountDue} is overdue. Please pay immediately.`,
-        type: "FEES_OVERDUE",
-        scope: "USER",
-      });
     }
   }
 
