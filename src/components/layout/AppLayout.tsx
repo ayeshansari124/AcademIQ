@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
+import Footer from "@/components/layout/Footer";
 import { SidebarConfig } from "@/types/sidebar";
 
 interface Props {
@@ -16,7 +17,6 @@ export default function AppLayout({
   sidebarConfig,
   onMount,
 }: Props) {
-    
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function AppLayout({
   }, [onMount]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <Header onMenuClick={() => setSidebarOpen(true)} />
 
       <Sidebar
@@ -33,7 +33,13 @@ export default function AppLayout({
         config={sidebarConfig}
       />
 
-      <main>{children}</main>
+      {/* Content */}
+      <main className="flex-1">
+        {children}
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
