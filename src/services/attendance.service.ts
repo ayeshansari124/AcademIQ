@@ -1,7 +1,7 @@
 import Attendance from "@/models/Attendance";
 import ClassModel from "@/models/Class";
 import Student from "@/models/Student";
-import createUserNotification from "@/services/notification.service";
+import {recordUserNotification }from "@/services/notification.service";
 import { Types } from "mongoose";
 import { AttendanceStatus } from "@/types/attendance";
 import { notifyUser } from "@/services/push.service";
@@ -32,7 +32,7 @@ async function calculateSummary(studentId: string) {
 
 // ---------- NOTIFICATIONS ----------
 async function notifyAbsent(student: any, date: string, classId: string) {
-  await createUserNotification({
+  await recordUserNotification({
     userId: student.userId,
     type: "ABSENT",
     title: "Absent Marked",
@@ -51,7 +51,7 @@ async function notifyAbsent(student: any, date: string, classId: string) {
 async function notifyLowAttendance(student: any, percentage: number) {
   if (percentage >= MIN_ATTENDANCE_PERCENTAGE) return;
 
-  await createUserNotification({
+  await recordUserNotification({
     userId: student.userId,
     type: "LOW_ATTENDANCE",
     title: "Low Attendance Alert",

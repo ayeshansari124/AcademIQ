@@ -1,8 +1,7 @@
 import connectDB from "@/lib/db";
-import Notification from "@/models/Notification";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import mongoose from "mongoose";
+import { fetchNotificationsForUser } from "@/controllers/notification.controller";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -14,34 +13,17 @@ export async function GET() {
     return Response.json({ notifications: [] });
   }
 
-  let payload;
-try {
-  payload = jwt.verify(token, JWT_SECRET) as any;
-} catch {
-  return Response.json({ notifications: [] });
-}
-  const { userId, role } = payload;
+  let payload: any;
+  try {
+    payload = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return Response.json({ notifications: [] });
+  }
 
-const notifications = await Notification.find({
-  $or: [
-    { scope: "ALL" },
-    { scope: "ROLE", role },
-    { scope: "USER", userId: new mongoose.Types.ObjectId(userId) },
-  ],
-}).sort({ createdAt: -1 });
-
-
-  return Response.json({ notifications });
-}
-
-export async function PATCH(req: Request) {
-  await connectDB();
-
-  const { notificationId } = await req.json();
-
-  await Notification.findByIdAndUpdate(notificationId, {
-    isRead: true,
+  const notifications = await fetchNotificationsForUser({
+    userId: payload.userId,
+    role: payload.role,
   });
 
-  return Response.json({ success: true });
+  return Response.json({ notifications });
 }

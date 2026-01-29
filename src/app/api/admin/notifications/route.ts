@@ -1,115 +1,79 @@
 import connectDB from "@/lib/db";
-import Notification from "@/models/Notification";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import PushSubscription from "@/models/PushSubscription";
-import { sendPush } from "@/lib/push-server";
+import {
+  createNotificationController,
+  fetchNotificationsForUser,
+} from "@/controllers/notification.controller";
+import {
+  notifyUser,
+  notifyUsers,
+  notifyAll,
+  notifyAdmins,
+} from "@/services/push.service";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
+async function getAdmin() {
+  const token = (await cookies()).get("token")?.value;
+  if (!token) throw new Error("UNAUTHORIZED");
+
+  const payload = jwt.verify(token, JWT_SECRET) as any;
+  if (payload.role !== "ADMIN") throw new Error("FORBIDDEN");
+
+  return payload;
+}
+
 export async function GET() {
   await connectDB();
- const cookieStore= await  cookies();
-  const token = cookieStore.get("token")?.value;
-  if (!token) {
-    return Response.json({ notifications: [] }, { status: 401 });
-  }
+  const admin = await getAdmin();
 
-  let payload: any;
-  try {
-    payload = jwt.verify(token, JWT_SECRET);
-  } catch {
-    return Response.json({ notifications: [] }, { status: 401 });
-  }
-
-  if (payload.role !== "ADMIN") {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const notifications = await Notification.find({
-    $or: [
-      { scope: "ALL" },
-      { scope: "ROLE", role: "ADMIN" },
-      { scope: "USER", userId: payload.userId },
-    ],
-  }).sort({ createdAt: -1 });
+  const notifications = await fetchNotificationsForUser({
+    userId: admin.userId,
+    role: "ADMIN",
+  });
 
   return Response.json({ notifications });
 }
 
-// ✅ THIS WAS MISSING
 export async function POST(req: Request) {
   await connectDB();
- const cookieStore= await cookies();
-  const token =  cookieStore.get("token")?.value;
-  if (!token) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  await getAdmin();
+
+  const body = await req.json();
+  await createNotificationController(body);
+
+ // 2️⃣ PUSH delivery (SIDE EFFECT)
+  const { scope, role, userId, userIds, title, message } = body;
+
+  const payload = {
+    title,
+    body: message,
+  };
+
+try {
+  if (scope === "ALL") {
+    await notifyAll(payload);
   }
 
-  let payload: any;
-  try {
-    payload = jwt.verify(token, JWT_SECRET);
-  } catch {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (scope === "ROLE" && role === "ADMIN") {
+    await notifyAdmins(payload);
   }
 
-  if (payload.role !== "ADMIN") {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (scope === "USER" && userId) {
+    await notifyUser(userId, payload);
   }
 
-  const { title, message, scope = "ALL", role, userId } = await req.json();
-
-  if (!title || !message) {
-    return Response.json(
-      { error: "Title and message required" },
-      { status: 400 }
+  if (scope === "USER" && userIds?.length) {
+    await Promise.allSettled(
+      userIds.map((id: string) =>
+        notifyUser(id, payload)
+      )
     );
   }
-
-  const notification = await Notification.create({
-    type: "ADMIN_BROADCAST",
-    title,
-    message,
-    scope,
-    role: scope === "ROLE" ? role : null,
-    userId: scope === "USER" ? userId : null,
-  });
-
-  if (scope === "ALL") {
-  const subs = await PushSubscription.find();
-
-  await Promise.allSettled(
-    subs.map((sub) =>
-      sendPush(sub.subscription, {
-        title,
-        body: message,
-      })
-    )
-  );
+} catch (err) {
+  console.error("Push notification failed:", err);
+  // DO NOT throw
 }
-
-if (scope === "ROLE" && role === "ADMIN") {
-  const subs = await PushSubscription.find({ role: "ADMIN" });
-
-  await Promise.allSettled(
-    subs.map((sub) =>
-      sendPush(sub.subscription, {
-        title,
-        body: message,
-      })
-    )
-  );
-}
- if (scope === "USER" && userId) {
-  const sub = await PushSubscription.findOne({ userId });
-
-  if (sub) {
-    await sendPush(sub.subscription, {
-      title,
-      body: message,
-    });
-  }
-}
-
-  return Response.json({ success: true, notification });
+  return Response.json({ success: true });
 }

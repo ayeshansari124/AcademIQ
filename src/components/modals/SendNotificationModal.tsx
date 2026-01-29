@@ -20,12 +20,15 @@ export default function SendNotificationModal({ onClose }: Props) {
 
     const t = toast.loading("Sending...");
 
-    const res = await fetch("/api/admin/notifications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ title, message }),
-    });
+    const res =await fetch("/api/admin/notifications", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    title,
+    message,
+    scope: "ALL", 
+  }),
+});
 
     toast.dismiss(t);
 

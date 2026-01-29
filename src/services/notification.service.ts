@@ -1,13 +1,48 @@
 import Notification from "@/models/Notification";
+import { Types } from "mongoose";
 
-const MIN_ATTENDANCE_PERCENTAGE = 75;
+/* --------------------------------------------------
+   Internal DB writer
+-------------------------------------------------- */
+async function recordNotification({
+  type,
+  scope,
+  title,
+  message,
+  metadata = {},
+  userId = null,
+  role = null,
+}: {
+  type: string;
+  scope: "USER" | "ROLE" | "ALL";
+  title: string;
+  message: string;
+  metadata?: any;
+  userId?: string | null;
+  role?: "ADMIN" | "STUDENT" | null;
+}) {
+  return Notification.create({
+    type,
+    scope,
+    userId,
+    role,
+    title,
+    message,
+    metadata,
+  });
+}
 
-export default async function createUserNotification({
+/* --------------------------------------------------
+   PUBLIC DB API
+-------------------------------------------------- */
+
+/** Single user */
+export async function recordUserNotification({
   userId,
   type,
   title,
   message,
-  metadata = {},
+  metadata,
 }: {
   userId: string;
   type: string;
@@ -15,7 +50,7 @@ export default async function createUserNotification({
   message: string;
   metadata?: any;
 }) {
-  await Notification.create({
+  return recordNotification({
     type,
     scope: "USER",
     userId,
@@ -25,20 +60,71 @@ export default async function createUserNotification({
   });
 }
 
-export async function createAdminBroadcast({
+/** Multiple selected users */
+export async function recordUsersNotification({
+  userIds,
+  type,
   title,
   message,
-  metadata = {},
+  metadata,
 }: {
+  userIds: string[];
+  type: string;
   title: string;
   message: string;
   metadata?: any;
 }) {
-  return Notification.create({
-    type: "ADMIN_BROADCAST",
-    scope: "ALL",          // 👈 visible to everyone
-    userId: null,          // 👈 MUST be null
-    role: null,
+  return Notification.insertMany(
+    userIds.map((id) => ({
+      type,
+      scope: "USER",
+      userId: new Types.ObjectId(id),
+      title,
+      message,
+      metadata,
+    }))
+  );
+}
+
+/** Everyone */
+export async function recordGlobalNotification({
+  type = "ADMIN_BROADCAST",
+  title,
+  message,
+  metadata,
+}: {
+  type?: string;
+  title: string;
+  message: string;
+  metadata?: any;
+}) {
+  return recordNotification({
+    type,
+    scope: "ALL",
+    title,
+    message,
+    metadata,
+  });
+}
+
+/** Role based */
+export async function recordRoleNotification({
+  role,
+  type,
+  title,
+  message,
+  metadata,
+}: {
+  role: "ADMIN" | "STUDENT";
+  type: string;
+  title: string;
+  message: string;
+  metadata?: any;
+}) {
+  return recordNotification({
+    type,
+    scope: "ROLE",
+    role,
     title,
     message,
     metadata,
