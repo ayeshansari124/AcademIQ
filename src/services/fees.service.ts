@@ -2,9 +2,12 @@ import connectDB from "@/lib/db";
 import FeeRecord from "@/models/FeeRecord";
 import Student from "@/models/Student";
 import Notification from "@/models/Notification";
-import PushSubscription from "@/models/PushSubscription";
-import { sendPush } from "@/lib/push-server";
 import { Types } from "mongoose";
+import {
+  recordUserNotification,
+} from "@/services/notification.service";
+import { notifyUser } from "@/services/push.service";
+import User from "@/models/User";
 
 export async function ensureMonthlyFee({
   studentId,
@@ -41,28 +44,64 @@ export async function ensureMonthlyFee({
 export async function markFeePaidCash(feeRecordId: string) {
   await connectDB();
 
+  // 1️⃣ Fetch fee
   const fee = await FeeRecord.findById(feeRecordId);
-  if (!fee) throw new Error("Fee not found");
-  if (fee.status === "PAID") throw new Error("Already paid");
+  if (!fee) throw new Error("FEE_NOT_FOUND");
+  if (fee.status === "PAID") throw new Error("ALREADY_PAID");
 
+  // 2️⃣ Mark as paid
   fee.status = "PAID";
   fee.amountPaid = fee.amountDue;
   fee.paymentMethod = "CASH";
   fee.paidAt = new Date();
   await fee.save();
 
-  const student = await Student.findById(fee.studentId).select("userId");
-  if (student) {
-    await Notification.create({
-  userId: student.userId,
-  title: "Fee Payment Received",
-  message: `₹${fee.amountDue} fee marked as paid.`,
-  type: "FEES_PAID",
-  scope: "USER", 
-});
+  // 3️⃣ Resolve student + user (NO populate)
+  const student = await Student.findById(fee.studentId);
+  if (!student) throw new Error("STUDENT_NOT_FOUND");
 
+  const user = await User.findById(student.userId).select("fullName");
+  if (!user) throw new Error("USER_NOT_FOUND");
+
+  const amount = fee.amountDue;
+
+  /* --------------------------------------------------
+     STUDENT: DB NOTIFICATION
+  -------------------------------------------------- */
+  await recordUserNotification({
+    userId: student.userId.toString(),
+    type: "FEES_PAID",
+    title: "Fee Payment Received",
+    message: `Your ₹${amount} fee has been received (Cash).`,
+    metadata: {
+      feeRecordId: fee._id,
+      amount,
+      paymentMethod: "CASH",
+    },
+  });
+
+  /* --------------------------------------------------
+     STUDENT: WEB PUSH (BEST EFFORT)
+  -------------------------------------------------- */
+  try {
+    await notifyUser(student.userId.toString(), {
+      title: "Fee Payment Received",
+      body: `Your ₹${amount} fee has been received (Cash).`,
+      data: {
+        url: "/student/fees",
+      },
+    });
+  } catch {
+    // ❌ Never fail cash marking because of push
   }
+
+  // 4️⃣ Admin toast is handled by frontend
+  return {
+    success: true,
+    message: "Fee marked as paid successfully",
+  };
 }
+
 
 export async function runFeeReminder() {
   await connectDB();

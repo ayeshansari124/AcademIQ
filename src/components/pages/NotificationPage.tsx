@@ -10,13 +10,7 @@ export default function NotificationPage({
           <div className="flex justify-between items-start">
             <div>
               <h2 className="font-semibold text-sm">{n.title}</h2>
-              <span className="text-xs text-slate-500">
-                {n.scope === "ALL"
-                  ? "Broadcast"
-                  : n.scope === "ROLE"
-                  ? "Role based"
-                  : "Personal"}
-              </span>
+              
             </div>
 
             <span className="text-xs text-slate-500">

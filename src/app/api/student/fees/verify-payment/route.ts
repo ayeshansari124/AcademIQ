@@ -2,8 +2,15 @@ import crypto from "crypto";
 import connectDB from "@/lib/db";
 import FeeRecord from "@/models/FeeRecord";
 import Student from "@/models/Student";
-import Notification from "@/models/Notification";
 import { NextResponse } from "next/server";
+import User from "@/models/User";
+
+import {
+  recordUserNotification,
+  recordRoleNotification,
+} from "@/services/notification.service";
+
+import { notifyAdmins } from "@/services/push.service";
 
 export async function POST(req: Request) {
   try {
@@ -16,6 +23,7 @@ export async function POST(req: Request) {
       feeRecordId,
     } = await req.json();
 
+    // 🔐 Verify Razorpay signature
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
     const expected = crypto
       .createHmac("sha256", process.env.RAZORPAY_SECRET!)
@@ -29,6 +37,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // 📄 Fetch fee record
     const fee = await FeeRecord.findById(feeRecordId);
     if (!fee) {
       return NextResponse.json(
@@ -37,6 +46,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // 💰 Mark paid
     fee.status = "PAID";
     fee.amountPaid = fee.amountDue;
     fee.paymentMethod = "ONLINE";
@@ -44,23 +54,79 @@ export async function POST(req: Request) {
     fee.paidAt = new Date();
     await fee.save();
 
-    const student = await Student.findById(fee.studentId).select("userId");
-    if (student) {
-     await Notification.create({
-  userId: student.userId,
-  title: "Fee Payment Successful",
-  message: `₹${fee.amountDue} paid successfully.`,
-  type: "FEES_PAID",
-  scope: "USER", // ✅ FIXED
-});
+    // 👨‍🎓 Fetch student + user name (STRICT)
+  const student = await Student.findById(fee.studentId);
+if (!student) {
+  throw new Error("STUDENT_NOT_FOUND");
+}
 
+const user = await User.findById(student.userId).select("fullName");
+if (!user) {
+  throw new Error("USER_NOT_FOUND");
+}
+ console.log("STUDENT RAW:", student);
+
+const studentName = student.fullName;
+
+const amount = fee.amountDue;
+
+    /* --------------------------------------------------
+       STUDENT: DB NOTIFICATION ONLY
+    -------------------------------------------------- */
+    await recordUserNotification({
+      userId: student.userId._id.toString(),
+      type: "FEES_PAID",
+      title: "Fee Payment Successful",
+      message: `₹${amount} paid successfully.`,
+      metadata: {
+        feeRecordId: fee._id,
+        amount,
+      },
+    });
+
+    /* --------------------------------------------------
+       ADMIN: DB + WEB PUSH
+    -------------------------------------------------- */
+    const adminMessage = `${studentName} paid ₹${amount} fees successfully.`;
+
+    // DB notification for admins
+    await recordRoleNotification({
+      role: "ADMIN",
+      type: "FEES_PAID",
+      title: "Fee Payment Received",
+      message: adminMessage,
+      metadata: {
+        studentId: student._id,
+        studentName,
+        feeRecordId: fee._id,
+        amount,
+      },
+    });
+
+    // Web push for admins (best-effort)
+    try {
+      await notifyAdmins({
+        title: "Fee Payment Received",
+        body: adminMessage,
+        data: {
+          url: "/admin/fees",
+        },
+      });
+    } catch {
+      // NEVER fail payment because of push
     }
 
-    return NextResponse.json({ success: true });
-  } catch {
+    return NextResponse.json({
+      success: true,
+      message: "Fee payment successful",
+    });
+
+  } catch (err) {
+    console.error("FEE VERIFY ERROR:", err);
     return NextResponse.json(
       { error: "Payment verification failed" },
       { status: 500 }
     );
   }
 }
+
