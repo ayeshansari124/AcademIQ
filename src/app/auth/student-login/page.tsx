@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { registerPush } from "@/lib/push-client";
 
 export default function StudentLoginPage() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function StudentLoginPage() {
     if (data.user.role !== "STUDENT")
       return toast.error("This login is for students only");
     toast.success("Login successful");
+    await registerPush();
     router.push("/student/dashboard");
   }
   return (

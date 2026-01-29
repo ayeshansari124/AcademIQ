@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { registerPush } from "@/lib/push-client";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function RegisterPage() {
         return;
       }
       toast.success("Admin account created");
-  
+  await registerPush();
       router.push("/admin/dashboard");
     } catch {
       toast.dismiss(toastId);

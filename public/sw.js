@@ -1,18 +1,36 @@
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", () => {
+  event.waitUntil(self.clients.claim());
+});
+
 self.addEventListener("push", event => {
-  const data = event.data?.json() || {};
+
+  let data = {};
+  try {
+    data = event.data?.json() || {};
+  } catch (e) {
+  }
+
+
+  const options = {
+    body: data.body || "No body",
+    icon: "/favicon.ico",
+    badge: "/favicon.ico",
+    data: { url: data.url || "/" },
+  };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || "AcademIQ", {
-      body: data.body,
-      icon: "/icon.png",
-      tag: "academiq-notification",
-    })
+    self.registration.showNotification(
+      data.title || "AcademIQ",
+      options
+    )
   );
 });
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
-  event.waitUntil(
-    clients.openWindow("/")
-  );
+  event.waitUntil(clients.openWindow(event.notification.data.url));
 });

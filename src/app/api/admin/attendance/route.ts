@@ -22,5 +22,8 @@ export async function POST(req: Request) {
   const attendance =
     await AttendanceController.markAttendance(body);
 
-  return NextResponse.json(attendance);
+   return NextResponse.json({
+    success: true,
+    attendanceId: attendance._id,
+  });
 }

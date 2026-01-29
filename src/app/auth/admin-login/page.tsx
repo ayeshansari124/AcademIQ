@@ -2,6 +2,8 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { registerPush } from "@/lib/push-client";
+
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function AdminLoginPage() {
     if (data.user.role !== "ADMIN")
       return toast.error("This login is for teachers only");
     toast.success("Welcome back");
+    await registerPush();
     router.push("/admin/dashboard");
   }
   return (

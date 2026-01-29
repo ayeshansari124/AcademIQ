@@ -1,9 +1,14 @@
 import mongoose, { Schema } from "mongoose";
 
-const PushSchema = new Schema(
+const PushSubscriptionSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
+      required: true,
+      index: true,
+    },
+    endpoint: {
+      type: String,
       required: true,
       unique: true,
     },
@@ -16,4 +21,4 @@ const PushSchema = new Schema(
 );
 
 export default mongoose.models.PushSubscription ||
-  mongoose.model("PushSubscription", PushSchema);
+  mongoose.model("PushSubscription", PushSubscriptionSchema);

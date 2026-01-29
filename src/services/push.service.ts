@@ -1,24 +1,75 @@
-import PushSubscriptionModel from "@/models/PushSubscription";
+import PushModel from "@/models/PushSubscription";
 import { sendPush } from "@/lib/push-server";
-import { PushPayload } from "@/types/push";
+import User from "@/models/User";
 
-export async function saveSubscription(
-  userId: string,
-  subscription: PushSubscription
-) {
-  return PushSubscriptionModel.findOneAndUpdate(
-    { userId },
-    { userId, subscription },
-    { upsert: true, new: true }
+export async function saveSubscription(userId: string, sub: any) {
+  return PushModel.findOneAndUpdate(
+    { endpoint: sub.endpoint },
+    {
+      userId,
+      endpoint: sub.endpoint,
+      subscription: sub,
+    },
+    { upsert: true }
   );
 }
 
-export async function notifyUser(
-  userId: string,
-  payload: PushPayload
-) {
-  const doc = await PushSubscriptionModel.findOne({ userId });
-  if (!doc) return;
+export async function removeSubscription(endpoint: string) {
+  return PushModel.deleteOne({ endpoint });
+}
 
-  await sendPush(doc.subscription, payload);
+// -------- NOTIFICATIONS --------
+export async function notifyUser(userId: string, payload: any) {
+
+  const subs = await PushModel.find({ userId });
+
+  for (const s of subs) {
+
+    try {
+      const res = await sendPush(s.subscription, payload);
+    } catch (err: any) {
+
+      if (err.statusCode === 404 || err.statusCode === 410) {
+        await PushModel.deleteOne({ _id: s._id });
+      }
+    }
+  }
+} 
+
+export async function notifyUsers(userIds: string[], payload: any) {
+  const subs = await PushModel.find({ userId: { $in: userIds } });
+  await Promise.all(subs.map(s => sendPush(s.subscription, payload)));
+}
+
+export async function notifyAll(payload: any) {
+  const subs = await PushModel.find();
+  await Promise.all(subs.map(s => sendPush(s.subscription, payload)));
+}
+
+/**
+ * Notify ALL admins
+ */
+export async function notifyAdmins(payload: any) {
+  // 1. Get admin user IDs
+  const admins = await User.find({ role: "ADMIN" }).select("_id");
+
+  if (!admins.length) return;
+
+  const adminIds = admins.map(a => a._id);
+
+  // 2. Get their push subscriptions
+  const subs = await PushModel.find({
+    userId: { $in: adminIds },
+  });
+
+  // 3. Send push safely
+  for (const s of subs) {
+    try {
+      await sendPush(s.subscription, payload);
+    } catch (err: any) {
+      if (err.statusCode === 404 || err.statusCode === 410) {
+        await PushModel.deleteOne({ _id: s._id });
+      }
+    }
+  }
 }

@@ -26,9 +26,9 @@ export async function getStudentUserId(): Promise<string> {
 
   const payload = verifyToken(token);
 
-  if (payload.role !== "STUDENT") {
-    throw new Error("FORBIDDEN");
-  }
+  // if (payload.role !== "STUDENT") {
+  //   throw new Error("FORBIDDEN");
+  // }
 
   return payload.userId; // USER ID
 }

@@ -1,23 +1,13 @@
 import Attendance from "@/models/Attendance";
 import ClassModel from "@/models/Class";
 import Student from "@/models/Student";
-import PushSubscription from "@/models/PushSubscription";
 import createUserNotification from "@/services/notification.service";
-import { sendPush } from "@/lib/push-server";
 import { Types } from "mongoose";
 import { AttendanceStatus } from "@/types/attendance";
+import { notifyUser } from "@/services/push.service";
 
 const MIN_ATTENDANCE_PERCENTAGE = 75;
 
-// ---------- PUSH ----------
-async function pushToUser(
-  userId: string,
-  payload: { title: string; body: string },
-) {
-  const sub = await PushSubscription.findOne({ userId });
-  if (!sub) return;
-  await sendPush(sub.subscription, payload);
-}
 
 // ---------- SUMMARY ----------
 async function calculateSummary(studentId: string) {
@@ -50,10 +40,12 @@ async function notifyAbsent(student: any, date: string, classId: string) {
     metadata: { date, classId },
   });
 
-  await pushToUser(student.userId, {
-    title: "Absent Marked",
-    body: `You were marked absent on ${date}`,
-  });
+ await notifyUser(student.userId.toString(), {
+  title: "Absent Marked",
+  body: `You were marked absent on ${date}`,
+  url: "/student/attendance",
+});
+
 }
 
 async function notifyLowAttendance(student: any, percentage: number) {
@@ -70,13 +62,15 @@ async function notifyLowAttendance(student: any, percentage: number) {
     metadata: { percentage },
   });
 
-  await pushToUser(student.userId, {
-    title: "Low Attendance Alert",
-    body:
-      percentage < 60
-        ? "Your attendance is critically low (below 60%)."
-        : "Your attendance has fallen below 75%.",
-  });
+ await notifyUser(student.userId.toString(), {
+  title: "Low Attendance Alert",
+  body:
+    percentage < 60
+      ? "Your attendance is critically low (below 60%)."
+      : "Your attendance has fallen below 75%.",
+  url: "/student/attendance",
+});
+
 }
 
 // ---------- ADMIN ----------
@@ -99,22 +93,32 @@ export async function markAttendance({
   );
 
   for (const r of records) {
-    const student = await Student.findById(r.student);
-    if (!student) continue;
+  const student = await Student.findById(r.student);
+  if (!student) continue;
 
-    // 1️⃣ ABSENT notification
-    if (r.status === "ABSENT") {
+  // ABSENT notification
+  if (r.status === "ABSENT") {
+    try {
       await notifyAbsent(student, date, classId);
+    } catch (err) {
     }
-
-    // 2️⃣ ALWAYS recalc after save
-    const summary = await calculateSummary(student._id.toString());
-
-    // 3️⃣ LOW attendance if applicable (EVERY TIME)
-    await notifyLowAttendance(student, summary.percentage);
   }
 
-  return attendance;
+  // Recalculate summary
+  let summary;
+  try {
+    summary = await calculateSummary(student._id.toString());
+  } catch (err) {
+    continue;
+  }
+
+  // LOW attendance
+  try {
+    await notifyLowAttendance(student, summary.percentage);
+  } catch (err) {
+  }
+}
+return attendance;
 }
 
 // ---------- READ ----------
