@@ -1,5 +1,5 @@
 "use client";
-import AssignmentList from "@/components/assignments/AssignmentList";
+import AssignmentPage from "@/components/pages/AssignmentPage";
 import { useAssignments } from "@/hooks/useAssignments";
 export default function StudentAssignmentsPage() {
   const { assignments, loading } = useAssignments(
@@ -15,7 +15,7 @@ export default function StudentAssignmentsPage() {
       {loading ? (
         <p className="text-slate-500">Loading…</p>
       ) : (
-        <AssignmentList
+        <AssignmentPage
           assignments={assignments}
           mode="STUDENT"
         />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import AttendanceReportView from "@/components/attendance/AttendanceReport";
+import AttendancePage from "@/components/pages/AttendancePage";
 import { useAttendanceReport } from "@/hooks/useAttendanceReport";
 
 export default function AdminStudentAttendancePage() {
@@ -15,7 +15,7 @@ if (error || !data) {
 }
 
 return (
-  <AttendanceReportView
+  <AttendancePage
     data={data}
     title="Attendance Report"
   />

@@ -15,7 +15,7 @@ type Props = {
   viewerRole: "ADMIN" | "STUDENT";
 };
 
-export default function FeeProfile({ studentId, viewerRole }: Props) {
+export default function FeePage({ studentId, viewerRole }: Props) {
   const { data, loading } = useFeeProfile(studentId);
 
   // Load Razorpay script once

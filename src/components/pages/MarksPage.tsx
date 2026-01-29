@@ -15,7 +15,7 @@ type Mark = {
   createdAt: string;
 };
 
-export default function StudentMarksLayout({
+export default function MarksPage({
   student,
   marks,
   canEdit = false,

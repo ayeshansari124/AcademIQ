@@ -2,7 +2,7 @@
 
 import { AttendanceReport, AttendanceStatus } from "@/types/attendance";
 
-export default function AttendanceReportView({
+export default function AttendancePage({
   data,
   title = "My Attendance",
 }: {

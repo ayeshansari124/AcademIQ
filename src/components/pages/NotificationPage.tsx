@@ -1,4 +1,4 @@
-export default function NotificationList({
+export default function NotificationPage({
   notifications,
 }: {
   notifications: any[];

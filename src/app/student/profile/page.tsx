@@ -1,6 +1,6 @@
 "use client";
 
-import StudentProfileView from "@/components/student/StudentProfileView";
+import ProfilePage from "@/components/pages/ProfilePage";
 import { useStudent } from "@/hooks/useStudent";
 
 export default function StudentSelfProfilePage() {
@@ -15,7 +15,7 @@ export default function StudentSelfProfilePage() {
   }
 
   return (
-    <StudentProfileView
+    <ProfilePage
       student={student}
       title="Your Profile"
     />

@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import StudentMarksLayout from "@/components/marks/StudentMarksLayout";
+import MarksPage from "@/components/pages/MarksPage";
 import { useAdminStudentMarks } from "@/hooks/useAdminStudentMarks";
 
 export default function AdminStudentMarksPage() {
@@ -20,7 +20,7 @@ export default function AdminStudentMarksPage() {
   if (!data?.student) return <div className="p-6">Student not found</div>;
 
   return (
-    <StudentMarksLayout
+    <MarksPage
       student={data.student}
       marks={marks}
       canEdit

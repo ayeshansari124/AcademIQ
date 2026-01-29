@@ -2,7 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 
-export default function StudentProfileView({
+export default function ProfilePage({
   student,
   showDelete = false,
   onDelete,

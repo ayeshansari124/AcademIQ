@@ -13,7 +13,7 @@ interface Props {
   mode: "ADMIN" | "STUDENT";
 }
 
-export default function AssignmentList({ assignments, mode }: Props) {
+export default function AssignmentPage({ assignments, mode }: Props) {
   if (assignments.length === 0) {
     return (
       <p className="text-sm text-slate-500">

@@ -1,6 +1,6 @@
 "use client";
 
-import AttendanceReportView from "@/components/attendance/AttendanceReport";
+import AttendancePage from "@/components/pages/AttendancePage";
 import { useAttendanceReport } from "@/hooks/useAttendanceReport";
 
 export default function StudentAttendancePage() {
@@ -13,7 +13,7 @@ export default function StudentAttendancePage() {
  }
  
  return (
-   <AttendanceReportView
+   <AttendancePage
      data={data}
      title="Attendance Report"
    />

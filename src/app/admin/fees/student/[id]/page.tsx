@@ -1,5 +1,5 @@
 import { use } from "react";
-import FeeProfile from "@/components/fees/FeeProfile";
+import FeePage from "@/components/pages/FeePage";
 
 export default function AdminStudentFeesPage({
   params,
@@ -15,7 +15,7 @@ export default function AdminStudentFeesPage({
 
   return (
     <div className="p-6">
-      <FeeProfile
+      <FeePage
         studentId={studentId}
         viewerRole="ADMIN"
       />

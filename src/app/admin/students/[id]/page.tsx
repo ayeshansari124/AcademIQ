@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import StudentProfileView from "@/components/student/StudentProfileView";
+import ProfilePage from "@/components/pages/ProfilePage";
 import { useStudent } from "@/hooks/useStudent";
 
 export default function AdminStudentProfilePage() {
@@ -31,7 +31,7 @@ export default function AdminStudentProfilePage() {
   if (!student) return <p className="p-8">Not found</p>;
 
   return (
-    <StudentProfileView
+    <ProfilePage
       student={student}
       showDelete
       onDelete={handleDelete}

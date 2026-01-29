@@ -1,7 +1,7 @@
 "use client";
 
 import { useNotifications } from "@/hooks/useNotifications";
-import NotificationList from "@/components/notifications/NotificationList";
+import NotificationPage from "@/components/pages/NotificationPage";
 
 export default function StudentNotificationsPage() {
   const { notifications, loading } = useNotifications(
@@ -17,7 +17,7 @@ export default function StudentNotificationsPage() {
       ) : notifications.length === 0 ? (
         <p className="text-slate-500">No notifications yet.</p>
       ) : (
-        <NotificationList notifications={notifications} />
+        <NotificationPage notifications={notifications} />
       )}
     </div>
   );

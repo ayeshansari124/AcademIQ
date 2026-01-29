@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { useNotifications } from "@/hooks/useNotifications";
-import NotificationList from "@/components/notifications/NotificationList";
+import NotificationPage from "@/components/pages/NotificationPage";
 import SendNotificationModal from "@/components/modals/SendNotificationModal";
 
 export default function AdminNotificationsPage() {
@@ -29,7 +29,7 @@ export default function AdminNotificationsPage() {
       ) : notifications.length === 0 ? (
         <p className="text-slate-500">No notifications.</p>
       ) : (
-        <NotificationList notifications={notifications} />
+        <NotificationPage notifications={notifications} />
       )}
 
       {open && <SendNotificationModal onClose={() => setOpen(false)} />}

@@ -1,6 +1,6 @@
 "use client";
 
-import StudentMarksLayout from "@/components/marks/StudentMarksLayout";
+import MarksPage from "@/components/pages/MarksPage";
 import { useStudentMarks } from "@/hooks/useStudentMarks";
 
 export default function StudentMarksPage() {
@@ -10,7 +10,7 @@ export default function StudentMarksPage() {
   if (!data?.student) return <div className="p-6">No data available</div>;
 
   return (
-    <StudentMarksLayout
+    <MarksPage
       student={data.student}
       marks={data.marks}
       canEdit={false}

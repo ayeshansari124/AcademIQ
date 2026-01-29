@@ -1,4 +1,4 @@
-import FeeProfile from "@/components/fees/FeeProfile";
+import FeePage from "@/components/pages/FeePage";
 import { getStudentUserId } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Student from "@/models/Student";
@@ -12,7 +12,7 @@ export default async function StudentFeesPage() {
 
   return (
     <div className="p-6">
-      <FeeProfile
+      <FeePage
         studentId={student._id.toString()}
         viewerRole="STUDENT"
       />
