@@ -14,18 +14,20 @@ type Mark = {
   totalMarks: number;
   createdAt: string;
 };
-
 export default function MarksPage({
   student,
   marks,
   canEdit = false,
+  mode,
   onMarksAdded,
 }: {
   student: any;
   marks: Mark[];
   canEdit?: boolean;
+  mode: "ADMIN" | "STUDENT";
   onMarksAdded?: (newMarks: Mark[]) => void;
 }) {
+
 
   const [openExam, setOpenExam] = useState<string | null>(null);
   const [sections, setSections] = useState({
@@ -207,6 +209,7 @@ export default function MarksPage({
      {canEdit && showAddExam && (
   <AddExamModal
     student={student}
+    mode={mode}
     onClose={() => setShowAddExam(false)}
     onSaved={(newMarks) => {
       onMarksAdded?.(newMarks);

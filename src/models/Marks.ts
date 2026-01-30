@@ -12,7 +12,6 @@ const MarksSchema = new Schema(
     marksObtained: { type: Number, required: true },
     totalMarks: { type: Number, required: true },
     percentage: { type: Number, required: true },
-    academicYear: { type: String, required: true },
     uploadedBy: {
       type: String,
       enum: ["ADMIN", "STUDENT"],

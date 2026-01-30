@@ -24,6 +24,7 @@ export default function AdminStudentMarksPage() {
       student={data.student}
       marks={marks}
       canEdit
+      mode="ADMIN"
       onMarksAdded={(newMarks) =>
         setMarks((prev) => [...prev, ...newMarks])
       }

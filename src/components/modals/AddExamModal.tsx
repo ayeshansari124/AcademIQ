@@ -3,12 +3,16 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+type Mode = "ADMIN" | "STUDENT";
+
 export default function AddExamModal({
   student,
+  mode,
   onClose,
   onSaved,
 }: {
   student: any;
+  mode: Mode;
   onClose: () => void;
   onSaved: (marks: any[]) => void;
 }) {
@@ -21,7 +25,7 @@ export default function AddExamModal({
   function handleChange(
     subject: string,
     field: "marksObtained" | "totalMarks",
-    value: string,
+    value: string
   ) {
     setMarks((prev) => ({
       ...prev,
@@ -47,12 +51,12 @@ export default function AddExamModal({
       }
 
       if (data.marksObtained < 0 || data.totalMarks <= 0) {
-        toast.error(`Marks for ${subject} must be positive`);
+        toast.error(`Marks must be positive for ${subject}`);
         return false;
       }
 
       if (data.marksObtained > data.totalMarks) {
-        toast.error(`Marks obtained cannot exceed total marks for ${subject}`);
+        toast.error(`Obtained marks cannot exceed total for ${subject}`);
         return false;
       }
     }
@@ -65,38 +69,48 @@ export default function AddExamModal({
 
     setSaving(true);
 
+    const endpoint =
+      mode === "ADMIN"
+        ? "/api/admin/marks/add"
+        : "/api/student/marks/add";
+
     try {
       const savedMarks: any[] = [];
 
       for (const subject of student.subjects) {
         const data = marks[subject];
 
-        const res = await fetch("/api/admin/marks/add", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             studentId: student._id,
-            subject,
             examName,
-            marksObtained: data!.marksObtained,
-            totalMarks: data!.totalMarks,
-            academicYear: "2024-25",
+            subject,
+            marksObtained: data.marksObtained,
+            totalMarks: data.totalMarks,
+            uploadedBy: mode, // 🔥 CORE FIX
           }),
         });
 
         if (!res.ok) {
-          throw new Error("Failed to save exam");
+          throw new Error("Failed to save marks");
         }
 
         const saved = await res.json();
         savedMarks.push(saved);
       }
 
-      toast.success("Marks added successfully");
+      toast.success(
+        mode === "ADMIN"
+          ? "Marks added successfully"
+          : "Marks submitted successfully"
+      );
+
       onSaved(savedMarks);
       onClose();
-    } catch {
-      toast.error("Failed to save exam. Try again.");
+    } catch (err) {
+      toast.error("Failed to submit marks. Try again.");
     } finally {
       setSaving(false);
     }
@@ -112,10 +126,14 @@ export default function AddExamModal({
           ✕
         </button>
 
-        <h3 className="text-lg font-semibold mb-5">Add Exam</h3>
+        <h3 className="text-lg font-semibold mb-5">
+          {mode === "ADMIN" ? "Add Exam Marks" : "Submit Exam Marks"}
+        </h3>
 
         <div className="mb-6 max-w-sm">
-          <label className="block text-sm font-medium mb-1">Exam Name</label>
+          <label className="block text-sm font-medium mb-1">
+            Exam Name
+          </label>
           <input
             value={examName}
             onChange={(e) => setExamName(e.target.value)}
@@ -176,7 +194,7 @@ export default function AddExamModal({
             disabled={saving}
             className="bg-blue-600 text-white px-5 py-2 text-sm rounded disabled:opacity-50"
           >
-            {saving ? "Saving…" : "Save Exam"}
+            {saving ? "Saving…" : "Submit Marks"}
           </button>
         </div>
       </div>

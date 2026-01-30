@@ -11,9 +11,12 @@ export default function StudentMarksPage() {
 
   return (
     <MarksPage
-      student={data.student}
-      marks={data.marks}
-      canEdit={false}
-    />
+  student={data.student}
+  marks={data.marks}
+  canEdit
+  mode="STUDENT"
+/>
+
+
   );
 }
