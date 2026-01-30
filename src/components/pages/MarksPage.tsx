@@ -68,7 +68,7 @@ export default function MarksPage({
             onClick={() => setShowAddExam(true)}
             className="bg-blue-600 text-white px-5 py-2 rounded"
           >
-            + Add Exam
+            + Add Marks
           </button>
         )}
       </div>
