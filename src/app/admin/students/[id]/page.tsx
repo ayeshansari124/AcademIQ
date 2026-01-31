@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import ProfilePage from "@/components/pages/ProfilePage";
-import { useStudent } from "@/hooks/useStudent";
+import { useStudent } from "@/hooks/student/useStudent";
 
 export default function AdminStudentProfilePage() {
   const { id } = useParams<{ id: string }>();

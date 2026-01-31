@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import MarksPage from "@/components/pages/MarksPage";
-import { useAdminStudentMarks } from "@/hooks/useAdminStudentMarks";
+import { useAdminStudentMarks } from "@/hooks/marks/useAdminStudentMarks";
 
 export default function AdminStudentMarksPage() {
   const { id } = useParams() as { id: string };

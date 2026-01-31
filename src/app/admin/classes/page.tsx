@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useClasses } from "@/hooks/useClasses";
+import { useClasses } from "@/hooks/class/useClasses";
 import CreateClassModal from "@/components/modals/CreateClassModal";
 
 export default function AdminClassesPage() {

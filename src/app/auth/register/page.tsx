@@ -1,6 +1,6 @@
 "use client";
 
-import { useAdminRegister } from "@/hooks/useAdminRegister";
+import { useAdminRegister } from "@/hooks/auth/useAdminRegister";
 import Link from "next/link";
 
 export default function RegisterPage() {

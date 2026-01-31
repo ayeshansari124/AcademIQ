@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import AssignmentPage from "@/components/pages/AssignmentPage";
-import { useAssignments } from "@/hooks/useAssignments";
+import { useAssignments } from "@/hooks/assignment/useAssignments";
 import SendAssignmentModal from "@/components/modals/SendAssignmentModal";
 
 export default function AdminAssignmentsPage() {

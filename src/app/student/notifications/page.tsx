@@ -1,6 +1,6 @@
 "use client";
 
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/notification/useNotifications";
 import NotificationPage from "@/components/pages/NotificationPage";
 
 export default function StudentNotificationsPage() {

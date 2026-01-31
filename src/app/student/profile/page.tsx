@@ -1,7 +1,7 @@
 "use client";
 
 import ProfilePage from "@/components/pages/ProfilePage";
-import { useStudent } from "@/hooks/useStudent";
+import { useStudent } from "@/hooks/student/useStudent";
 
 export default function StudentSelfProfilePage() {
   const { student, loading } = useStudent("/api/student/profile");

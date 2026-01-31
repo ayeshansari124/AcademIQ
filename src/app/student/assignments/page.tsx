@@ -1,6 +1,6 @@
 "use client";
 import AssignmentPage from "@/components/pages/AssignmentPage";
-import { useAssignments } from "@/hooks/useAssignments";
+import { useAssignments } from "@/hooks/assignment/useAssignments";
 export default function StudentAssignmentsPage() {
   const { assignments, loading } = useAssignments(
     "/api/student/assignments"

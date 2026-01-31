@@ -1,7 +1,7 @@
 "use client";
 
 import MarksPage from "@/components/pages/MarksPage";
-import { useStudentMarks } from "@/hooks/useStudentMarks";
+import { useStudentMarks } from "@/hooks/marks/useStudentMarks";
 
 export default function StudentMarksPage() {
   const { data, loading } = useStudentMarks();

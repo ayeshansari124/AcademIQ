@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/notification/useNotifications";
 import NotificationPage from "@/components/pages/NotificationPage";
 import SendNotificationModal from "@/components/modals/SendNotificationModal";
 

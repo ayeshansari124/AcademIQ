@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { useFeeProfile } from "@/hooks/useFeeProfile";
+import { useFeeProfile } from "@/hooks/fee/useFeeProfile";
 
 declare global {
   interface Window {

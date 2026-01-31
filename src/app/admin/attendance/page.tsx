@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useClassAttendance } from "@/hooks/useClassAttendance";
+import { useClassAttendance } from "@/hooks/attendance/useClassAttendance";
 
 export default function AdminAttendancePage() {
   const router = useRouter();

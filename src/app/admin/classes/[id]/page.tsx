@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useClass } from "@/hooks/useClass";
+import { useClass } from "@/hooks/class/useClass";
 import toast from "react-hot-toast";
 import { Trash2 } from "lucide-react";
 

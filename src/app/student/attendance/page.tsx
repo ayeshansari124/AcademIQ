@@ -1,7 +1,7 @@
 "use client";
 
 import AttendancePage from "@/components/pages/AttendancePage";
-import { useAttendanceReport } from "@/hooks/useAttendanceReport";
+import { useAttendanceReport } from "@/hooks/attendance/useAttendanceReport";
 
 export default function StudentAttendancePage() {
   const { data, loading, error } =
