@@ -23,7 +23,7 @@ export default function HomePage() {
           </Link>
 
           <Link
-            href="/auth/student-login"
+            href="/auth/login"
             className="block w-full rounded-lg border border-slate-300 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
           >
             Continue as Student

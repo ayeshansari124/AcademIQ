@@ -18,10 +18,8 @@ export function verifyToken(token: string): TokenPayload {
   return jwt.verify(token, JWT_SECRET) as TokenPayload;
 }
 
-/* ✅ SINGLE SOURCE OF TRUTH */
 export async function getAuthPayload(): Promise<TokenPayload | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = (await cookies()).get("token")?.value;
   if (!token) return null;
 
   try {

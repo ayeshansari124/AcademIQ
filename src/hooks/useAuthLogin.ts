@@ -1,25 +1,19 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { registerPush } from "@/lib/push-client";
 
-export function useAuthLogin({
-  expectedRole,
-  redirectTo,
-  loadingText,
-}: {
-  expectedRole: "ADMIN" | "STUDENT";
-  redirectTo: string;
-  loadingText: string;
-}) {
+export function useAuthLogin() {
   const router = useRouter();
 
   return async (values: Record<string, string>) => {
-    const t = toast.loading(loadingText);
+    const t = toast.loading("Signing in...");
 
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // ✅ THIS WAS MISSING
+      credentials: "include",
       body: JSON.stringify(values),
     });
 
@@ -31,14 +25,13 @@ export function useAuthLogin({
       return;
     }
 
-    if (data.user.role !== expectedRole) {
-      toast.error("Unauthorized role");
-      return;
-    }
-
     toast.success("Welcome back");
     await registerPush();
 
-    router.replace(redirectTo); // replace > push
+    router.replace(
+      data.user.role === "ADMIN"
+        ? "/admin/dashboard"
+        : "/student/dashboard"
+    );
   };
 }

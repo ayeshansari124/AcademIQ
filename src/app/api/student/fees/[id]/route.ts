@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { getFeeProfile } from "@/controllers/fees.controller";
 
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
