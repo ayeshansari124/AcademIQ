@@ -1,10 +1,13 @@
 export type AssignmentScope = "CLASS" | "STUDENT";
 
-export interface CreateAssignmentDTO {
-  title: string;
-  description: string;
+export interface AssignmentType {
+  content: string;
+  createdBy: {
+    _id: string;
+    name: string;
+  };
   scope: AssignmentScope;
   classId?: string;
   studentIds?: string[];
-  dueDate?: string;
+  students: string;
 }

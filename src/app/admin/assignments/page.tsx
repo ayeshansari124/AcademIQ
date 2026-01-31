@@ -13,25 +13,28 @@ export default function AdminAssignmentsPage() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="p-6 max-w-4xl mx-auto">
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-blue-900">
-          Assignments
-        </h1>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-blue-900">
+            Assignments
+          </h1>
+          <p className="text-sm text-slate-600">
+            Create and manage assignments for classes or students.
+          </p>
+        </div>
 
         <button
           onClick={() => setOpen(true)}
-          className="w-10 h-10 rounded-full bg-blue-600 text-white
-                     flex items-center justify-center hover:bg-blue-700"
+          className="mt-1 flex h-10 w-10 items-center justify-center
+                     rounded-full bg-blue-600 text-white
+                     hover:bg-blue-700"
+          aria-label="Create assignment"
         >
-          <FaPlus />
+          <FaPlus size={14} />
         </button>
       </div>
-
-      <p className="text-sm text-slate-500">
-        Create and manage assignments for classes or students.
-      </p>
 
       {/* CONTENT */}
       {loading ? (

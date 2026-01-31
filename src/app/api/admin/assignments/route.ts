@@ -1,25 +1,15 @@
 import connectDB from "@/lib/db";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 import {
-  createAssignmentController,
-  fetchAdminAssignments,
+  createAssignmentController
 } from "@/controllers/assignment.controller";
-
-const JWT_SECRET = process.env.JWT_SECRET!;
-
-async function getAdmin() {
-  const token = (await cookies()).get("token")?.value;
-  const payload = jwt.verify(token!, JWT_SECRET) as any;
-  if (payload.role !== "ADMIN") throw new Error("FORBIDDEN");
-  return payload;
-}
+import { getAllAssignments } from "@/services/assignment.service";
+import getAdmin from "@/guards/getAdmin";
 
 export async function GET() {
   await connectDB();
   await getAdmin();
 
-  const assignments = await fetchAdminAssignments();
+  const assignments = await getAllAssignments();
   return Response.json({ assignments });
 }
 

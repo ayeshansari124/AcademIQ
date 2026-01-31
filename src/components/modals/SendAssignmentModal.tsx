@@ -8,10 +8,8 @@ interface Props {
 }
 
 export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
   const [scope, setScope] = useState<"STUDENT" | "CLASS">("CLASS");
-
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
 
@@ -34,7 +32,7 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
   }, []);
 
   async function handleSubmit() {
-    if (!title.trim() || !description.trim()) {
+    if (!content.trim()) {
       alert("Title and description are required");
       return;
     }
@@ -52,8 +50,7 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
     setLoading(true);
 
     const body: any = {
-      title,
-      description,
+      content,
       scope,
     };
 
@@ -79,26 +76,22 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-md rounded-lg p-5 space-y-4">
-        <h2 className="font-semibold text-lg">Send Assignment</h2>
-
-        <input
-          className="w-full border rounded px-3 py-2 text-sm"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+      <div className="bg-white w-full max-w-md rounded-xl p-5 space-y-4">
+        <h2 className="font-bold text-lg text-blue-900">Send Assignment</h2>
 
         <textarea
-          className="w-full border rounded px-3 py-2 text-sm"
-          placeholder="Description"
-          rows={4}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+  className="w-full border rounded-lg px-3 py-2 text-sm"
+  placeholder="New Assignment"
+  rows={4}
+  value={content}
+  onChange={(e) => {
+    setContent(e.target.value);
+  }}
+/>
+
 
         <select
-          className="w-full border rounded px-3 py-2 text-sm"
+          className="w-full border rounded-lg px-3 py-2 text-sm"
           value={scope}
           onChange={(e) => {
             setScope(e.target.value as any);
@@ -112,7 +105,7 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
 
         {scope === "CLASS" && (
           <select
-            className="w-full border rounded px-3 py-2 text-sm"
+            className="w-full border rounded-lg px-3 py-2 text-sm"
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
           >
@@ -128,7 +121,7 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
         {scope === "STUDENT" && (
           <div className="max-h-40 overflow-y-auto border rounded p-2 space-y-1">
             {students.map((s) => (
-              <label key={s._id} className="flex gap-2 text-sm">
+              <label key={s._id} className="flex gap-2 text-">
                 <input
                   type="checkbox"
                   checked={selectedStudents.includes(s._id)}
@@ -136,7 +129,7 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
                     setSelectedStudents((prev) =>
                       e.target.checked
                         ? [...prev, s._id]
-                        : prev.filter((id) => id !== s._id)
+                        : prev.filter((id) => id !== s._id),
                     );
                   }}
                 />
@@ -147,13 +140,16 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
         )}
 
         <div className="flex justify-end gap-3">
-          <button onClick={onClose} className="text-sm text-slate-500">
+          <button
+            onClick={onClose}
+            className="text-sm text-slate-500 hover:cursor-pointer"
+          >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded text-sm"
+            className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover: cursor-pointer"
           >
             {loading ? "Sending…" : "Send"}
           </button>

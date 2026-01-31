@@ -2,24 +2,20 @@ import mongoose, { Schema, Types } from "mongoose";
 
 const AssignmentSchema = new Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
+    content: { type: String, required: true },
 
-    // WHO sent it
     createdBy: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    // TARGETING
     scope: {
       type: String,
       enum: ["STUDENT", "CLASS"],
       required: true,
     },
 
-    // If scope === STUDENT
     studentIds: [
       {
         type: Types.ObjectId,
@@ -27,18 +23,10 @@ const AssignmentSchema = new Schema(
       },
     ],
 
-    // If scope === CLASS
     classId: {
       type: Types.ObjectId,
       ref: "Class",
       default: null,
-    },
-
-    dueDate: Date,
-
-    isActive: {
-      type: Boolean,
-      default: true,
     },
   },
   { timestamps: true }

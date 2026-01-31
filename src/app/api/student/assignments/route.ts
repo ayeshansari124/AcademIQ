@@ -1,6 +1,6 @@
 import connectDB from "@/lib/db";
 import Student from "@/models/Student";
-import { fetchStudentAssignments } from "@/controllers/assignment.controller";
+import { getAssignmentsForStudent } from "@/services/assignment.service";
 import { requireStudent } from "@/guards/requireStudent";
 
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
     return Response.json({ assignments: [] });
   }
 
-  const assignments = await fetchStudentAssignments(
+  const assignments = await getAssignmentsForStudent(
     student._id.toString(),
     student.class.toString()
   );

@@ -1,11 +1,14 @@
 "use client";
 
+import { formatDateTime } from "@/utils/dateTime";
+
 interface Assignment {
   _id: string;
-  title: string;
-  description: string;
-  scope: "CLASS" | "STUDENT";
+  content: string;
   createdAt: string;
+  createdBy: {
+    name: string;
+  };
 }
 
 interface Props {
@@ -13,44 +16,32 @@ interface Props {
   mode: "ADMIN" | "STUDENT";
 }
 
-export default function AssignmentPage({ assignments, mode }: Props) {
+export default function AssignmentPage({ assignments }: Props) {
   if (assignments.length === 0) {
     return (
       <p className="text-sm text-slate-500">
-        No assignments available.
+        No assignments yet.
       </p>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {assignments.map((a) => (
         <div
           key={a._id}
-          className="border rounded-lg p-4 bg-white"
+          className="rounded-lg bg-white p-4 shadow"
         >
-          <div className="flex justify-between items-start">
-            <h2 className="font-semibold text-slate-800">
-              {a.title}
-            </h2>
-
-            <span className="text-xs text-slate-500">
-              {new Date(a.createdAt).toLocaleString()}
-            </span>
-          </div>
-
-          <p className="text-sm text-slate-700 mt-1">
-            {a.description}
+          {/* CONTENT */}
+          <p className="text-sm text-slate-800">
+            {a.content}
           </p>
 
-          {/* 🔐 Admin-only info */}
-          {mode === "ADMIN" && (
-            <span className="text-xs text-blue-600 mt-2 inline-block">
-              {a.scope === "CLASS"
-                ? "Class Assignment"
-                : "Selected Students"}
-            </span>
-          )}
+          {/* META */}
+          <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+            <span>By {a.createdBy.name}</span>
+            <span>{formatDateTime(a.createdAt)}</span>
+          </div>
         </div>
       ))}
     </div>
