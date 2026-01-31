@@ -1,132 +1,75 @@
+import "server-only";
 import Notification from "@/models/Notification";
 import { Types } from "mongoose";
+import { CreateNotificationDTO } from "@/types/notification";
 
-/* --------------------------------------------------
-   Internal DB writer
--------------------------------------------------- */
-async function recordNotification({
-  type,
-  scope,
-  title,
-  message,
-  metadata = {},
-  userId = null,
-  role = null,
-}: {
+async function recordNotification(data: {
   type: string;
   scope: "USER" | "ROLE" | "ALL";
   title: string;
   message: string;
-  metadata?: any;
-  userId?: string | null;
+  metadata?: Record<string, unknown>;
+  userId?: Types.ObjectId | null;
   role?: "ADMIN" | "STUDENT" | null;
 }) {
   return Notification.create({
-    type,
-    scope,
-    userId,
-    role,
-    title,
-    message,
-    metadata,
+    ...data,
+    metadata: data.metadata ?? {},
   });
 }
 
-/* --------------------------------------------------
-   PUBLIC DB API
--------------------------------------------------- */
-
-/** Single user */
-export async function recordUserNotification({
-  userId,
-  type,
-  title,
-  message,
-  metadata,
-}: {
-  userId: string;
-  type: string;
-  title: string;
-  message: string;
-  metadata?: any;
-}) {
+export async function recordUserNotification(
+  data: Required<Pick<CreateNotificationDTO, "userId" | "title" | "message">> &
+    Partial<CreateNotificationDTO>
+) {
   return recordNotification({
-    type,
+    type: data.type ?? "ADMIN_BROADCAST",
     scope: "USER",
-    userId,
-    title,
-    message,
-    metadata,
+    userId: new Types.ObjectId(data.userId),
+    title: data.title,
+    message: data.message,
+    metadata: data.metadata,
   });
 }
 
-/** Multiple selected users */
-export async function recordUsersNotification({
-  userIds,
-  type,
-  title,
-  message,
-  metadata,
-}: {
-  userIds: string[];
-  type: string;
-  title: string;
-  message: string;
-  metadata?: any;
-}) {
+export async function recordUsersNotification(
+  data: Required<Pick<CreateNotificationDTO, "userIds" | "title" | "message">> &
+    Partial<CreateNotificationDTO>
+) {
   return Notification.insertMany(
-    userIds.map((id) => ({
-      type,
+    data.userIds.map((id) => ({
+      type: data.type ?? "ADMIN_BROADCAST",
       scope: "USER",
       userId: new Types.ObjectId(id),
-      title,
-      message,
-      metadata,
+      title: data.title,
+      message: data.message,
+      metadata: data.metadata ?? {},
     }))
   );
 }
 
-/** Everyone */
-export async function recordGlobalNotification({
-  type = "ADMIN_BROADCAST",
-  title,
-  message,
-  metadata,
-}: {
-  type?: string;
-  title: string;
-  message: string;
-  metadata?: any;
-}) {
+export async function recordGlobalNotification(
+  data: Pick<CreateNotificationDTO, "title" | "message" | "metadata" | "type">
+) {
   return recordNotification({
-    type,
+    type: data.type ?? "ADMIN_BROADCAST",
     scope: "ALL",
-    title,
-    message,
-    metadata,
+    title: data.title,
+    message: data.message,
+    metadata: data.metadata,
   });
 }
 
-/** Role based */
-export async function recordRoleNotification({
-  role,
-  type,
-  title,
-  message,
-  metadata,
-}: {
-  role: "ADMIN" | "STUDENT";
-  type: string;
-  title: string;
-  message: string;
-  metadata?: any;
-}) {
+export async function recordRoleNotification(
+  data: Required<Pick<CreateNotificationDTO, "role" | "title" | "message">> &
+    Partial<CreateNotificationDTO>
+) {
   return recordNotification({
-    type,
+    type: data.type ?? "ADMIN_BROADCAST",
     scope: "ROLE",
-    role,
-    title,
-    message,
-    metadata,
+    role: data.role,
+    title: data.title,
+    message: data.message,
+    metadata: data.metadata,
   });
 }

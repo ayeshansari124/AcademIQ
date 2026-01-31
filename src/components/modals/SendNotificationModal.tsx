@@ -2,50 +2,43 @@
 
 import { useState } from "react";
 import { FaPaperPlane } from "react-icons/fa";
-import toast from "react-hot-toast";
+import { useSendNotification } from "@/hooks/notification/useSendNotification";
 
 interface Props {
   onClose: () => void;
+  onSuccess: () => void | Promise<void>;
 }
 
-export default function SendNotificationModal({ onClose }: Props) {
+export default function SendNotificationModal({
+  onClose,
+  onSuccess,  
+}: Props) {
+
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
 
-  async function handleSend() {
-    if (!title || !message) {
-      toast.error("Title and message required");
-      return;
-    }
+  const isValid = title.trim().length > 0 && message.trim().length > 0;
 
-    const t = toast.loading("Sending...");
-
-    const res =await fetch("/api/admin/notifications", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    title,
-    message,
-    scope: "ALL", 
-  }),
+const { send, loading } = useSendNotification(async () => {
+  await onSuccess();
 });
 
-    toast.dismiss(t);
 
-    if (!res.ok) {
-      toast.error("Failed to send");
-      return;
-    }
+  function handleSend() {
+    if (!isValid) return;
 
-    toast.success("Notification sent 🚀");
-    onClose();
+    send({
+      title,
+      message,
+      scope: "ALL",
+    });
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
       <div className="bg-white w-full max-w-sm rounded-xl p-5 m-4 space-y-4">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          📣 Send Notification
+        <h2 className="text-lg font-bold text-blue-900">
+          Send Notification
         </h2>
 
         <input
@@ -72,12 +65,22 @@ export default function SendNotificationModal({ onClose }: Props) {
           </button>
 
           <button
-            onClick={handleSend}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg"
-          >
-            <FaPaperPlane />
-            Send
-          </button>
+  onClick={handleSend}
+  disabled={!isValid || loading}
+  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white
+    transition
+    ${
+      !isValid || loading
+        ? "bg-blue-400 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700"
+    }`}
+>
+  <FaPaperPlane className="h-4 w-4 -translate-y-px" />
+  <span className="leading-none">
+    {loading ? "Sending…" : "Send"}
+  </span>
+</button>
+
         </div>
       </div>
     </div>

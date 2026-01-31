@@ -7,7 +7,9 @@ import SendAssignmentModal from "@/components/modals/SendAssignmentModal";
 import { useAssignments } from "@/hooks/assignment/useAssignments";
 
 export default function AdminAssignmentsPage() {
-  const { assignments, loading } = useAssignments("/api/admin/assignments");
+  const { assignments, loading, refetch } = useAssignments(
+    "/api/admin/assignments"
+  );
   const [open, setOpen] = useState(false);
 
   return (
@@ -22,19 +24,9 @@ export default function AdminAssignmentsPage() {
 
         <button
           onClick={() => setOpen(true)}
-          aria-label="Create assignment"
-          className="
-    flex items-center justify-center
-    h-12 w-12
-    rounded-full
-    bg-blue-600 text-white
-    shadow-md
-    hover:bg-blue-700
-    active:scale-95
-    transition
-  "
+          className="h-12 w-12 rounded-full bg-blue-600 text-white flex items-center justify-center"
         >
-          <FaPlus className="h-5 w-5" />
+          <FaPlus size={18} />
         </button>
       </div>
 
@@ -47,7 +39,10 @@ export default function AdminAssignmentsPage() {
       {open && (
         <SendAssignmentModal
           onClose={() => setOpen(false)}
-          onSuccess={() => setOpen(false)}
+          onSuccess={async () => {
+            setOpen(false);
+            await refetch(); // ✅ THIS IS THE FIX
+          }}
         />
       )}
     </div>

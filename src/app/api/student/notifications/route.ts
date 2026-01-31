@@ -1,15 +1,15 @@
 import connectDB from "@/lib/db";
-import { fetchNotificationsForUser } from "@/controllers/notification.controller";
 import { requireStudent } from "@/guards/requireStudent";
+import { fetchNotificationsForUser } from "@/controllers/notification.controller";
 
 export async function GET() {
   await connectDB();
 
-  const { userId, role } = await requireStudent();
+  const { userId } = await requireStudent();
 
   const notifications = await fetchNotificationsForUser({
     userId,
-    role,
+    role: "STUDENT",
   });
 
   return Response.json({ notifications });

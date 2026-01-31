@@ -1,39 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Assignment } from "@/types/assignment";
 
 interface UseAssignmentsResult {
   assignments: Assignment[];
   loading: boolean;
+  refetch: () => Promise<void>;
 }
 
-export function useAssignments(url: string): UseAssignmentsResult {
+export function useAssignments(apiUrl: string): UseAssignmentsResult {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchAssignments = useCallback(async () => {
+    setLoading(true);
+    const res = await fetch(apiUrl, { credentials: "include" });
+    const data = await res.json();
+    setAssignments(data.assignments ?? []);
+    setLoading(false);
+  }, [apiUrl]);
+
   useEffect(() => {
-    let mounted = true;
+    fetchAssignments();
+  }, [fetchAssignments]);
 
-    fetch(url, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (mounted) {
-          setAssignments(data.assignments ?? []);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setAssignments([]);
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [url]);
-
-  return { assignments, loading };
+  return { assignments, loading, refetch: fetchAssignments };
 }

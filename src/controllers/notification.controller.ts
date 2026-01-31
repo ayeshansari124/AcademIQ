@@ -1,47 +1,41 @@
-import Notification from "@/models/Notification";
 import mongoose from "mongoose";
+import Notification from "@/models/Notification";
 import {
   recordGlobalNotification,
   recordRoleNotification,
   recordUserNotification,
   recordUsersNotification,
-} from "../services/notification.service";
-import { CreateNotificationDTO } from "@/types/notification";
-
-/* ---------------- CREATE (ADMIN) ---------------- */
+} from "@/services/notification.service";
+import { CreateNotificationDTO, NotificationRole } from "@/types/notification";
 
 export async function createNotificationController(
   data: CreateNotificationDTO
 ) {
-  const { scope } = data;
-
-  if (scope === "ALL") {
+  if (data.scope === "ALL") {
     return recordGlobalNotification(data);
   }
 
-  if (scope === "ROLE" && data.role) {
-    return recordRoleNotification(data);
+  if (data.scope === "ROLE" && data.role) {
+    return recordRoleNotification(data as any);
   }
 
-  if (scope === "USER" && data.userId) {
-    return recordUserNotification(data);
+  if (data.scope === "USER" && data.userId) {
+    return recordUserNotification(data as any);
   }
 
-  if (scope === "USER" && data.userIds?.length) {
-    return recordUsersNotification(data);
+  if (data.scope === "USER" && data.userIds?.length) {
+    return recordUsersNotification(data as any);
   }
 
   throw new Error("INVALID_NOTIFICATION_PAYLOAD");
 }
-
-/* ---------------- FETCH ---------------- */
 
 export async function fetchNotificationsForUser({
   userId,
   role,
 }: {
   userId: string;
-  role: "ADMIN" | "STUDENT";
+  role: NotificationRole;
 }) {
   return Notification.find({
     $or: [
@@ -49,13 +43,5 @@ export async function fetchNotificationsForUser({
       { scope: "ROLE", role },
       { scope: "USER", userId: new mongoose.Types.ObjectId(userId) },
     ],
-  }).sort({ createdAt: -1 });
-}
-
-/* ---------------- READ ---------------- */
-
-export async function markNotificationAsRead(notificationId: string) {
-  return Notification.findByIdAndUpdate(notificationId, {
-    isRead: true,
-  });
+  }).sort({ createdAt: -1 }).limit(10);
 }

@@ -1,27 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FaPaperPlane } from "react-icons/fa";
 import { AssignmentScope, AssignmentCreatePayload } from "@/types/assignment";
 import { useSendAssignment } from "@/hooks/assignment/useSendAssignment";
-import { useRouter } from "next/navigation";
 
 interface Props {
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: () => void | Promise<void>;
 }
 
-export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
+export default function SendAssignmentModal({
+  onClose,
+  onSuccess,
+}: Props) {
   const [content, setContent] = useState("");
   const [scope, setScope] = useState<AssignmentScope>("CLASS");
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
-  const router = useRouter();
 
-  const { submit, loading } = useSendAssignment(() => {
-    onClose();
-    router.refresh();
+  const { submit, loading } = useSendAssignment(async () => {
+    await onSuccess(); 
   });
 
   useEffect(() => {
@@ -55,7 +56,9 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white w-full max-w-md rounded-xl p-5 space-y-4">
-        <h2 className="font-bold text-lg text-blue-900">Send Assignment</h2>
+        <h2 className="font-bold text-lg text-blue-900">
+          Send Assignment
+        </h2>
 
         <textarea
           className="w-full border rounded-lg px-3 py-2 text-sm"
@@ -68,7 +71,9 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
         <select
           className="w-full border rounded-lg px-3 py-2 text-sm"
           value={scope}
-          onChange={(e) => setScope(e.target.value as AssignmentScope)}
+          onChange={(e) =>
+            setScope(e.target.value as AssignmentScope)
+          }
         >
           <option value="CLASS">Full Class</option>
           <option value="STUDENT">Selected Students</option>
@@ -100,7 +105,7 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
                     setSelectedStudents((prev) =>
                       e.target.checked
                         ? [...prev, s._id]
-                        : prev.filter((id) => id !== s._id),
+                        : prev.filter((id) => id !== s._id)
                     )
                   }
                 />
@@ -114,11 +119,16 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
           <button onClick={onClose} className="text-sm text-slate-500">
             Cancel
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={!isFormValid || loading}
-            className={`
-    px-4 py-2 rounded text-sm
+
+         <button
+  onClick={handleSubmit}
+  disabled={!isFormValid || loading}
+  className={`
+    flex items-center justify-center
+    gap-2
+    px-4 py-2
+    rounded-lg
+    text-sm font-medium
     text-white
     transition
     ${
@@ -127,9 +137,13 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
         : "bg-blue-600 hover:bg-blue-700"
     }
   `}
-          >
-            {loading ? "Sending…" : "Send"}
-          </button>
+>
+  <FaPaperPlane className="h-4 w-4 relative top-px" />
+  <span className="leading-none">
+    {loading ? "Sending…" : "Send"}
+  </span>
+</button>
+
         </div>
       </div>
     </div>

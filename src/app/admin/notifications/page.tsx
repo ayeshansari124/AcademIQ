@@ -7,7 +7,7 @@ import NotificationPage from "@/components/pages/NotificationPage";
 import SendNotificationModal from "@/components/modals/SendNotificationModal";
 
 export default function AdminNotificationsPage() {
-  const { notifications, loading } = useNotifications(
+  const { notifications, loading, refetch } = useNotifications(
     "/api/admin/notifications"
   );
   const [open, setOpen] = useState(false);
@@ -15,10 +15,11 @@ export default function AdminNotificationsPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">Notifications</h1>
+        <h1 className="text-2xl font-bold text-blue-900">Notifications</h1>
+
         <button
           onClick={() => setOpen(true)}
-          className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center"
+          className="h-10 w-10 rounded-full bg-blue-600 text-white flex items-center justify-center"
         >
           <FaPlus />
         </button>
@@ -32,7 +33,15 @@ export default function AdminNotificationsPage() {
         <NotificationPage notifications={notifications} />
       )}
 
-      {open && <SendNotificationModal onClose={() => setOpen(false)} />}
+      {open && (
+        <SendNotificationModal
+          onClose={() => setOpen(false)}
+          onSuccess={async () => {
+            setOpen(false);
+            await refetch();
+          }}
+        />
+      )}
     </div>
   );
 }
