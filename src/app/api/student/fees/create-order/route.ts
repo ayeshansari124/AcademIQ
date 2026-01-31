@@ -9,35 +9,28 @@ const razorpay = new Razorpay({
 });
 
 export async function POST(req: Request) {
-  try {
-    await connectDB();
+  await connectDB();
 
-    const { feeRecordId } = await req.json();
-    const fee = await FeeRecord.findById(feeRecordId);
+  const { feeRecordId } = await req.json();
+  const fee = await FeeRecord.findById(feeRecordId);
 
-    if (!fee || fee.status === "PAID") {
-      return NextResponse.json(
-        { error: "Invalid fee record" },
-        { status: 400 }
-      );
-    }
-
-    const order = await razorpay.orders.create({
-      amount: fee.amountDue * 100,
-      currency: "INR",
-      receipt: `fee_${fee._id}`,
-    });
-
-    return NextResponse.json({
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      key: process.env.RAZORPAY_KEY_ID,
-    });
-  } catch {
+  if (!fee || fee.status === "PAID") {
     return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 }
+      { error: "Invalid fee record" },
+      { status: 400 }
     );
   }
+
+  const order = await razorpay.orders.create({
+    amount: fee.amountDue * 100,
+    currency: "INR",
+    receipt: `fee_${fee._id}`,
+  });
+
+  return NextResponse.json({
+    orderId: order.id,
+    amount: order.amount,
+    currency: order.currency,
+    key: process.env.RAZORPAY_KEY_ID,
+  });
 }

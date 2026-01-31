@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import { loginUser } from "@/services/auth.service";
+import { loginController } from "@/controllers/auth.controller";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   await connectDB();
   const body = await req.json();
 
-  const { user, token } = await loginUser(body);
+  const { user, token } = await loginController(body);
 
   const res = NextResponse.json({ user });
 
@@ -17,6 +17,6 @@ export async function POST(req: Request) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
+
   return res;
 }
-

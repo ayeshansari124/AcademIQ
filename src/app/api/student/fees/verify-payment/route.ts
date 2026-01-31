@@ -31,19 +31,13 @@ export async function POST(req: Request) {
       .digest("hex");
 
     if (expected !== razorpay_signature) {
-      return NextResponse.json(
-        { error: "Invalid signature" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
     // 📄 Fetch fee record
     const fee = await FeeRecord.findById(feeRecordId);
     if (!fee) {
-      return NextResponse.json(
-        { error: "Fee not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Fee not found" }, { status: 404 });
     }
 
     // 💰 Mark paid
@@ -55,24 +49,22 @@ export async function POST(req: Request) {
     await fee.save();
 
     // 👨‍🎓 Fetch student + user name (STRICT)
-  const student = await Student.findById(fee.studentId);
-if (!student) {
-  throw new Error("STUDENT_NOT_FOUND");
-}
+    const student = await Student.findById(fee.studentId);
+    if (!student) {
+      throw new Error("STUDENT_NOT_FOUND");
+    }
 
-const user = await User.findById(student.userId).select("fullName");
-if (!user) {
-  throw new Error("USER_NOT_FOUND");
-}
- console.log("STUDENT RAW:", student);
+    const user = await User.findById(student.userId).select("fullName");
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    console.log("STUDENT RAW:", student);
 
-const studentName = student.fullName;
+    const studentName = student.fullName;
 
-const amount = fee.amountDue;
+    const amount = fee.amountDue;
 
-    /* --------------------------------------------------
-       STUDENT: DB NOTIFICATION ONLY
-    -------------------------------------------------- */
+   //STUDENT DB NOTIFICATION
     await recordUserNotification({
       userId: student.userId._id.toString(),
       type: "FEES_PAID",
@@ -84,9 +76,7 @@ const amount = fee.amountDue;
       },
     });
 
-    /* --------------------------------------------------
-       ADMIN: DB + WEB PUSH
-    -------------------------------------------------- */
+    //ADMIN WEB+ DB NOTIFICATION
     const adminMessage = `${studentName} paid ₹${amount} fees successfully.`;
 
     // DB notification for admins
@@ -120,13 +110,11 @@ const amount = fee.amountDue;
       success: true,
       message: "Fee payment successful",
     });
-
   } catch (err) {
     console.error("FEE VERIFY ERROR:", err);
     return NextResponse.json(
       { error: "Payment verification failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

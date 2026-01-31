@@ -11,24 +11,22 @@ export interface TokenPayload {
 }
 
 export function signToken(payload: TokenPayload) {
-  return jwt.sign(payload, JWT_SECRET);
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 }
 
 export function verifyToken(token: string): TokenPayload {
   return jwt.verify(token, JWT_SECRET) as TokenPayload;
 }
 
-export async function getStudentUserId(): Promise<string> {
+/* ✅ SINGLE SOURCE OF TRUTH */
+export async function getAuthPayload(): Promise<TokenPayload | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
+  if (!token) return null;
 
-  if (!token) throw new Error("UNAUTHORIZED");
-
-  const payload = verifyToken(token);
-
-  // if (payload.role !== "STUDENT") {
-  //   throw new Error("FORBIDDEN");
-  // }
-
-  return payload.userId; // USER ID
+  try {
+    return verifyToken(token);
+  } catch {
+    return null;
+  }
 }

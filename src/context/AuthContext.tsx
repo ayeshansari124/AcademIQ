@@ -2,43 +2,28 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type User = any;
-
-type AuthContextType = {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  loading: boolean;
-  logout: () => void;
-};
-
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<any>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const logout = () => setUser(null);
-
 
   useEffect(() => {
     fetch("/api/auth/me", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setUser(data.user);
         setLoading(false);
       });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, setUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuthContext() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuthContext must be used within AuthProvider");
-  }
-  return context;
+export function useAuth() {
+  return useContext(AuthContext);
 }
