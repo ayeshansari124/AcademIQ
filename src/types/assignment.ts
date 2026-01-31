@@ -1,13 +1,21 @@
 export type AssignmentScope = "CLASS" | "STUDENT";
 
-export interface AssignmentType {
+export interface AssignmentCreatePayload {
   content: string;
-  createdBy: {
-    _id: string;
-    name: string;
-  };
   scope: AssignmentScope;
   classId?: string;
   studentIds?: string[];
-  students: string;
+}
+
+export interface AssignmentCreator {
+  _id: string;
+  name: string;
+}
+
+export interface Assignment {
+  _id: string;
+  content: string;
+  scope: AssignmentScope;
+  createdAt: string;
+  createdBy: AssignmentCreator;
 }

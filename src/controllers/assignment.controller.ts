@@ -1,34 +1,29 @@
 import Student from "@/models/Student";
-import {
-  createAssignment,
-} from "../services/assignment.service";
-import {
-  notifyUser,
-} from "@/services/push.service";
-import { AssignmentType} from "@/types/assignment";
+import { notifyUser } from "@/services/push.service";
+import { createAssignment } from "@/services/assignment.service";
+import { AssignmentCreatePayload } from "@/types/assignment";
 
 export async function createAssignmentController(
-  payload: AssignmentType,
-  adminUserId: string
+  payload: AssignmentCreatePayload,
+  adminUserId: string,
 ) {
-  //Create assignment (DB)
   const assignment = await createAssignment({
     ...payload,
     createdBy: adminUserId,
   });
 
-  //Resolve target students
-  let students:string[] = [];
+  let students: { userId: string }[] = [];
 
   if (payload.scope === "CLASS" && payload.classId) {
-    students = await Student.find({ class: payload.classId });
+    students = await Student.find({ class: payload.classId }).select("userId");
   }
 
   if (payload.scope === "STUDENT" && payload.studentIds?.length) {
-    students = await Student.find({ _id: { $in: payload.studentIds } });
+    students = await Student.find({
+      _id: { $in: payload.studentIds },
+    }).select("userId");
   }
 
-  //Notify each student (DB + Push)
   for (const student of students) {
     try {
       await notifyUser(student.userId.toString(), {
@@ -37,9 +32,9 @@ export async function createAssignmentController(
         data: { url: "/student/assignments" },
       });
     } catch {
-      // swallow push errors
+      // intentionally swallowed
     }
   }
+
   return assignment;
 }
-

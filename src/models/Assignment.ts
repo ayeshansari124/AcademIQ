@@ -29,7 +29,7 @@ const AssignmentSchema = new Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.models.Assignment ||

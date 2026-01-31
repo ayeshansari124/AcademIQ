@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AssignmentScope, AssignmentCreatePayload } from "@/types/assignment";
+import { useSendAssignment } from "@/hooks/assignment/useSendAssignment";
+import { useRouter } from "next/navigation";
 
 interface Props {
   onClose: () => void;
@@ -9,69 +12,44 @@ interface Props {
 
 export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
   const [content, setContent] = useState("");
-  const [scope, setScope] = useState<"STUDENT" | "CLASS">("CLASS");
+  const [scope, setScope] = useState<AssignmentScope>("CLASS");
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
-
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
+  const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
+  const { submit, loading } = useSendAssignment(() => {
+    onClose();
+    router.refresh();
+  });
 
-  // 🔐 SAFE FETCH
   useEffect(() => {
     fetch("/api/admin/students", { credentials: "include" })
-      .then(async (res) => (res.ok ? res.json() : { students: [] }))
-      .then((d) => setStudents(d.students || []))
-      .catch(() => setStudents([]));
+      .then((r) => r.json())
+      .then((d) => setStudents(d.students ?? []));
 
     fetch("/api/admin/classes", { credentials: "include" })
-      .then(async (res) => (res.ok ? res.json() : { classes: [] }))
-      .then((d) => setClasses(d.classes || []))
-      .catch(() => setClasses([]));
+      .then((r) => r.json())
+      .then((d) => setClasses(d.classes ?? []));
   }, []);
 
-  async function handleSubmit() {
-    if (!content.trim()) {
-      alert("Title and description are required");
-      return;
-    }
+  const isFormValid =
+    content.trim().length > 0 &&
+    ((scope === "CLASS" && selectedClass !== "") ||
+      (scope === "STUDENT" && selectedStudents.length > 0));
 
-    if (scope === "CLASS" && !selectedClass) {
-      alert("Please select a class");
-      return;
-    }
+  function handleSubmit() {
+    if (!isFormValid) return;
 
-    if (scope === "STUDENT" && selectedStudents.length === 0) {
-      alert("Please select at least one student");
-      return;
-    }
-
-    setLoading(true);
-
-    const body: any = {
+    const payload: AssignmentCreatePayload = {
       content,
       scope,
+      ...(scope === "CLASS" && { classId: selectedClass }),
+      ...(scope === "STUDENT" && { studentIds: selectedStudents }),
     };
 
-    if (scope === "CLASS") body.classId = selectedClass;
-    if (scope === "STUDENT") body.studentIds = selectedStudents;
-
-    const res = await fetch("/api/admin/assignments", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    setLoading(false);
-
-    if (!res.ok) {
-      alert("Failed to send assignment");
-      return;
-    }
-
-    onSuccess();
+    submit(payload);
   }
 
   return (
@@ -80,24 +58,17 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
         <h2 className="font-bold text-lg text-blue-900">Send Assignment</h2>
 
         <textarea
-  className="w-full border rounded-lg px-3 py-2 text-sm"
-  placeholder="New Assignment"
-  rows={4}
-  value={content}
-  onChange={(e) => {
-    setContent(e.target.value);
-  }}
-/>
-
+          className="w-full border rounded-lg px-3 py-2 text-sm"
+          placeholder="New Assignment"
+          rows={4}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
 
         <select
           className="w-full border rounded-lg px-3 py-2 text-sm"
           value={scope}
-          onChange={(e) => {
-            setScope(e.target.value as any);
-            setSelectedClass("");
-            setSelectedStudents([]);
-          }}
+          onChange={(e) => setScope(e.target.value as AssignmentScope)}
         >
           <option value="CLASS">Full Class</option>
           <option value="STUDENT">Selected Students</option>
@@ -121,17 +92,17 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
         {scope === "STUDENT" && (
           <div className="max-h-40 overflow-y-auto border rounded p-2 space-y-1">
             {students.map((s) => (
-              <label key={s._id} className="flex gap-2 text-">
+              <label key={s._id} className="flex gap-2 text-sm">
                 <input
                   type="checkbox"
                   checked={selectedStudents.includes(s._id)}
-                  onChange={(e) => {
+                  onChange={(e) =>
                     setSelectedStudents((prev) =>
                       e.target.checked
                         ? [...prev, s._id]
                         : prev.filter((id) => id !== s._id),
-                    );
-                  }}
+                    )
+                  }
                 />
                 {s.fullName}
               </label>
@@ -140,16 +111,22 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
         )}
 
         <div className="flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="text-sm text-slate-500 hover:cursor-pointer"
-          >
+          <button onClick={onClose} className="text-sm text-slate-500">
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover: cursor-pointer"
+            disabled={!isFormValid || loading}
+            className={`
+    px-4 py-2 rounded text-sm
+    text-white
+    transition
+    ${
+      !isFormValid || loading
+        ? "bg-blue-400 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700"
+    }
+  `}
           >
             {loading ? "Sending…" : "Send"}
           </button>

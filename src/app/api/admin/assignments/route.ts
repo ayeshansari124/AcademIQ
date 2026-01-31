@@ -1,9 +1,7 @@
 import connectDB from "@/lib/db";
-import {
-  createAssignmentController
-} from "@/controllers/assignment.controller";
-import { getAllAssignments } from "@/services/assignment.service";
 import getAdmin from "@/guards/getAdmin";
+import { getAllAssignments } from "@/services/assignment.service";
+import { createAssignmentController } from "@/controllers/assignment.controller";
 
 export async function GET() {
   await connectDB();
