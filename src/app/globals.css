@@ -14,3 +14,23 @@
 .no-scrollbar {
   -ms-overflow-style: none;
 }
+
+/* ================================
+   GLOBAL SCROLLBAR HIDE (SAFE)
+   ================================ */
+
+/* Chrome, Edge, Safari */
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* Old Edge / IE */
+* {
+  -ms-overflow-style: none;
+}

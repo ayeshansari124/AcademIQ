@@ -35,14 +35,6 @@ export async function createAssignmentController(
 
   // 3️⃣ Notify each student (DB + Push)
   for (const student of students) {
-    // DB notification
-    await recordUserNotification({
-      userId: student.userId.toString(),
-      type: "ASSIGNMENT",
-      title: "New Assignment",
-      message: assignment.title,
-      metadata: { assignmentId: assignment._id },
-    });
 
     // Push (best effort)
     try {
