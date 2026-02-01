@@ -15,13 +15,14 @@ export function useAttendanceReport({
   useEffect(() => {
     const url = self
       ? "/api/student/attendance"
-      : `/api/admin/attendance/student/${studentId}`;
+      : studentId
+      ? `/api/admin/attendance/student/${studentId}`
+      : null;
+
+    if (!url) return;
 
     fetch(url, { credentials: "include" })
-      .then((r) => {
-        if (!r.ok) throw new Error();
-        return r.json();
-      })
+      .then(res => (res.ok ? res.json() : Promise.reject()))
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false));

@@ -1,27 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useClassAttendance } from "@/hooks/attendance/useClassAttendance";
 import ListCard from "@/components/common/ListCard";
 
 export default function AdminAttendancePage() {
-  const router = useRouter();
-
   const {
     date,
     setDate,
     classes,
     selectedClass,
     setSelectedClass,
+    students,
     records,
     toggleStatus,
     saveAttendance,
     loading,
-    visibleStudents,
   } = useClassAttendance();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {/* HEADER */}
       <div>
         <h1 className="text-2xl font-bold text-blue-900">
@@ -56,45 +53,51 @@ export default function AdminAttendancePage() {
       </div>
 
       {/* MARK ATTENDANCE */}
-      {selectedClass && records.length > 0 && (
+      {selectedClass && (
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-blue-900">
             Mark Attendance
           </h2>
 
-          {records.map((r) => (
-            <div
-              key={r.student._id}
-              className="flex items-center justify-between rounded-lg border px-4 py-2"
-            >
-              <span className="font-medium">
-                {r.student.fullName}
-              </span>
-
-              <button
-                onClick={() => toggleStatus(r.student._id)}
-                className={`px-3 py-1 rounded text-sm ${
-                  r.status === "PRESENT"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
+          {records.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              No attendance marked yet.
+            </p>
+          ) : (
+            records.map((r) => (
+              <div
+                key={r.student._id}
+                className="flex items-center justify-between rounded-lg border px-4 py-2"
               >
-                {r.status}
-              </button>
-            </div>
-          ))}
+                <span className="font-medium">
+                  {r.student.fullName}
+                </span>
+
+                <button
+                  onClick={() => toggleStatus(r.student._id)}
+                  className={`cursor-pointer px-3 py-1 rounded text-sm ${
+                    r.status === "PRESENT"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {r.status}
+                </button>
+              </div>
+            ))
+          )}
 
           <button
             onClick={saveAttendance}
             disabled={loading}
-            className="rounded bg-blue-900 px-5 py-2 text-white"
+            className="cursor-pointer rounded bg-blue-900 px-5 py-2 text-white disabled:opacity-60"
           >
             Save Attendance
           </button>
         </div>
       )}
 
-      {/* STUDENTS */}
+      {/* STUDENTS LIST — ALWAYS VISIBLE */}
       <div className="pt-6 border-t space-y-2">
         <h2 className="text-lg font-semibold text-blue-900">
           View Attendance
@@ -104,18 +107,18 @@ export default function AdminAttendancePage() {
         </p>
 
         <div className="space-y-3">
-          {visibleStudents.map((s) => (
-            <ListCard
-              key={s._id}
-              title={s.fullName}
-              subtitle={`Class: ${s.class?.name ?? "—"}`}
-              onClick={() =>
-                router.push(
-                  `/admin/attendance/student/${s._id}`
-                )
-              }
-            />
-          ))}
+          {students.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              No students found
+            </p>
+          ) : (
+            students.map((s) => (
+              <ListCard
+                key={s._id}
+                title={s.fullName}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

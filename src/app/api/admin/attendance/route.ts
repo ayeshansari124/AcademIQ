@@ -6,8 +6,15 @@ export async function GET(req: Request) {
   await requireAdmin();
 
   const { searchParams } = new URL(req.url);
-  const classId = searchParams.get("classId")!;
-  const date = searchParams.get("date")!;
+  const classId = searchParams.get("classId");
+  const date = searchParams.get("date");
+
+  if (!classId || !date) {
+    return NextResponse.json(
+      { error: "Missing params" },
+      { status: 400 }
+    );
+  }
 
   const data =
     await AttendanceController.getClassAttendance({ classId, date });

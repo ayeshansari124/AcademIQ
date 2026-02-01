@@ -1,13 +1,5 @@
 export type AttendanceStatus = "PRESENT" | "ABSENT";
 
-export interface AttendanceRecord {
-  student: {
-    _id: string;
-    fullName: string;
-  };
-  status: AttendanceStatus;
-}
-
 export interface AttendanceReport {
   student?: {
     id: string;

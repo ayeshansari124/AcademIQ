@@ -9,39 +9,53 @@ export function useClassAttendance() {
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [records, setRecords] = useState<any[]>([]);
-  const [allStudents, setAllStudents] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetch("/api/admin/classes")
-      .then((r) => r.json())
-      .then((d) => setClasses(d.classes));
+  // --- LOAD CLASSES + STUDENTS (SOURCE OF TRUTH) ---
+  async function loadBaseData() {
+    const [cRes, sRes] = await Promise.all([
+      fetch("/api/admin/classes"),
+      fetch("/api/admin/students"),
+    ]);
 
-    fetch("/api/admin/students")
-      .then((r) => r.json())
-      .then((d) => setAllStudents(d.students));
+    const cData = await cRes.json();
+    const sData = await sRes.json();
+
+    setClasses(cData.classes || []);
+    setStudents(sData.students || []);
+  }
+
+  useEffect(() => {
+    loadBaseData();
   }, []);
 
-  useEffect(() => {
-    if (!selectedClass) return;
+  // --- LOAD ATTENDANCE RECORDS ---
+  async function loadAttendance() {
+    if (!selectedClass) {
+      setRecords([]);
+      return;
+    }
 
-    fetch(
+    const res = await fetch(
       `/api/admin/attendance?classId=${selectedClass}&date=${date}`,
-    )
-      .then((r) => r.json())
-      .then((d) => setRecords(d.records || []));
+    );
+    const data = await res.json();
+    setRecords(data.records || []);
+  }
+
+  useEffect(() => {
+    loadAttendance();
   }, [selectedClass, date]);
 
   function toggleStatus(studentId: string) {
-    setRecords((prev) =>
-      prev.map((r) =>
+    setRecords(prev =>
+      prev.map(r =>
         r.student._id === studentId
           ? {
               ...r,
               status:
-                r.status === "PRESENT"
-                  ? "ABSENT"
-                  : "PRESENT",
+                r.status === "PRESENT" ? "ABSENT" : "PRESENT",
             }
           : r,
       ),
@@ -49,37 +63,42 @@ export function useClassAttendance() {
   }
 
   async function saveAttendance() {
-    setLoading(true);
-    const t = toast.loading("Saving attendance...");
-
-    const res = await fetch("/api/admin/attendance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        classId: selectedClass,
-        date,
-        records,
-      }),
-    });
-
-    toast.dismiss(t);
-    setLoading(false);
-
-    if (!res.ok) {
-      toast.error("Save failed");
+    if (!selectedClass) {
+      toast.error("Select a class");
       return;
     }
 
-    toast.success("Attendance saved");
-    setSelectedClass("");
-    setRecords([]);
-  }
+    setLoading(true);
+    const t = toast.loading("Saving attendance...");
 
-  const visibleStudents = selectedClass
-    ? allStudents.filter(
-        (s) => String(s.class) === selectedClass,
-      )
-    : allStudents;
+    try {
+      const res = await fetch("/api/admin/attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classId: selectedClass,
+          date,
+          records,
+        }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      toast.success("Attendance saved");
+
+      // ✅ HARD RESET UI STATE
+      setSelectedClass("");
+      setRecords([]);
+
+      // ✅ FORCE CLEAN REFRESH
+      await loadBaseData();
+    } catch {
+      toast.error("Save failed");
+    } finally {
+      toast.dismiss(t);
+      setLoading(false);
+    }
+  }
 
   return {
     date,
@@ -87,10 +106,10 @@ export function useClassAttendance() {
     classes,
     selectedClass,
     setSelectedClass,
+    students, // ✅ ALWAYS FULL LIST
     records,
     toggleStatus,
     saveAttendance,
     loading,
-    visibleStudents,
   };
 }

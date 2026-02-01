@@ -1,41 +1,27 @@
 "use client";
 
-import { AttendanceReport, AttendanceStatus } from "@/types/attendance";
+import { AttendanceReport } from "@/types/attendance";
 
 export default function AttendancePage({
   data,
-  title = "My Attendance",
+  title,
 }: {
   data: AttendanceReport;
-  title?: string;
+  title: string;
 }) {
-  const {
-  summary,
-  monthly = {},
-  daily = [],
-  student,
-} = data ?? {};
+  const { summary, monthly, daily, student } = data;
 
-
-  function formatDate(dateStr: string) {
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+  function formatDate(date: string) {
+    return new Date(date).toLocaleDateString("en-IN");
   }
 
   return (
-    
     <div className="p-6 max-w-3xl mx-auto space-y-6">
-        
-      {/* Title */}
       <h1 className="text-2xl font-semibold text-blue-900">
         {title}
       </h1>
 
-      {/* Admin-only student name */}
-      {student?.name && title !== "My Attendance" && (
+      {student?.name && (
         <p className="text-sm text-slate-600">
           Student:{" "}
           <span className="font-medium text-slate-900">
@@ -44,109 +30,99 @@ export default function AttendancePage({
         </p>
       )}
 
-      {/* SUMMARY */}
-      <div className="rounded-xl border p-4">
-        <h2 className="font-semibold mb-3">Summary</h2>
+      <Section title="Summary">
+        <Stat label="Present" value={summary.present} />
+        <Stat label="Absent" value={summary.absent} />
+        <Stat label="Total" value={summary.total} />
+        <Stat
+          label="%"
+          value={`${summary.percentage}%`}
+          danger={summary.percentage < 75}
+        />
+      </Section>
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            Present: <b>{summary.present}</b>
-          </div>
-          <div>
-            Absent: <b>{summary.absent}</b>
-          </div>
-          <div>
-            Total: <b>{summary.total}</b>
-          </div>
-          <div>
-            %:
-            <b
-              className={`ml-1 ${
-                summary.percentage < 75
-                  ? "text-red-600"
-                  : "text-green-600"
-              }`}
-            >
-              {summary.percentage}%
-            </b>
-          </div>
-        </div>
-      </div>
-
-      {/* WARNING */}
       {summary.percentage < 75 && (
-        <div
-          className={`rounded-lg border p-3 text-sm ${
-            summary.percentage < 60
-              ? "border-red-500 bg-red-50 text-red-700"
-              : "border-yellow-500 bg-yellow-50 text-yellow-700"
-          }`}
-        >
-          {summary.percentage < 60
-            ? "⚠️ Attendance critically low (below 60%). Immediate action required."
-            : "⚠️ Attendance below required 75% threshold."}
+        <div className="rounded-lg border p-3 text-sm border-red-500 bg-red-50 text-red-700">
+          Attendance below required threshold.
         </div>
       )}
 
-      {/* MONTHLY */}
-      <div className="rounded-xl border p-4">
-        <h2 className="font-semibold mb-3">Monthly</h2>
-
+      <Section title="Monthly">
         {Object.keys(monthly).length === 0 ? (
-          <p className="text-sm text-slate-500">
-            No data
-          </p>
+          <Empty text="No monthly data" />
         ) : (
-          <div className="space-y-2 text-sm">
-            {Object.entries(monthly).map(
-              ([month, m]) => (
-                <div
-                  key={month}
-                  className="flex justify-between"
-                >
-                  <span>{month}</span>
-                  <span>
-                    {m.present}/{m.total}
-                  </span>
-                </div>
-              ),
-            )}
-          </div>
+          Object.entries(monthly).map(([m, v]) => (
+            <div key={m} className="flex justify-between text-sm">
+              <span>{m}</span>
+              <span>
+                {v.present}/{v.total}
+              </span>
+            </div>
+          ))
         )}
-      </div>
+      </Section>
 
-      {/* DAILY LOG */}
-      <div className="rounded-xl border p-4">
-        <h2 className="font-semibold mb-3">
-          Attendance Log
-        </h2>
-
+      <Section title="Daily Log">
         {daily.length === 0 ? (
-          <p className="text-sm text-slate-500">
-            No records
-          </p>
+          <Empty text="No attendance records" />
         ) : (
-          <div className="space-y-2 text-sm">
-            {daily.map((d) => (
-              <div
-                key={d.date}
-                className="flex justify-between"
+          daily.map(d => (
+            <div
+              key={d.date}
+              className="flex justify-between text-sm"
+            >
+              <span>{formatDate(d.date)}</span>
+              <span
+                className={
+                  d.status === "PRESENT"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }
               >
-                <span>{formatDate(d.date)}</span>
-                <span
-                  className={
-                    d.status === "PRESENT"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }
-                >
-                  {d.status}
-                </span>
-              </div>
-            ))}
-          </div>
+                {d.status}
+              </span>
+            </div>
+          ))
         )}
-      </div>
+      </Section>
     </div>
   );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border p-4 space-y-2">
+      <h2 className="font-semibold">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  danger,
+}: {
+  label: string;
+  value: string | number;
+  danger?: boolean;
+}) {
+  return (
+    <div className="text-sm">
+      {label}:{" "}
+      <b className={danger ? "text-red-600" : ""}>
+        {value}
+      </b>
+    </div>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return <p className="text-sm text-slate-500">{text}</p>;
 }
