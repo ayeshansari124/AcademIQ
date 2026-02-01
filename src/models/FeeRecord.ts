@@ -20,7 +20,11 @@ export interface IFeeRecord extends Document {
 
   paymentMethod?: PaymentMethod;
   razorpayPaymentId?: string;
+
+  // 🔔 REMINDER TRACKING
+  remindersSent: number[];
 }
+
 
 const FeeRecordSchema = new Schema<IFeeRecord>(
   {
@@ -36,7 +40,7 @@ const FeeRecordSchema = new Schema<IFeeRecord>(
       required: true,
     },
 
-    month: { type: Number, required: true, min: 1, max: 12 },
+    month: { type: Number, required: true },
     year: { type: Number, required: true },
 
     amountDue: { type: Number, required: true },
@@ -49,16 +53,24 @@ const FeeRecordSchema = new Schema<IFeeRecord>(
     },
 
     dueDate: { type: Date, required: true },
-    paidAt: { type: Date },
+    paidAt: Date,
 
     paymentMethod: {
       type: String,
       enum: ["ONLINE", "CASH"],
     },
+
     razorpayPaymentId: String,
+
+    // ✅ REQUIRED FOR REMINDERS
+    remindersSent: {
+      type: [Number],
+      default: [],
+    },
   },
   { timestamps: true }
 );
+
 
 FeeRecordSchema.index(
   { studentId: 1, month: 1, year: 1 },

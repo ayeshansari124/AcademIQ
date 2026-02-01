@@ -5,19 +5,31 @@ import toast from "react-hot-toast";
 import { FeeProfileResponse } from "@/types/fee";
 
 export function useFeeProfile(studentId: string) {
-  const [data, setData] = useState<FeeProfileResponse | null>(null);
+  const [data, setData] =
+    useState<FeeProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
+  async function load() {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/student/fees/${studentId}`);
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to load fees");
+      }
+
+      setData(json);
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    fetch(`/api/student/fees/${studentId}`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.error) throw new Error(res.error);
-        setData(res);
-      })
-      .catch(e => toast.error(e.message))
-      .finally(() => setLoading(false));
+    load();
   }, [studentId]);
 
-  return { data, loading };
+  return { data, loading, reload: load };
 }

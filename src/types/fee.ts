@@ -4,11 +4,19 @@ export interface FeeRecordDTO {
   _id: string;
   month: number;
   year: number;
-  amountDue: number;
+  amount: number;
   amountPaid: number;
   status: FeeStatus;
   dueDate: string;
   paidAt?: string;
+}
+
+export interface FeeHistoryRow {
+  _id: string;
+  date: string;
+  amount: number;
+  status: FeeStatus;
+  mode: "ONLINE" | "CASH" | "-";
 }
 
 export interface FeeProfileResponse {
@@ -18,5 +26,5 @@ export interface FeeProfileResponse {
     class?: { name: string };
   };
   currentFee: FeeRecordDTO | null;
-  feeHistory: FeeRecordDTO[];
+  feeHistory: FeeHistoryRow[];
 }
