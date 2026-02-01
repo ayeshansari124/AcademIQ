@@ -15,17 +15,11 @@ export async function getClassById(id: string) {
     "fullName"
   );
 
-  if (!cls) {
-    throw new Error("CLASS_NOT_FOUND");
-  }
-
+  if (!cls) throw new Error("CLASS_NOT_FOUND");
   return cls;
 }
 
-export async function createClass(
-  name: string,
-  subjects: string[]
-) {
+export async function createClass(name: string, subjects: string[]) {
   await connectDB();
 
   if (!name || !subjects.length) {
@@ -40,10 +34,8 @@ export async function deleteClass(id: string) {
 
   const cls = await ClassModel.findById(id);
   if (!cls) throw new Error("CLASS_NOT_FOUND");
-
-  if (cls.students.length > 0) {
+  if (cls.students.length > 0)
     throw new Error("CLASS_HAS_STUDENTS");
-  }
 
   await ClassModel.findByIdAndDelete(id);
 }

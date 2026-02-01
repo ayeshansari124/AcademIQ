@@ -5,14 +5,8 @@ import { X, Plus, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const CLASS_OPTIONS = [
-  "I", "II", "III", "IV", "V",
-  "VI", "VII", "VIII", "IX", "X",
+  "I","II","III","IV","V","VI","VII","VIII","IX","X",
 ];
-
-function capitalize(word: string) {
-  if (!word) return word;
-  return word.charAt(0).toUpperCase() + word.slice(1);
-}
 
 export default function CreateClassModal({
   onClose,
@@ -25,26 +19,17 @@ export default function CreateClassModal({
   const [subjects, setSubjects] = useState<string[]>([""]);
   const [loading, setLoading] = useState(false);
 
-  function updateSubject(index: number, value: string) {
+  function updateSubject(i: number, value: string) {
     const copy = [...subjects];
-    copy[index] = capitalize(value.trim());
+    copy[i] = value.trim();
     setSubjects(copy);
-  }
-
-  function addSubject() {
-    setSubjects([...subjects, ""]);
-  }
-
-  function removeSubject(index: number) {
-    setSubjects(subjects.filter((_, i) => i !== index));
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const cleanSubjects = subjects.filter(Boolean);
-
-    if (!className || cleanSubjects.length === 0) {
+    const clean = subjects.filter(Boolean);
+    if (!className || !clean.length) {
       toast.error("Class and subjects required");
       return;
     }
@@ -52,114 +37,98 @@ export default function CreateClassModal({
     setLoading(true);
     const t = toast.loading("Creating class...");
 
-    const res = await fetch("/api/admin/classes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        name: `Class ${className}`,
-        subjects: cleanSubjects,
-      }),
-    });
+    try {
+      const res = await fetch("/api/admin/classes", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `Class ${className}`,
+          subjects: clean,
+        }),
+      });
 
-    toast.dismiss(t);
-    setLoading(false);
+      if (!res.ok) throw new Error();
 
-    if (!res.ok) {
+      toast.success("Class created");
+      onSuccess();
+    } catch {
       toast.error("Failed to create class");
-      return;
+    } finally {
+      toast.dismiss(t);
+      setLoading(false);
     }
-
-    toast.success("Class created");
-    onSuccess();
   }
 
   return (
     <>
-      {/* Overlay */}
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
-
-      {/* Modal */}
+      <div
+        className="fixed inset-0 bg-black/40 z-40"
+        onClick={onClose}
+      />
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-          {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
+          <header className="mb-6 flex justify-between">
             <h2 className="text-lg font-semibold">Create Class</h2>
             <X className="cursor-pointer" onClick={onClose} />
-          </div>
+          </header>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Class Dropdown */}
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Class
-              </label>
-              <select
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-                className="w-full rounded-lg border px-3 py-2"
-              >
-                <option value="">Select Class</option>
-                {CLASS_OPTIONS.map((c) => (
-                  <option key={c} value={c}>
-                    Class {c}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <select
+              value={className}
+              onChange={e => setClassName(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2"
+            >
+              <option value="">Select Class</option>
+              {CLASS_OPTIONS.map(c => (
+                <option key={c} value={c}>
+                  Class {c}
+                </option>
+              ))}
+            </select>
 
-            {/* Subjects */}
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Subjects
-              </label>
-
-              <div className="space-y-2">
-                {subjects.map((sub, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <input
-                      value={sub}
-                      onChange={(e) =>
-                        updateSubject(i, e.target.value)
-                      }
-                      placeholder="Subject name"
-                      className="flex-1 rounded-lg border px-3 py-2 text-sm"
-                    />
-
-                    {subjects.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeSubject(i)}
-                        className="rounded-md border p-2 text-red-600"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
-                  </div>
-                ))}
+            {subjects.map((sub, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  value={sub}
+                  onChange={e =>
+                    updateSubject(i, e.target.value)
+                  }
+                  className="flex-1 rounded-lg border px-3 py-2"
+                />
+                {subjects.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSubjects(subjects.filter((_, x) => x !== i))
+                    }
+                    className="cursor-pointer rounded-md border p-2 text-red-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
+            ))}
 
-              <button
-                type="button"
-                onClick={addSubject}
-                className="mt-3 flex items-center gap-1 text-sm text-blue-600"
-              >
-                <Plus size={16} /> Add Subject
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setSubjects([...subjects, ""])}
+              className="flex items-center gap-1 text-sm text-blue-600"
+            >
+              <Plus size={16} /> Add Subject
+            </button>
 
-            {/* Actions */}
             <div className="flex justify-end gap-3 pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg border px-4 py-2 text-sm"
+                className="rounded-lg border px-4 py-2"
               >
                 Cancel
               </button>
               <button
                 disabled={loading}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-white"
               >
                 Create
               </button>

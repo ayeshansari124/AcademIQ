@@ -6,26 +6,35 @@ import toast from "react-hot-toast";
 import { Trash2 } from "lucide-react";
 
 export default function ClassProfilePage() {
-  const { id } = useParams();
+  const params = useParams();
   const router = useRouter();
-  const { cls, loading } = useClass(id as string);
+  const id = params?.id as string | undefined;
+
+  const { cls, loading } = useClass(id || "");
 
   async function handleDelete() {
+    if (!id) return;
     if (!confirm("Delete this class?")) return;
 
-    const res = await fetch(`/api/admin/classes/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    const t = toast.loading("Deleting class...");
 
-    if (!res.ok) {
+    try {
+      const res = await fetch(`/api/admin/classes/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
       const data = await res.json();
-      toast.error(data.error);
-      return;
-    }
+      if (!res.ok) throw new Error(data.error);
 
-    toast.success("Class deleted");
-    router.push("/admin/classes");
+      toast.success("Class deleted");
+      router.push("/admin/classes");
+      router.refresh();
+    } catch (err: any) {
+      toast.error(err.message || "Delete failed");
+    } finally {
+      toast.dismiss(t);
+    }
   }
 
   if (loading) return <p className="p-6 text-slate-500">Loading…</p>;
@@ -36,13 +45,17 @@ export default function ClassProfilePage() {
       {/* HEADER */}
       <div className="flex items-center justify-between rounded-xl bg-white p-6 shadow-sm">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{cls.name}</h1>
-          <p className="mt-1 text-sm text-slate-500">Class Overview</p>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            {cls.name}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Class Overview
+          </p>
         </div>
 
         <button
           onClick={handleDelete}
-          className="rounded-lg p-2 text-red-600 hover:bg-red-50"
+          className="cursor-pointer rounded-lg p-2 text-red-600 hover:bg-red-50"
           title="Delete class"
         >
           <Trash2 size={18} />
@@ -50,26 +63,21 @@ export default function ClassProfilePage() {
       </div>
 
       {/* SUBJECTS */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-blue-700">
-          Subjects
-        </h2>
-        <p className="text-sm text-slate-700">{cls.subjects.join(", ")}</p>
-      </div>
+      <Section title="Subjects">
+        <p className="text-sm text-slate-700">
+          {cls.subjects.join(", ")}
+        </p>
+      </Section>
 
       {/* STUDENTS */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-blue-700">
-          Students
-        </h2>
-
+      <Section title="Students">
         {cls.students?.length === 0 ? (
           <p className="text-sm text-slate-500">
             No students enrolled in this class
           </p>
         ) : (
           <ul className="space-y-2">
-            {cls.students?.map((s) => (
+            {cls.students?.map(s => (
               <li
                 key={s._id}
                 className="rounded-lg px-3 py-2 hover:bg-slate-50"
@@ -79,7 +87,24 @@ export default function ClassProfilePage() {
             ))}
           </ul>
         )}
-      </div>
+      </Section>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl bg-white p-6 shadow-sm">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-blue-700">
+        {title}
+      </h2>
+      {children}
     </div>
   );
 }
