@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
@@ -12,10 +12,11 @@ export const metadata: Metadata = {
     "AcademIQ is a smart school management system for attendance, fees, marks, and academic insights.",
 
   applicationName: "AcademIQ",
-
-  themeColor: "#1e3a8a", // blue-900
 };
 
+export const viewport: Viewport = {
+  themeColor: "#0f172a", // blue-900
+};
 export default function RootLayout({
   children,
 }: {

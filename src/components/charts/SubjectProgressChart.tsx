@@ -59,7 +59,12 @@ export default function SubjectProgressChart({ marks }: { marks: Mark[] }) {
         <LineChart data={data}>
           <XAxis dataKey="exam" />
           <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-          <Tooltip formatter={(v: number) => `${v}%`} />
+          <Tooltip
+  formatter={(value) =>
+    typeof value === "number" ? `${value}%` : "-"
+  }
+/>
+
           <Legend />
 
           {subjects.map((subject, i) => (
