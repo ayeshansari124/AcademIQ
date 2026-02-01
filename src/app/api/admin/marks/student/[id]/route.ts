@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/guards/requireAdmin";
 import { adminStudentMarksController } from "@/controllers/marks.controller";
+import { NextResponse } from "next/server";
 
 export async function GET(
   _: Request,
@@ -7,5 +8,8 @@ export async function GET(
 ) {
   await requireAdmin();
   const { id } = await context.params;
-  return adminStudentMarksController(id);
+
+  const data = await adminStudentMarksController(id);
+
+  return NextResponse.json(data);
 }

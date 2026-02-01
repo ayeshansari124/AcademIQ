@@ -8,7 +8,9 @@ import { notifyUser, notifyAdmins } from "@/services/push.service";
 import { CreateMarkDTO } from "@/types/marks";
 
 export async function getStudentsForMarks() {
-  return Student.find().select("_id fullName");
+  return Student.find()
+    .populate("class", "name")
+    .select("fullName class");
 }
 
 export async function getMarksByStudentId(studentId: string) {

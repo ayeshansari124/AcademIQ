@@ -22,12 +22,11 @@ export default function Header({
     toast.dismiss(t);
     toast.success("Logged out");
 
-    // 🔥 hard redirect so middleware re-runs
     window.location.href = "/";
   }
 
   return (
-    <header className="flex items-center justify-between bg-blue-800 px-6 py-4 text-white">
+    <header className="flex items-center justify-between bg-blue-900 px-6 py-4 text-white">
       {/* Menu */}
       <div
         className="flex items-center gap-2 cursor-pointer"

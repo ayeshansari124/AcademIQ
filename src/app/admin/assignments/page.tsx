@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa";
 import AssignmentPage from "@/components/pages/AssignmentPage";
 import SendAssignmentModal from "@/components/modals/SendAssignmentModal";
 import { useAssignments } from "@/hooks/assignment/useAssignments";
+import PlusFab from "@/components/common/PlusFab";
 
 export default function AdminAssignmentsPage() {
   const { assignments, loading, refetch } = useAssignments(
@@ -13,21 +13,18 @@ export default function AdminAssignmentsPage() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="mb-6 flex justify-between">
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-blue-900">Assignments</h1>
+          <h1 className="text-2xl font-bold text-blue-900">
+            Assignments
+          </h1>
           <p className="text-sm text-slate-600">
             Create and manage assignments
           </p>
         </div>
 
-        <button
-          onClick={() => setOpen(true)}
-          className="h-12 w-12 rounded-full bg-blue-600 text-white flex items-center justify-center"
-        >
-          <FaPlus size={18} />
-        </button>
+        <PlusFab onClick={() => setOpen(true)} label="Create assignment" />
       </div>
 
       {loading ? (
@@ -41,7 +38,7 @@ export default function AdminAssignmentsPage() {
           onClose={() => setOpen(false)}
           onSuccess={async () => {
             setOpen(false);
-            await refetch(); // ✅ THIS IS THE FIX
+            await refetch();
           }}
         />
       )}

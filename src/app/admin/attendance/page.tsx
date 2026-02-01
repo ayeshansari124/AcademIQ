@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useClassAttendance } from "@/hooks/attendance/useClassAttendance";
+import ListCard from "@/components/common/ListCard";
 
 export default function AdminAttendancePage() {
   const router = useRouter();
@@ -20,13 +21,19 @@ export default function AdminAttendancePage() {
   } = useClassAttendance();
 
   return (
-    <div className="p-6 space-y-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-semibold text-blue-900">
-        Attendance
-      </h1>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      {/* HEADER */}
+      <div>
+        <h1 className="text-2xl font-bold text-blue-900">
+          Attendance Management
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Mark and review student attendance
+        </p>
+      </div>
 
-      {/* Controls */}
-      <div className="flex gap-4 flex-col sm:flex-row">
+      {/* CONTROLS */}
+      <div className="flex flex-col sm:flex-row gap-4">
         <input
           type="date"
           value={date}
@@ -48,15 +55,22 @@ export default function AdminAttendancePage() {
         </select>
       </div>
 
-      {/* Mark Attendance */}
+      {/* MARK ATTENDANCE */}
       {selectedClass && records.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-blue-900">
+            Mark Attendance
+          </h2>
+
           {records.map((r) => (
             <div
               key={r.student._id}
-              className="flex justify-between border rounded-lg px-4 py-2"
+              className="flex items-center justify-between rounded-lg border px-4 py-2"
             >
-              <span>{r.student.fullName}</span>
+              <span className="font-medium">
+                {r.student.fullName}
+              </span>
+
               <button
                 onClick={() => toggleStatus(r.student._id)}
                 className={`px-3 py-1 rounded text-sm ${
@@ -73,40 +87,36 @@ export default function AdminAttendancePage() {
           <button
             onClick={saveAttendance}
             disabled={loading}
-            className="bg-blue-600 text-white px-5 py-2 rounded"
+            className="rounded bg-blue-900 px-5 py-2 text-white"
           >
             Save Attendance
           </button>
         </div>
       )}
 
-      {/* Students (always visible) */}
-      <div className="pt-6 border-t">
-        <h2 className="text-lg font-semibold mb-2">
-          Students
+      {/* STUDENTS */}
+      <div className="pt-6 border-t space-y-2">
+        <h2 className="text-lg font-semibold text-blue-900">
+          View Attendance
         </h2>
+        <p className="text-sm text-slate-500">
+          Select a student to view detailed attendance
+        </p>
 
-        {visibleStudents.length === 0 ? (
-          <p className="text-sm text-slate-500">
-            No students available
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {visibleStudents.map((s) => (
-              <div
-                key={s._id}
-                onClick={() =>
-                  router.push(
-                    `/admin/attendance/student/${s._id}`,
-                  )
-                }
-                className="cursor-pointer border rounded-lg px-4 py-2 hover:bg-slate-50"
-              >
-                {s.fullName}
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="space-y-3">
+          {visibleStudents.map((s) => (
+            <ListCard
+              key={s._id}
+              title={s.fullName}
+              subtitle={`Class: ${s.class?.name ?? "—"}`}
+              onClick={() =>
+                router.push(
+                  `/admin/attendance/student/${s._id}`
+                )
+              }
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

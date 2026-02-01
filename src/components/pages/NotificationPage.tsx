@@ -1,33 +1,29 @@
 import { NotificationEntity } from "@/types/notification";
 import { formatDateTime } from "@/utils/dateTime";
+import ContentCard from "@/components/common/ContentCard";
 
 interface Props {
   notifications: NotificationEntity[];
 }
 
 export default function NotificationPage({ notifications }: Props) {
+  if (!notifications.length) {
+    return (
+      <p className="text-sm text-slate-500">
+        No notifications yet.
+      </p>
+    );
+  }
+
   return (
     <div className="space-y-3">
       {notifications.map((n) => (
-        <div
+        <ContentCard
           key={n._id}
-          className="rounded-lg p-4 bg-white shadow-lg"
-        >
-          <div className="flex justify-between items-start gap-4">
-            <div className="flex-1">
-              <h2 className="font-semibold text-sm text-slate-900">
-                {n.title}
-              </h2>
-              <p className="text-sm text-slate-700 mt-1 leading-relaxed">
-                {n.message}
-              </p>
-            </div>
-
-            <span className="text-xs text-slate-500 whitespace-nowrap">
-              {formatDateTime(n.createdAt)}
-            </span>
-          </div>
-        </div>
+          title={n.title}
+          content={n.message}
+          metaRight={formatDateTime(n.createdAt)}
+        />
       ))}
     </div>
   );
