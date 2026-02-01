@@ -7,9 +7,6 @@ import FeeRecord from "@/models/FeeRecord";
 import { generateUsername } from "@/utils/generateUsername";
 import { generatePassword } from "@/utils/generatePassword";
 
-/* ---------------- READ ---------------- */
-
-// STUDENT ID (Admin)
 export async function getStudentByStudentId(studentId: string) {
   await connectDB();
 
@@ -21,46 +18,28 @@ export async function getStudentByStudentId(studentId: string) {
   return student;
 }
 
-// USER ID (Student self)
 export async function getStudentByUserId(userId: string) {
   await connectDB();
 
   const student = await Student.findOne({ userId })
     .populate("class", "name")
-    .populate("userId", "username role"); // ✅ ADD THIS
+    .populate("userId", "username role");
 
-  if (!student) {
-    throw new Error("STUDENT_NOT_FOUND");
-  }
-
+  if (!student) throw new Error("STUDENT_NOT_FOUND");
   return student;
 }
-
-
 
 export async function getAllStudents() {
   await connectDB();
 
   return Student.find()
     .populate("class", "name")
-    .select("_id fullName class monthlyFee") // ✅ explicitly include _id
+    .select("_id fullName class monthlyFee")
     .sort({ createdAt: -1 })
     .lean();
 }
 
-/* ---------------- CREATE ---------------- */
-
-interface CreateStudentInput {
-  fullName: string;
-  parentName: string;
-  phone: string;
-  classId: string;
-  subjects: string[];
-  days: string[];
-  monthlyFee: number;
-}
-
-export async function createStudent(data: CreateStudentInput) {
+export async function createStudent(data: any) {
   await connectDB();
 
   const {
@@ -78,8 +57,8 @@ export async function createStudent(data: CreateStudentInput) {
     !parentName ||
     !phone ||
     !classId ||
-    !subjects.length ||
-    !days.length ||
+    !subjects?.length ||
+    !days?.length ||
     !monthlyFee
   ) {
     throw new Error("VALIDATION_ERROR");
@@ -87,10 +66,6 @@ export async function createStudent(data: CreateStudentInput) {
 
   const cls = await ClassModel.findById(classId);
   if (!cls) throw new Error("CLASS_NOT_FOUND");
-
-  if (subjects.some(s => !cls.subjects.includes(s))) {
-    throw new Error("INVALID_SUBJECT");
-  }
 
   let username = generateUsername(fullName);
   while (await User.findOne({ username })) {

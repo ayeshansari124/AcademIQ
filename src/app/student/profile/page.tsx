@@ -6,13 +6,9 @@ import { useStudent } from "@/hooks/student/useStudent";
 export default function StudentSelfProfilePage() {
   const { student, loading } = useStudent("/api/student/profile");
 
-  if (loading) {
-    return <p className="p-8 text-slate-500">Loading...</p>;
-  }
-
-  if (!student) {
+  if (loading) return <p className="p-8 text-slate-500">Loading...</p>;
+  if (!student)
     return <p className="p-8 text-red-500">Profile not found</p>;
-  }
 
   return (
     <ProfilePage

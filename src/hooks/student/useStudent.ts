@@ -6,13 +6,14 @@ export function useStudent(url: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!url) {
+      setLoading(false);
+      return;
+    }
+
     fetch(url, { credentials: "include" })
-      .then(async (res) => {
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data.student;
-      })
-      .then(setStudent)
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => setStudent(data?.student ?? null))
       .finally(() => setLoading(false));
   }, [url]);
 

@@ -34,11 +34,15 @@ export default function AddStudentModal({
       .then(data => setClasses(data.classes || []));
   }, []);
 
-  function toggleDay(day: string) {
-    setDays(prev =>
-      prev.includes(day)
-        ? prev.filter(d => d !== day)
-        : [...prev, day]
+  function toggleItem(
+    value: string,
+    list: string[],
+    setList: (v: string[]) => void
+  ) {
+    setList(
+      list.includes(value)
+        ? list.filter(v => v !== value)
+        : [...list, value]
     );
   }
 
@@ -50,8 +54,8 @@ export default function AddStudentModal({
       !form.parentName ||
       !form.phone ||
       !form.classId ||
-      subjects.length === 0 ||
-      days.length === 0 ||
+      !subjects.length ||
+      !days.length ||
       !form.monthlyFees
     ) {
       toast.error("All fields are required");
@@ -61,36 +65,36 @@ export default function AddStudentModal({
     setLoading(true);
     const t = toast.loading("Creating student...");
 
-    const res = await fetch("/api/admin/students", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: form.fullName,
-        parentName: form.parentName,
-        phone: form.phone,
-        classId: form.classId,
-        subjects,
-        days,
-        monthlyFee: Number(form.monthlyFees),
-      }),
-    });
+    try {
+      const res = await fetch("/api/admin/students", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          parentName: form.parentName,
+          phone: form.phone,
+          classId: form.classId,
+          subjects,
+          days,
+          monthlyFee: Number(form.monthlyFees),
+        }),
+      });
 
-    const data = await res.json();
-    toast.dismiss(t);
-    setLoading(false);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
 
-    if (!res.ok) {
-      toast.error(data.error || "Failed to create student");
-      return;
+      toast.success("Student created");
+      onSuccess({
+        student: data.student,
+        credentials: data.credentials,
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create student");
+    } finally {
+      toast.dismiss(t);
+      setLoading(false);
     }
-
-    toast.success("Student created");
-
-    onSuccess({
-      student: data.student,
-      credentials: data.credentials,
-    });
   }
 
   return (
@@ -100,59 +104,38 @@ export default function AddStudentModal({
         onClick={onClose}
       />
 
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto">
-        <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-          <div className="mb-6 flex items-center justify-between">
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+          <header className="mb-6 flex justify-between">
             <h2 className="text-lg font-semibold">Add Student</h2>
-            <X className="h-5 w-5 cursor-pointer" onClick={onClose} />
-          </div>
+            <X
+              className="h-5 w-5 cursor-pointer"
+              onClick={onClose}
+            />
+          </header>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Student Name */}
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Student Full Name
-              </label>
-              <input
-                value={form.fullName}
-                onChange={e =>
-                  setForm({ ...form, fullName: e.target.value })
-                }
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none"
-              />
-            </div>
+            {[
+              ["Student Full Name", "fullName"],
+              ["Parent Name", "parentName"],
+              ["Phone Number", "phone"],
+            ].map(([label, key]) => (
+              <div key={key}>
+                <label className="block text-sm font-medium">
+                  {label}
+                </label>
+                <input
+                  value={(form as any)[key]}
+                  onChange={e =>
+                    setForm({ ...form, [key]: e.target.value })
+                  }
+                  className="w-full rounded-lg border px-3 py-2"
+                />
+              </div>
+            ))}
 
-            {/* Parent Name */}
             <div>
-              <label className="mb-1 block text-sm font-medium">
-                Parent Name
-              </label>
-              <input
-                value={form.parentName}
-                onChange={e =>
-                  setForm({ ...form, parentName: e.target.value })
-                }
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none"
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Phone Number
-              </label>
-              <input
-                value={form.phone}
-                onChange={e =>
-                  setForm({ ...form, phone: e.target.value })
-                }
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none"
-              />
-            </div>
-
-            {/* Class */}
-            <div>
-              <label className="mb-1 block text-sm font-medium">
+              <label className="block text-sm font-medium">
                 Class
               </label>
               <select
@@ -176,10 +159,9 @@ export default function AddStudentModal({
               </select>
             </div>
 
-            {/* Subjects */}
             {selectedClass && (
               <div>
-                <label className="mb-1 block text-sm font-medium">
+                <label className="block text-sm font-medium">
                   Subjects
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -188,13 +170,9 @@ export default function AddStudentModal({
                       key={sub}
                       type="button"
                       onClick={() =>
-                        setSubjects(prev =>
-                          prev.includes(sub)
-                            ? prev.filter(s => s !== sub)
-                            : [...prev, sub]
-                        )
+                        toggleItem(sub, subjects, setSubjects)
                       }
-                      className={`rounded-md border px-3 py-1 text-sm ${
+                      className={`cursor-pointer rounded-md border px-3 py-1 text-sm ${
                         subjects.includes(sub)
                           ? "bg-blue-600 text-white"
                           : "border-slate-300"
@@ -207,9 +185,8 @@ export default function AddStudentModal({
               </div>
             )}
 
-            {/* Days */}
             <div>
-              <label className="mb-1 block text-sm font-medium">
+              <label className="block text-sm font-medium">
                 Days Attending
               </label>
               <div className="flex flex-wrap gap-2">
@@ -217,8 +194,10 @@ export default function AddStudentModal({
                   <button
                     key={day}
                     type="button"
-                    onClick={() => toggleDay(day)}
-                    className={`rounded-md border px-3 py-1 text-sm ${
+                    onClick={() =>
+                      toggleItem(day, days, setDays)
+                    }
+                    className={`cursor-pointer rounded-md border px-3 py-1 text-sm ${
                       days.includes(day)
                         ? "bg-blue-600 text-white"
                         : "border-slate-300"
@@ -230,9 +209,8 @@ export default function AddStudentModal({
               </div>
             </div>
 
-            {/* Fees */}
             <div>
-              <label className="mb-1 block text-sm font-medium">
+              <label className="block text-sm font-medium">
                 Monthly Fees (₹)
               </label>
               <input
@@ -241,22 +219,22 @@ export default function AddStudentModal({
                 onChange={e =>
                   setForm({ ...form, monthlyFees: e.target.value })
                 }
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:outline-none"
+                className="w-full rounded-lg border px-3 py-2"
               />
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="flex justify-end gap-3 pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg border px-4 py-2 text-sm"
+                className="rounded-lg border px-4 py-2"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-white disabled:opacity-60"
               >
                 Create Student
               </button>
