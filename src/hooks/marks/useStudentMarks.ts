@@ -5,12 +5,17 @@ export function useStudentMarks() {
   const [data, setData] = useState<StudentMarksResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
+  async function load() {
+    setLoading(true);
+    const res = await fetch("/api/student/marks");
+    const json = await res.json();
+    setData(json);
+    setLoading(false);
+  }
+
   useEffect(() => {
-    fetch("/api/student/marks")
-      .then(res => res.json())
-      .then(setData)
-      .finally(() => setLoading(false));
+    load();
   }, []);
 
-  return { data, loading };
+  return { data, loading, reload: load };
 }

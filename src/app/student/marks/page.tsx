@@ -4,19 +4,20 @@ import MarksPage from "@/components/pages/MarksPage";
 import { useStudentMarks } from "@/hooks/marks/useStudentMarks";
 
 export default function StudentMarksPage() {
-  const { data, loading } = useStudentMarks();
+  const { data, loading, reload } = useStudentMarks();
 
   if (loading) return <div className="p-6">Loading…</div>;
   if (!data?.student) return <div className="p-6">No data available</div>;
 
   return (
     <MarksPage
-  student={data.student}
-  marks={data.marks}
-  canEdit
-  mode="STUDENT"
-/>
-
-
+      student={data.student}
+      marks={data.marks}
+      canEdit
+      mode="STUDENT"
+      onMarksAdded={() => {
+        reload();
+      }}
+    />
   );
 }

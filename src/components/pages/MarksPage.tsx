@@ -206,17 +206,18 @@ export default function MarksPage({
       </section>
 
       {/* ================= ADD EXAM MODAL ================= */}
-     {canEdit && showAddExam && (
+    {canEdit && showAddExam && (
   <AddExamModal
     student={student}
     mode={mode}
     onClose={() => setShowAddExam(false)}
     onSaved={(newMarks) => {
-      onMarksAdded?.(newMarks);
+      onMarksAdded?.(newMarks); // 🔥 trigger reload
       setShowAddExam(false);
     }}
   />
 )}
+
 
     </div>
   );

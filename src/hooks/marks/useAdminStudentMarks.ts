@@ -5,14 +5,17 @@ export function useAdminStudentMarks(studentId: string) {
   const [data, setData] = useState<StudentMarksResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!studentId) return;
+  async function load() {
+    setLoading(true);
+    const res = await fetch(`/api/admin/marks/student/${studentId}`);
+    const json = await res.json();
+    setData(json);
+    setLoading(false);
+  }
 
-    fetch(`/api/admin/marks/student/${studentId}`)
-      .then(res => res.json())
-      .then(setData)
-      .finally(() => setLoading(false));
+  useEffect(() => {
+    if (studentId) load();
   }, [studentId]);
 
-  return { data, loading };
+  return { data, loading, reload: load };
 }

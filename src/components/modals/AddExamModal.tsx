@@ -107,7 +107,7 @@ export default function AddExamModal({
           : "Marks submitted successfully"
       );
 
-      onSaved(savedMarks);
+      await onSaved(savedMarks);
       onClose();
     } catch (err) {
       toast.error("Failed to submit marks. Try again.");
