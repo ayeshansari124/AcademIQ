@@ -10,10 +10,7 @@ interface Props {
   onSuccess: () => void | Promise<void>;
 }
 
-export default function SendAssignmentModal({
-  onClose,
-  onSuccess,
-}: Props) {
+export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
   const [content, setContent] = useState("");
   const [scope, setScope] = useState<AssignmentScope>("CLASS");
   const [students, setStudents] = useState<any[]>([]);
@@ -22,7 +19,7 @@ export default function SendAssignmentModal({
   const [selectedClass, setSelectedClass] = useState("");
 
   const { submit, loading } = useSendAssignment(async () => {
-    await onSuccess(); 
+    await onSuccess();
   });
 
   useEffect(() => {
@@ -56,9 +53,7 @@ export default function SendAssignmentModal({
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white w-full max-w-md rounded-xl p-5 space-y-4">
-        <h2 className="font-bold text-lg text-blue-900">
-          Send Assignment
-        </h2>
+        <h2 className="font-bold text-lg text-blue-900">Send Assignment</h2>
 
         <textarea
           className="w-full border rounded-lg px-3 py-2 text-sm"
@@ -71,9 +66,7 @@ export default function SendAssignmentModal({
         <select
           className="w-full border rounded-lg px-3 py-2 text-sm"
           value={scope}
-          onChange={(e) =>
-            setScope(e.target.value as AssignmentScope)
-          }
+          onChange={(e) => setScope(e.target.value as AssignmentScope)}
         >
           <option value="CLASS">Full Class</option>
           <option value="STUDENT">Selected Students</option>
@@ -105,7 +98,7 @@ export default function SendAssignmentModal({
                     setSelectedStudents((prev) =>
                       e.target.checked
                         ? [...prev, s._id]
-                        : prev.filter((id) => id !== s._id)
+                        : prev.filter((id) => id !== s._id),
                     )
                   }
                 />
@@ -120,10 +113,10 @@ export default function SendAssignmentModal({
             Cancel
           </button>
 
-         <button
-  onClick={handleSubmit}
-  disabled={!isFormValid || loading}
-  className={`
+          <button
+            onClick={handleSubmit}
+            disabled={!isFormValid || loading}
+            className={`
     flex items-center justify-center
     gap-2
     px-4 py-2
@@ -133,17 +126,16 @@ export default function SendAssignmentModal({
     transition
     ${
       !isFormValid || loading
-        ? "bg-blue-400 cursor-not-allowed"
-        : "bg-blue-600 hover:bg-blue-700"
+        ? "bg-blue-800 cursor-not-allowed"
+        : "bg-blue-900 hover:bg-blue-800"
     }
   `}
->
-  <FaPaperPlane className="h-4 w-4 relative top-px" />
-  <span className="leading-none">
-    {loading ? "Sending…" : "Send"}
-  </span>
-</button>
-
+          >
+            <FaPaperPlane className="h-4 w-4 relative top-px" />
+            <span className="leading-none">
+              {loading ? "Sending…" : "Send"}
+            </span>
+          </button>
         </div>
       </div>
     </div>

@@ -19,9 +19,7 @@ export default function AdminMarksPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-blue-900">
-          Marks Management
-        </h1>
+        <h1 className="text-2xl font-bold text-blue-900">Marks Management</h1>
         <p className="mt-1 text-sm text-slate-500">
           Select a student to manage marks
         </p>
@@ -33,9 +31,7 @@ export default function AdminMarksPage() {
             key={s._id}
             title={s.fullName}
             subtitle={`Class: ${s.class?.name ?? "—"}`}
-            onClick={() =>
-              router.push(`/admin/marks/student/${s._id}`)
-            }
+            onClick={() => router.push(`/admin/marks/student/${s._id}`)}
           />
         ))}
       </div>

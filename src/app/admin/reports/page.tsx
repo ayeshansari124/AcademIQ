@@ -1,11 +1,7 @@
-import React from 'react'
-
-const AdminReportsPage = () => {
+export default function AdminReportsPage() {
   return (
-    <div>
-      Admin reports here
+    <div className="p-6 text-slate-500">
+      Reports module coming soon.
     </div>
-  )
+  );
 }
-
-export default AdminReportsPage

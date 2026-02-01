@@ -37,11 +37,10 @@ const StudentSchema = new Schema<IStudent>(
     monthlyFee: { type: Number, required: true },
     feeStartDate: { type: Date, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Student: Model<IStudent> =
-  mongoose.models.Student ||
-  mongoose.model<IStudent>("Student", StudentSchema);
+  mongoose.models.Student || mongoose.model<IStudent>("Student", StudentSchema);
 
 export default Student;

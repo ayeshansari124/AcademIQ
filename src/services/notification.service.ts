@@ -20,7 +20,7 @@ async function recordNotification(data: {
 
 export async function recordUserNotification(
   data: Required<Pick<CreateNotificationDTO, "userId" | "title" | "message">> &
-    Partial<CreateNotificationDTO>
+    Partial<CreateNotificationDTO>,
 ) {
   return recordNotification({
     type: data.type ?? "ADMIN_BROADCAST",
@@ -34,7 +34,7 @@ export async function recordUserNotification(
 
 export async function recordUsersNotification(
   data: Required<Pick<CreateNotificationDTO, "userIds" | "title" | "message">> &
-    Partial<CreateNotificationDTO>
+    Partial<CreateNotificationDTO>,
 ) {
   return Notification.insertMany(
     data.userIds.map((id) => ({
@@ -44,12 +44,12 @@ export async function recordUsersNotification(
       title: data.title,
       message: data.message,
       metadata: data.metadata ?? {},
-    }))
+    })),
   );
 }
 
 export async function recordGlobalNotification(
-  data: Pick<CreateNotificationDTO, "title" | "message" | "metadata" | "type">
+  data: Pick<CreateNotificationDTO, "title" | "message" | "metadata" | "type">,
 ) {
   return recordNotification({
     type: data.type ?? "ADMIN_BROADCAST",
@@ -62,7 +62,7 @@ export async function recordGlobalNotification(
 
 export async function recordRoleNotification(
   data: Required<Pick<CreateNotificationDTO, "role" | "title" | "message">> &
-    Partial<CreateNotificationDTO>
+    Partial<CreateNotificationDTO>,
 ) {
   return recordNotification({
     type: data.type ?? "ADMIN_BROADCAST",

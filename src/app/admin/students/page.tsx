@@ -24,24 +24,22 @@ export default function StudentsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* HEADER */}
-     <div className="flex items-center justify-between gap-4">
-  <div>
-    <h1 className="text-2xl font-bold text-blue-900">
-      Student Management
-    </h1>
-    <p className="mt-1 text-sm text-slate-500">
-      Manage enrolled students
-    </p>
-  </div>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-blue-900">
+            Student Management
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Manage enrolled students
+          </p>
+        </div>
 
-  <PlusFab onClick={() => setOpen(true)} label="Add student" />
-</div>
+        <PlusFab onClick={() => setOpen(true)} label="Add student" />
+      </div>
 
       {/* CONTENT */}
       {loading ? (
-        <p className="text-sm text-slate-500">
-          Loading students…
-        </p>
+        <p className="text-sm text-slate-500">Loading students…</p>
       ) : (
         <div className="space-y-3">
           {students.map((s) => (
@@ -49,9 +47,7 @@ export default function StudentsPage() {
               key={s._id}
               title={s.fullName}
               subtitle={`Class: ${s.class?.name ?? "—"}`}
-              onClick={() =>
-                router.push(`/admin/students/${s._id}`)
-              }
+              onClick={() => router.push(`/admin/students/${s._id}`)}
             />
           ))}
         </div>
@@ -63,10 +59,7 @@ export default function StudentsPage() {
           onSuccess={(result) => {
             setOpen(false);
             setCredentials(result.credentials);
-            setStudents((prev) => [
-              result.student,
-              ...prev,
-            ]);
+            setStudents((prev) => [result.student, ...prev]);
           }}
         />
       )}

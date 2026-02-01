@@ -12,8 +12,8 @@ export function useStudent(url: string) {
     }
 
     fetch(url, { credentials: "include" })
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => setStudent(data?.student ?? null))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setStudent(data?.student ?? null))
       .finally(() => setLoading(false));
   }, [url]);
 

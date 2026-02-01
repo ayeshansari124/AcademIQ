@@ -57,7 +57,7 @@ export default function RegisterPage() {
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
           />
 
-          <button className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition">
+          <button className="w-full rounded-lg bg-blue-900 py-3 text-sm font-semibold text-white hover:bg-blue-900 transition">
             Register
           </button>
         </form>
@@ -66,7 +66,7 @@ export default function RegisterPage() {
           Already registered?{" "}
           <Link
             href="/auth/login"
-            className="font-semibold text-blue-600 hover:underline"
+            className="font-semibold text-blue-900 hover:underline"
           >
             Sign in
           </Link>

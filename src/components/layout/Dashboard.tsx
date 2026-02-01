@@ -6,14 +6,11 @@ interface DashboardGridProps {
   tiles: DashboardTile[];
 }
 
-export default function DashboardGrid({
-  title,
-  tiles,
-}: DashboardGridProps) {
+export default function DashboardGrid({ title, tiles }: DashboardGridProps) {
   return (
     <main className="flex-1 px-6 py-12">
       <div className="mb-16 text-center">
-        <h2 className="text-3xl font-bold text-blue-800 tracking-wide">
+        <h2 className="text-3xl font-bold text-blue-900 tracking-wide">
           {title}
         </h2>
       </div>

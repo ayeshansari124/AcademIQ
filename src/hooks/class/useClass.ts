@@ -14,8 +14,8 @@ export function useClass(id: string) {
     fetch(`/api/admin/classes/${id}`, {
       credentials: "include",
     })
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => setCls(data?.class ?? null))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setCls(data?.class ?? null))
       .finally(() => setLoading(false));
   }, [id]);
 

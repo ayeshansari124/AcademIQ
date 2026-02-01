@@ -15,10 +15,6 @@
   -ms-overflow-style: none;
 }
 
-/* ================================
-   GLOBAL SCROLLBAR HIDE (SAFE)
-   ================================ */
-
 /* Chrome, Edge, Safari */
 *::-webkit-scrollbar {
   width: 0px;

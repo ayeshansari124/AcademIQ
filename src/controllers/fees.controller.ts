@@ -1,13 +1,10 @@
-
 import { ensureMonthlyFee } from "@/services/fees.service";
 import { formatReadableDate } from "@/utils/dateTime";
-import "@/models/Class"
+import "@/models/Class";
 
 import FeeRecord from "@/models/FeeRecord";
 import Student from "@/models/Student";
-import {
-  recordUserNotification,
-} from "@/services/notification.service";
+import { recordUserNotification } from "@/services/notification.service";
 import { notifyUser } from "@/services/push.service";
 import connectDB from "@/lib/db";
 
@@ -29,29 +26,26 @@ export async function runFeeReminder() {
     const due = new Date(fee.dueDate);
     due.setHours(0, 0, 0, 0);
 
-    const diffDays = Math.floor(
-      (due.getTime() - today.getTime()) / 86400000
-    );
+    const diffDays = Math.floor((due.getTime() - today.getTime()) / 86400000);
 
     if (!REMINDER_DAYS.includes(diffDays)) continue;
 
     // Prevent duplicate reminders
     if (fee.remindersSent?.includes(diffDays)) continue;
 
-    const student = await Student.findById(fee.studentId).select("userId fullName");
+    const student = await Student.findById(fee.studentId).select(
+      "userId fullName",
+    );
     if (!student) continue;
 
-    const title =
-      diffDays === 0
-        ? "Fee Due Today"
-        : "Fee Payment Reminder";
+    const title = diffDays === 0 ? "Fee Due Today" : "Fee Payment Reminder";
 
     const message =
       diffDays === 0
         ? `Your fee of ₹${fee.amountDue} is due TODAY.`
         : `Your fee of ₹${fee.amountDue} is due in ${diffDays} days.`;
 
-    /* ---------- DB NOTIFICATION ---------- */
+    //DB NOTIFICATION
     await recordUserNotification({
       userId: student.userId.toString(),
       type: "FEES_DUE",
@@ -63,7 +57,7 @@ export async function runFeeReminder() {
       },
     });
 
-    /* ---------- PUSH (BEST EFFORT) ---------- */
+    //PUSH
     try {
       await notifyUser(student.userId.toString(), {
         title,
@@ -76,7 +70,7 @@ export async function runFeeReminder() {
       // never fail job due to push
     }
 
-    /* ---------- MARK REMINDER AS SENT ---------- */
+    //MARK REMINDER AS SENT
     fee.remindersSent = [...(fee.remindersSent || []), diffDays];
     await fee.save();
 
@@ -86,25 +80,19 @@ export async function runFeeReminder() {
   return { processed: fees.length, sent };
 }
 
-/* ============================================
-   HELPERS
-============================================ */
+//HELPERS
 
 function getCycleStartDate(
   fee: { year: number; month: number },
-  feeStartDate: Date
+  feeStartDate: Date,
 ) {
-  return new Date(
-    fee.year,
-    fee.month - 1,
-    feeStartDate.getDate()
-  );
+  return new Date(fee.year, fee.month - 1, feeStartDate.getDate());
 }
 
 function isActiveFee(
   fee: { year: number; month: number },
   feeStartDate: Date,
-  now: Date
+  now: Date,
 ) {
   const start = getCycleStartDate(fee, feeStartDate);
   const end = new Date(start);
@@ -114,9 +102,7 @@ function isActiveFee(
   return now >= start && now <= end;
 }
 
-/* ============================================
-   CONTROLLER
-============================================ */
+//CONTROLLER
 
 export async function getFeeProfile(studentId: string) {
   const student = await Student.findById(studentId)
@@ -141,42 +127,31 @@ export async function getFeeProfile(studentId: string) {
 
   const now = new Date();
 
-  /* ---------- CURRENT FEE ---------- */
-  const active = fees.find(f =>
-    isActiveFee(f, student.feeStartDate, now)
-  );
+  //CURRENT FEE
+  const active = fees.find((f) => isActiveFee(f, student.feeStartDate, now));
 
   const currentFee = active
     ? {
         _id: active._id,
         date: formatReadableDate(
-          getCycleStartDate(active, student.feeStartDate)
+          getCycleStartDate(active, student.feeStartDate),
         ),
         amount: active.amountDue,
         status: active.status,
-        mode:
-          active.status === "PAID"
-            ? active.paymentMethod ?? "CASH"
-            : "-",
+        mode: active.status === "PAID" ? (active.paymentMethod ?? "CASH") : "-",
       }
     : null;
 
-  /* ---------- HISTORY ---------- */
-  const feeHistory = fees.map(f => {
-    const cycleStart = getCycleStartDate(
-      f,
-      student.feeStartDate
-    );
+  //HISTORY
+  const feeHistory = fees.map((f) => {
+    const cycleStart = getCycleStartDate(f, student.feeStartDate);
 
     return {
       _id: f._id,
       date: formatReadableDate(cycleStart),
       amount: f.amountDue,
       status: f.status,
-      mode:
-        f.status === "PAID"
-          ? f.paymentMethod ?? "CASH"
-          : "-",
+      mode: f.status === "PAID" ? (f.paymentMethod ?? "CASH") : "-",
     };
   });
 

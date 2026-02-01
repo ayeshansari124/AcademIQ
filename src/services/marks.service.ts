@@ -8,9 +8,7 @@ import { notifyUser, notifyAdmins } from "@/services/push.service";
 import { CreateMarkDTO } from "@/types/marks";
 
 export async function getStudentsForMarks() {
-  return Student.find()
-    .populate("class", "name")
-    .select("fullName class");
+  return Student.find().populate("class", "name").select("fullName class");
 }
 
 export async function getMarksByStudentId(studentId: string) {
@@ -42,7 +40,7 @@ export async function createMark(data: CreateMarkDTO) {
 
   const student = await Student.findById(data.studentId).populate(
     "userId",
-    "name"
+    "name",
   );
   if (!student || !student.userId) return mark;
 

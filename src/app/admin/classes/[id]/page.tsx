@@ -45,12 +45,8 @@ export default function ClassProfilePage() {
       {/* HEADER */}
       <div className="flex items-center justify-between rounded-xl bg-white p-6 shadow-sm">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            {cls.name}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Class Overview
-          </p>
+          <h1 className="text-2xl font-semibold text-slate-900">{cls.name}</h1>
+          <p className="mt-1 text-sm text-slate-500">Class Overview</p>
         </div>
 
         <button
@@ -64,9 +60,7 @@ export default function ClassProfilePage() {
 
       {/* SUBJECTS */}
       <Section title="Subjects">
-        <p className="text-sm text-slate-700">
-          {cls.subjects.join(", ")}
-        </p>
+        <p className="text-sm text-slate-700">{cls.subjects.join(", ")}</p>
       </Section>
 
       {/* STUDENTS */}
@@ -77,7 +71,7 @@ export default function ClassProfilePage() {
           </p>
         ) : (
           <ul className="space-y-2">
-            {cls.students?.map(s => (
+            {cls.students?.map((s) => (
               <li
                 key={s._id}
                 className="rounded-lg px-3 py-2 hover:bg-slate-50"
@@ -101,7 +95,7 @@ function Section({
 }) {
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-blue-700">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-blue-900">
         {title}
       </h2>
       {children}

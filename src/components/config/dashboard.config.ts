@@ -14,7 +14,7 @@ export const adminDashboardTiles: DashboardTile[] = [
   {
     title: "Students",
     icon: Users,
-    color: "bg-blue-500",
+    color: "bg-blue-900",
     href: "/admin/students",
   },
   {
@@ -65,7 +65,7 @@ export const studentDashboardTiles: DashboardTile[] = [
   {
     title: "Profile",
     icon: User,
-    color: "bg-blue-600",
+    color: "bg-blue-900",
     href: "/student/profile",
   },
   {

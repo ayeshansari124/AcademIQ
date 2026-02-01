@@ -32,9 +32,7 @@ export default function Sidebar({ open, onClose, config }: Props) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
           <div className="flex flex-col">
             <h2 className="text-lg font-semibold">{config.title}</h2>
-            <span className="text-xs text-white/70">
-              {config.subtitle}
-            </span>
+            <span className="text-xs text-white/70">{config.subtitle}</span>
           </div>
           <X
             className="h-6 w-6 cursor-pointer hover:text-white/80"
@@ -59,9 +57,7 @@ export default function Sidebar({ open, onClose, config }: Props) {
                 }`}
               >
                 <item.icon
-                  className={`h-5 w-5 ${
-                    isActive ? "text-blue-900" : ""
-                  }`}
+                  className={`h-5 w-5 ${isActive ? "text-blue-900" : ""}`}
                 />
                 {item.label}
               </Link>

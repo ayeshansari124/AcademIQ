@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       feeRecordId,
     } = await req.json();
 
-    // 🔐 Verify Razorpay signature
+    // Verify Razorpay signature
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
     const expected = crypto
       .createHmac("sha256", process.env.RAZORPAY_SECRET!)
@@ -34,13 +34,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    // 📄 Fetch fee record
+    // Fetch fee record
     const fee = await FeeRecord.findById(feeRecordId);
     if (!fee) {
       return NextResponse.json({ error: "Fee not found" }, { status: 404 });
     }
 
-    // 💰 Mark paid
+    // Mark paid
     fee.status = "PAID";
     fee.amountPaid = fee.amountDue;
     fee.paymentMethod = "ONLINE";
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     fee.paidAt = new Date();
     await fee.save();
 
-    // 👨‍🎓 Fetch student + user name (STRICT)
+    // Fetch student + user name
     const student = await Student.findById(fee.studentId);
     if (!student) {
       throw new Error("STUDENT_NOT_FOUND");
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
 
     const amount = fee.amountDue;
 
-   //STUDENT DB NOTIFICATION
+    //STUDENT DB NOTIFICATION
     await recordUserNotification({
       userId: student.userId._id.toString(),
       type: "FEES_PAID",
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // Web push for admins (best-effort)
+    // Web push for admins
     try {
       await notifyAdmins({
         title: "Fee Payment Received",

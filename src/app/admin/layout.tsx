@@ -8,9 +8,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AppLayout sidebarConfig={adminSidebarConfig}>
-      {children}
-    </AppLayout>
-  );
+  return <AppLayout sidebarConfig={adminSidebarConfig}>{children}</AppLayout>;
 }

@@ -6,7 +6,7 @@ import {
 
 export async function GET(
   _: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   await requireAdmin();
   const { id } = await params;
@@ -16,7 +16,7 @@ export async function GET(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   await requireAdmin();
   const { id } = await params;

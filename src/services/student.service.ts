@@ -42,15 +42,8 @@ export async function getAllStudents() {
 export async function createStudent(data: any) {
   await connectDB();
 
-  const {
-    fullName,
-    parentName,
-    phone,
-    classId,
-    subjects,
-    days,
-    monthlyFee,
-  } = data;
+  const { fullName, parentName, phone, classId, subjects, days, monthlyFee } =
+    data;
 
   if (
     !fullName ||

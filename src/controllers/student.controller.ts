@@ -10,10 +10,9 @@ export async function deleteStudentById(studentId: string) {
   if (!student) throw new Error("STUDENT_NOT_FOUND");
 
   if (student.class) {
-    await ClassModel.findByIdAndUpdate(
-      student.class,
-      { $pull: { students: student._id } }
-    );
+    await ClassModel.findByIdAndUpdate(student.class, {
+      $pull: { students: student._id },
+    });
   }
 
   await User.findByIdAndDelete(student.userId);

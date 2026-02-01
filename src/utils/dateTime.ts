@@ -1,10 +1,5 @@
-/* ============================================
-   DATE & TIME FORMATTERS (GLOBAL)
-============================================ */
+//26/02/26
 
-/**
- * 26/02/26
- */
 export function formatShortDate(date: Date | string): string {
   const d = new Date(date);
   return d.toLocaleDateString("en-GB", {
@@ -14,9 +9,7 @@ export function formatShortDate(date: Date | string): string {
   });
 }
 
-/**
- * 12 January 2026
- */
+//12 January 2026
 export function formatReadableDate(date: Date | string): string {
   const d = new Date(date);
   return d.toLocaleDateString("en-GB", {
@@ -26,9 +19,7 @@ export function formatReadableDate(date: Date | string): string {
   });
 }
 
-/**
- * 8:34 PM
- */
+//8:34 PM
 export function formatTime(date: Date | string): string {
   const d = new Date(date);
   return d.toLocaleTimeString("en-US", {
@@ -38,16 +29,12 @@ export function formatTime(date: Date | string): string {
   });
 }
 
-/**
- * 12 January 2026, 8:34 PM
- */
+// 12 January 2026, 8:34 PM
 export function formatDateTime(date: Date | string): string {
   return `${formatReadableDate(date)}, ${formatTime(date)}`;
 }
 
-/**
- * Monday
- */
+// Monday
 export function formatDay(date: Date | string): string {
   const d = new Date(date);
   return d.toLocaleDateString("en-US", {

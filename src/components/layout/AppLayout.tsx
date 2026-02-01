@@ -12,11 +12,7 @@ interface Props {
   onMount?: () => void;
 }
 
-export default function AppLayout({
-  children,
-  sidebarConfig,
-  onMount,
-}: Props) {
+export default function AppLayout({ children, sidebarConfig, onMount }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -34,9 +30,7 @@ export default function AppLayout({
       />
 
       {/* Content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       {/* Footer */}
       <Footer />

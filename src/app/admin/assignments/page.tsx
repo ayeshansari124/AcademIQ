@@ -8,7 +8,7 @@ import PlusFab from "@/components/common/PlusFab";
 
 export default function AdminAssignmentsPage() {
   const { assignments, loading, refetch } = useAssignments(
-    "/api/admin/assignments"
+    "/api/admin/assignments",
   );
   const [open, setOpen] = useState(false);
 
@@ -16,9 +16,7 @@ export default function AdminAssignmentsPage() {
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-blue-900">
-            Assignments
-          </h1>
+          <h1 className="text-2xl font-bold text-blue-900">Assignments</h1>
           <p className="text-sm text-slate-600">
             Create and manage assignments
           </p>

@@ -5,8 +5,7 @@ import toast from "react-hot-toast";
 import { FeeProfileResponse } from "@/types/fee";
 
 export function useFeeProfile(studentId: string) {
-  const [data, setData] =
-    useState<FeeProfileResponse | null>(null);
+  const [data, setData] = useState<FeeProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function load() {

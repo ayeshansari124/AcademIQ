@@ -6,10 +6,7 @@ export default async function StudentFeesPage() {
 
   return (
     <div className="p-6">
-      <FeePage
-        studentId={student._id.toString()}
-        viewerRole="STUDENT"
-      />
+      <FeePage studentId={student._id.toString()} viewerRole="STUDENT" />
     </div>
   );
 }

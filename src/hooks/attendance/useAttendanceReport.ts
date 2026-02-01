@@ -16,13 +16,13 @@ export function useAttendanceReport({
     const url = self
       ? "/api/student/attendance"
       : studentId
-      ? `/api/admin/attendance/student/${studentId}`
-      : null;
+        ? `/api/admin/attendance/student/${studentId}`
+        : null;
 
     if (!url) return;
 
     fetch(url, { credentials: "include" })
-      .then(res => (res.ok ? res.json() : Promise.reject()))
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false));

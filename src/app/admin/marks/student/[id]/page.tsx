@@ -17,7 +17,7 @@ export default function AdminStudentMarksPage() {
       marks={data.marks}
       canEdit
       mode="ADMIN"
-      onMarksAdded={reload} 
+      onMarksAdded={reload}
     />
   );
 }

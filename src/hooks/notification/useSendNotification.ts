@@ -10,7 +10,7 @@ interface UseSendNotificationResult {
 }
 
 export function useSendNotification(
-  onSuccess: () => void
+  onSuccess: () => void,
 ): UseSendNotificationResult {
   const [loading, setLoading] = useState(false);
 

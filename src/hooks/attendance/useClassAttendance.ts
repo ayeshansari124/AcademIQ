@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { AttendanceStatus } from "@/types/attendance";
 
 export function useClassAttendance() {
   const today = new Date().toISOString().split("T")[0];
@@ -12,7 +11,7 @@ export function useClassAttendance() {
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // --- LOAD CLASSES + STUDENTS (SOURCE OF TRUTH) ---
+  //LOAD CLASS AND STUDENTS
   async function loadBaseData() {
     const [cRes, sRes] = await Promise.all([
       fetch("/api/admin/classes"),
@@ -30,7 +29,6 @@ export function useClassAttendance() {
     loadBaseData();
   }, []);
 
-  // --- LOAD ATTENDANCE RECORDS ---
   async function loadAttendance() {
     if (!selectedClass) {
       setRecords([]);
@@ -49,13 +47,12 @@ export function useClassAttendance() {
   }, [selectedClass, date]);
 
   function toggleStatus(studentId: string) {
-    setRecords(prev =>
-      prev.map(r =>
+    setRecords((prev) =>
+      prev.map((r) =>
         r.student._id === studentId
           ? {
               ...r,
-              status:
-                r.status === "PRESENT" ? "ABSENT" : "PRESENT",
+              status: r.status === "PRESENT" ? "ABSENT" : "PRESENT",
             }
           : r,
       ),
@@ -86,11 +83,9 @@ export function useClassAttendance() {
 
       toast.success("Attendance saved");
 
-      // ✅ HARD RESET UI STATE
       setSelectedClass("");
       setRecords([]);
 
-      // ✅ FORCE CLEAN REFRESH
       await loadBaseData();
     } catch {
       toast.error("Save failed");
@@ -106,7 +101,7 @@ export function useClassAttendance() {
     classes,
     selectedClass,
     setSelectedClass,
-    students, // ✅ ALWAYS FULL LIST
+    students,
     records,
     toggleStatus,
     saveAttendance,

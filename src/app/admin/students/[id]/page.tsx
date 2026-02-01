@@ -11,7 +11,7 @@ export default function AdminStudentProfilePage() {
   const id = params?.id as string | undefined;
 
   const { student, loading } = useStudent(
-    id ? `/api/admin/students/${id}` : ""
+    id ? `/api/admin/students/${id}` : "",
   );
 
   async function handleDelete() {
@@ -38,11 +38,5 @@ export default function AdminStudentProfilePage() {
   if (loading) return <p className="p-8">Loading...</p>;
   if (!student) return <p className="p-8">Not found</p>;
 
-  return (
-    <ProfilePage
-      student={student}
-      showDelete
-      onDelete={handleDelete}
-    />
-  );
+  return <ProfilePage student={student} showDelete onDelete={handleDelete} />;
 }

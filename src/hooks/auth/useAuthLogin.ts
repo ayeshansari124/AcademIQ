@@ -40,9 +40,7 @@ export function useAuthLogin() {
       await registerPush();
 
       router.replace(
-        data.user.role === "ADMIN"
-          ? "/admin/dashboard"
-          : "/student/dashboard"
+        data.user.role === "ADMIN" ? "/admin/dashboard" : "/student/dashboard",
       );
     } catch {
       toast.dismiss(toastId);

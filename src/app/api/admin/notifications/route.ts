@@ -3,11 +3,7 @@ import {
   createNotificationController,
   fetchNotificationsForUser,
 } from "@/controllers/notification.controller";
-import {
-  notifyAll,
-  notifyAdmins,
-  notifyUser,
-} from "@/services/push.service";
+import { notifyAll, notifyAdmins, notifyUser } from "@/services/push.service";
 
 export async function GET() {
   const { userId } = await requireAdmin();
@@ -35,7 +31,7 @@ export async function POST(req: Request) {
     if (scope === "USER" && userId) await notifyUser(userId, payload);
     if (scope === "USER" && userIds?.length) {
       await Promise.allSettled(
-        userIds.map((id: string) => notifyUser(id, payload))
+        userIds.map((id: string) => notifyUser(id, payload)),
       );
     }
   } catch {

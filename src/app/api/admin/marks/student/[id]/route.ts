@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   _: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     await requireAdmin();
@@ -16,7 +16,7 @@ export async function GET(
     console.error("[ADMIN_MARKS_GET]", err);
     return NextResponse.json(
       { error: "Failed to fetch marks" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

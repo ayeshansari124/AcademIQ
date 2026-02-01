@@ -9,11 +9,7 @@ interface Props {
 
 export default function AssignmentPage({ assignments }: Props) {
   if (!assignments.length) {
-    return (
-      <p className="text-sm text-slate-500">
-        No assignments yet.
-      </p>
-    );
+    return <p className="text-sm text-slate-500">No assignments yet.</p>;
   }
 
   return (

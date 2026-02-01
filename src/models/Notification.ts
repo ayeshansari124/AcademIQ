@@ -45,7 +45,7 @@ const NotificationSchema = new Schema(
       default: {},
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.models.Notification ||

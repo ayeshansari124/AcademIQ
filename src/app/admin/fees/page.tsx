@@ -19,18 +19,14 @@ export default function AdminFeesPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-blue-900">
-          Fees Management
-        </h1>
+        <h1 className="text-2xl font-bold text-blue-900">Fees Management</h1>
         <p className="mt-1 text-sm text-slate-500">
           Select a student to manage their fees
         </p>
       </div>
 
       {loading ? (
-        <p className="text-sm text-slate-500">
-          Loading students…
-        </p>
+        <p className="text-sm text-slate-500">Loading students…</p>
       ) : (
         <div className="space-y-3">
           {students.map((s) => (
@@ -41,9 +37,7 @@ export default function AdminFeesPage() {
                 `Class: ${s.class?.name ?? "—"}`,
                 `Fees: ₹${s.monthlyFee}`,
               ]}
-              onClick={() =>
-                router.push(`/admin/fees/student/${s._id}`)
-              }
+              onClick={() => router.push(`/admin/fees/student/${s._id}`)}
             />
           ))}
         </div>

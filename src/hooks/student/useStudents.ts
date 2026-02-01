@@ -7,8 +7,8 @@ export function useStudents() {
 
   useEffect(() => {
     fetch("/api/admin/students", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => setStudents(data.students || []))
+      .then((res) => res.json())
+      .then((data) => setStudents(data.students || []))
       .finally(() => setLoading(false));
   }, []);
 

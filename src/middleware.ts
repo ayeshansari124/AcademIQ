@@ -6,12 +6,10 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("token")?.value;
 
-  // 🔓 Public routes
+  // Public routes
   if (!token) {
     if (pathname.startsWith("/admin") || pathname.startsWith("/student")) {
-      return NextResponse.redirect(
-        new URL("/auth/login", req.url)
-      );
+      return NextResponse.redirect(new URL("/auth/login", req.url));
     }
     return NextResponse.next();
   }
@@ -20,37 +18,28 @@ export async function middleware(req: NextRequest) {
   try {
     payload = await verifyEdgeToken(token);
   } catch {
-    // ❌ Invalid token → force login (NO silent cookie delete)
-    return NextResponse.redirect(
-      new URL("/auth/login", req.url)
-    );
+    return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
   const role = payload.role;
 
-  // Already logged in → block auth pages
+  // BLOCK AUTH FOR LOGGED IN USERS
   if (pathname.startsWith("/auth") || pathname === "/") {
     return NextResponse.redirect(
       new URL(
-        role === "ADMIN"
-          ? "/admin/dashboard"
-          : "/student/dashboard",
-        req.url
-      )
+        role === "ADMIN" ? "/admin/dashboard" : "/student/dashboard",
+        req.url,
+      ),
     );
   }
 
   // Role protection
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
-    return NextResponse.redirect(
-      new URL("/student/dashboard", req.url)
-    );
+    return NextResponse.redirect(new URL("/student/dashboard", req.url));
   }
 
   if (pathname.startsWith("/student") && role !== "STUDENT") {
-    return NextResponse.redirect(
-      new URL("/admin/dashboard", req.url)
-    );
+    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
   }
 
   return NextResponse.next();

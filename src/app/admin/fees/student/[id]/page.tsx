@@ -6,7 +6,6 @@ export default function AdminStudentFeesPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  // ✅ unwrap params
   const { id: studentId } = use(params);
 
   if (!studentId) {
@@ -15,10 +14,7 @@ export default function AdminStudentFeesPage({
 
   return (
     <div className="p-6">
-      <FeePage
-        studentId={studentId}
-        viewerRole="ADMIN"
-      />
+      <FeePage studentId={studentId} viewerRole="ADMIN" />
     </div>
   );
 }

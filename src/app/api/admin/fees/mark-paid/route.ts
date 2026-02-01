@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   if (!feeRecordId) {
     return NextResponse.json(
       { error: "feeRecordId required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

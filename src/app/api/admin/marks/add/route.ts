@@ -16,9 +16,6 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("[ADMIN_MARK_ADD]", err);
 
-    return NextResponse.json(
-      { error: "Failed to add marks" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to add marks" }, { status: 500 });
   }
 }

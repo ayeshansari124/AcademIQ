@@ -26,7 +26,7 @@ const ClassSchema = new Schema<IClass>(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const ClassModel: Model<IClass> =

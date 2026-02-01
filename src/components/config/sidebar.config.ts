@@ -39,9 +39,8 @@ export const studentSidebarConfig: SidebarConfig = {
     { label: "Fees", icon: IndianRupee, href: "/student/fees" },
     { label: "Attendance", icon: ClipboardCheck, href: "/student/attendance" },
     { label: "Marks", icon: BarChart3, href: "/student/marks" },
-    
+
     { label: "Assignments", icon: NotebookText, href: "/student/assignments" },
     { label: "Notifications", icon: Bell, href: "/student/notifications" },
-    
   ],
 };

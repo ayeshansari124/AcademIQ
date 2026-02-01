@@ -5,7 +5,16 @@ import { X, Plus, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const CLASS_OPTIONS = [
-  "I","II","III","IV","V","VI","VII","VIII","IX","X",
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII",
+  "IX",
+  "X",
 ];
 
 export default function CreateClassModal({
@@ -62,10 +71,7 @@ export default function CreateClassModal({
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black/40 z-40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
           <header className="mb-6 flex justify-between">
@@ -76,11 +82,11 @@ export default function CreateClassModal({
           <form onSubmit={handleSubmit} className="space-y-4">
             <select
               value={className}
-              onChange={e => setClassName(e.target.value)}
+              onChange={(e) => setClassName(e.target.value)}
               className="w-full rounded-lg border px-3 py-2"
             >
               <option value="">Select Class</option>
-              {CLASS_OPTIONS.map(c => (
+              {CLASS_OPTIONS.map((c) => (
                 <option key={c} value={c}>
                   Class {c}
                 </option>
@@ -91,9 +97,7 @@ export default function CreateClassModal({
               <div key={i} className="flex gap-2">
                 <input
                   value={sub}
-                  onChange={e =>
-                    updateSubject(i, e.target.value)
-                  }
+                  onChange={(e) => updateSubject(i, e.target.value)}
                   className="flex-1 rounded-lg border px-3 py-2"
                 />
                 {subjects.length > 1 && (
@@ -113,7 +117,7 @@ export default function CreateClassModal({
             <button
               type="button"
               onClick={() => setSubjects([...subjects, ""])}
-              className="flex items-center gap-1 text-sm text-blue-600"
+              className="flex items-center gap-1 text-sm text-blue-900"
             >
               <Plus size={16} /> Add Subject
             </button>
@@ -128,7 +132,7 @@ export default function CreateClassModal({
               </button>
               <button
                 disabled={loading}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+                className="rounded-lg bg-blue-900 px-4 py-2 text-white"
               >
                 Create
               </button>

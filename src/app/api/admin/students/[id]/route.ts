@@ -5,10 +5,7 @@ import { NextResponse } from "next/server";
 
 type Params = { id: string };
 
-export async function GET(
-  _: Request,
-  context: { params: Promise<Params> }
-) {
+export async function GET(_: Request, context: { params: Promise<Params> }) {
   await requireAdmin();
   const { id } = await context.params;
 
@@ -16,10 +13,7 @@ export async function GET(
   return NextResponse.json({ student });
 }
 
-export async function DELETE(
-  _: Request,
-  context: { params: Promise<Params> }
-) {
+export async function DELETE(_: Request, context: { params: Promise<Params> }) {
   await requireAdmin();
   const { id } = await context.params;
 

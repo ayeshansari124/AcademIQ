@@ -26,21 +26,11 @@ const COLORS = [
   "#ea580c", // orange
 ];
 
-export default function SubjectProgressChart({
-  marks,
-}: {
-  marks: Mark[];
-}) {
+export default function SubjectProgressChart({ marks }: { marks: Mark[] }) {
   if (!marks.length) return null;
 
-  /* ---------- BUILD EXAM AXIS ---------- */
-
   // Unique exams in order of appearance
-  const exams = Array.from(
-    new Set(marks.map((m) => m.examName))
-  );
-
-  /* ---------- BUILD CHART DATA ---------- */
+  const exams = Array.from(new Set(marks.map((m) => m.examName)));
 
   const data = exams.map((exam) => {
     const row: any = { exam };
@@ -48,9 +38,7 @@ export default function SubjectProgressChart({
     marks.forEach((m) => {
       if (m.examName === exam) {
         const pct =
-          m.totalMarks > 0
-            ? (m.marksObtained / m.totalMarks) * 100
-            : 0;
+          m.totalMarks > 0 ? (m.marksObtained / m.totalMarks) * 100 : 0;
 
         row[m.subject] = Number(pct.toFixed(1));
       }
@@ -59,26 +47,19 @@ export default function SubjectProgressChart({
     return row;
   });
 
-  /* ---------- UNIQUE SUBJECTS ---------- */
+  //UNIQUE SUBJECTS
 
-  const subjects = Array.from(
-    new Set(marks.map((m) => m.subject))
-  );
+  const subjects = Array.from(new Set(marks.map((m) => m.subject)));
 
-  /* ---------- UI ---------- */
+  //UI
 
   return (
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <XAxis dataKey="exam" />
-          <YAxis
-            domain={[0, 100]}
-            tickFormatter={(v) => `${v}%`}
-          />
-          <Tooltip
-            formatter={(v: number) => `${v}%`}
-          />
+          <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+          <Tooltip formatter={(v: number) => `${v}%`} />
           <Legend />
 
           {subjects.map((subject, i) => (

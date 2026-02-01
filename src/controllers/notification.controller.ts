@@ -9,7 +9,7 @@ import {
 import { CreateNotificationDTO, NotificationRole } from "@/types/notification";
 
 export async function createNotificationController(
-  data: CreateNotificationDTO
+  data: CreateNotificationDTO,
 ) {
   if (data.scope === "ALL") {
     return recordGlobalNotification(data);
@@ -43,5 +43,7 @@ export async function fetchNotificationsForUser({
       { scope: "ROLE", role },
       { scope: "USER", userId: new mongoose.Types.ObjectId(userId) },
     ],
-  }).sort({ createdAt: -1 }).limit(10);
+  })
+    .sort({ createdAt: -1 })
+    .limit(10);
 }

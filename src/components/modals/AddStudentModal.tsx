@@ -30,19 +30,17 @@ export default function AddStudentModal({
 
   useEffect(() => {
     fetch("/api/admin/classes", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => setClasses(data.classes || []));
+      .then((res) => res.json())
+      .then((data) => setClasses(data.classes || []));
   }, []);
 
   function toggleItem(
     value: string,
     list: string[],
-    setList: (v: string[]) => void
+    setList: (v: string[]) => void,
   ) {
     setList(
-      list.includes(value)
-        ? list.filter(v => v !== value)
-        : [...list, value]
+      list.includes(value) ? list.filter((v) => v !== value) : [...list, value],
     );
   }
 
@@ -99,19 +97,13 @@ export default function AddStudentModal({
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-40 bg-black/40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
 
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
           <header className="mb-6 flex justify-between">
             <h2 className="text-lg font-semibold">Add Student</h2>
-            <X
-              className="h-5 w-5 cursor-pointer"
-              onClick={onClose}
-            />
+            <X className="h-5 w-5 cursor-pointer" onClick={onClose} />
           </header>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -121,29 +113,21 @@ export default function AddStudentModal({
               ["Phone Number", "phone"],
             ].map(([label, key]) => (
               <div key={key}>
-                <label className="block text-sm font-medium">
-                  {label}
-                </label>
+                <label className="block text-sm font-medium">{label}</label>
                 <input
                   value={(form as any)[key]}
-                  onChange={e =>
-                    setForm({ ...form, [key]: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                   className="w-full rounded-lg border px-3 py-2"
                 />
               </div>
             ))}
 
             <div>
-              <label className="block text-sm font-medium">
-                Class
-              </label>
+              <label className="block text-sm font-medium">Class</label>
               <select
                 value={form.classId}
-                onChange={e => {
-                  const cls = classes.find(
-                    c => c._id === e.target.value
-                  );
+                onChange={(e) => {
+                  const cls = classes.find((c) => c._id === e.target.value);
                   setSelectedClass(cls);
                   setSubjects([]);
                   setForm({ ...form, classId: e.target.value });
@@ -151,7 +135,7 @@ export default function AddStudentModal({
                 className="w-full rounded-lg border px-3 py-2"
               >
                 <option value="">Select Class</option>
-                {classes.map(cls => (
+                {classes.map((cls) => (
                   <option key={cls._id} value={cls._id}>
                     {cls.name}
                   </option>
@@ -161,20 +145,16 @@ export default function AddStudentModal({
 
             {selectedClass && (
               <div>
-                <label className="block text-sm font-medium">
-                  Subjects
-                </label>
+                <label className="block text-sm font-medium">Subjects</label>
                 <div className="flex flex-wrap gap-2">
                   {selectedClass.subjects.map((sub: string) => (
                     <button
                       key={sub}
                       type="button"
-                      onClick={() =>
-                        toggleItem(sub, subjects, setSubjects)
-                      }
+                      onClick={() => toggleItem(sub, subjects, setSubjects)}
                       className={`cursor-pointer rounded-md border px-3 py-1 text-sm ${
                         subjects.includes(sub)
-                          ? "bg-blue-600 text-white"
+                          ? "bg-blue-900 text-white"
                           : "border-slate-300"
                       }`}
                     >
@@ -190,16 +170,14 @@ export default function AddStudentModal({
                 Days Attending
               </label>
               <div className="flex flex-wrap gap-2">
-                {DAYS.map(day => (
+                {DAYS.map((day) => (
                   <button
                     key={day}
                     type="button"
-                    onClick={() =>
-                      toggleItem(day, days, setDays)
-                    }
+                    onClick={() => toggleItem(day, days, setDays)}
                     className={`cursor-pointer rounded-md border px-3 py-1 text-sm ${
                       days.includes(day)
-                        ? "bg-blue-600 text-white"
+                        ? "bg-blue-900 text-white"
                         : "border-slate-300"
                     }`}
                   >
@@ -216,7 +194,7 @@ export default function AddStudentModal({
               <input
                 type="number"
                 value={form.monthlyFees}
-                onChange={e =>
+                onChange={(e) =>
                   setForm({ ...form, monthlyFees: e.target.value })
                 }
                 className="w-full rounded-lg border px-3 py-2"
@@ -234,7 +212,7 @@ export default function AddStudentModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-white disabled:opacity-60"
+                className="rounded-lg bg-blue-900 px-4 py-2 text-white disabled:opacity-60"
               >
                 Create Student
               </button>

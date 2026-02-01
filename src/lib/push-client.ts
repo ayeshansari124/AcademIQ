@@ -1,18 +1,12 @@
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
 
   const rawData = atob(base64);
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+  return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
 }
 
-/**
- * CALL THIS AFTER LOGIN SUCCESS
- */
 export async function registerPush() {
-
   if (!("serviceWorker" in navigator)) {
     return;
   }
@@ -39,20 +33,14 @@ export async function registerPush() {
     });
   }
 
-
   const res = await fetch("/api/push/subscribe", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ subscription: sub }),
   });
-
 }
 
-
-/**
- * CALL THIS ON LOGOUT
- */
 export async function unregisterPush() {
   if (!("serviceWorker" in navigator)) return;
 

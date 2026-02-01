@@ -42,7 +42,7 @@ const UserSchema = new Schema<IUser>(
 
     isActive: { type: Boolean, default: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User: Model<IUser> =

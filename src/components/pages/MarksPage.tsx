@@ -5,6 +5,7 @@ import { FiChevronDown } from "react-icons/fi";
 import AddExamModal from "@/components/modals/AddExamModal";
 import SubjectProgressChart from "@/components/charts/SubjectProgressChart";
 import ExamPerformanceChart from "@/components/charts/ExamPerformanceChart";
+import PlusFab from "@/components/common/PlusFab";
 
 type Mark = {
   _id: string;
@@ -14,6 +15,7 @@ type Mark = {
   totalMarks: number;
   createdAt: string;
 };
+
 export default function MarksPage({
   student,
   marks,
@@ -27,19 +29,15 @@ export default function MarksPage({
   mode: "ADMIN" | "STUDENT";
   onMarksAdded?: (newMarks: Mark[]) => void;
 }) {
-
-
   const [openExam, setOpenExam] = useState<string | null>(null);
   const [sections, setSections] = useState({
-    exams: false,
-    subjects: false,
-    charts: false,
+    exams: true,
+    subjects: true,
+    charts: true,
   });
-  const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
   const [showAddExam, setShowAddExam] = useState(false);
 
-  /* ---------- GROUP DATA ---------- */
-
+  //GROUP DATA
   const marksByExam = marks.reduce<Record<string, Mark[]>>((acc, m) => {
     (acc[m.examName] ||= []).push(m);
     return acc;
@@ -55,78 +53,64 @@ export default function MarksPage({
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-6 space-y-10">
+    <div className="relative max-w-5xl mx-auto px-6 py-6 space-y-8">
       {/* HEADER */}
-      <div className="flex justify-between items-start">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{student.fullName}</h1>
-          <p className="text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-blue-900">
+            {student.fullName}
+          </h1>
+          <p className="text-sm text-slate-600">
             Subjects: {student.subjects.join(", ")}
           </p>
         </div>
 
         {canEdit && (
-          <button
-            onClick={() => setShowAddExam(true)}
-            className="bg-blue-600 text-white px-5 py-2 rounded"
-          >
-            + Add Marks
-          </button>
+          <PlusFab onClick={() => setShowAddExam(true)} label="Add Marks" />
         )}
       </div>
 
-      {/* ================= MARKS BY EXAM ================= */}
-      <section>
-        <button
+      {/* MARKS BY EXAM */}
+      <Card>
+        <SectionHeader
+          title="Marks by Exam"
+          open={sections.exams}
           onClick={() => toggle("exams")}
-          className="w-full flex justify-between py-3"
-        >
-          <h2 className="text-lg font-semibold">Marks by Exam</h2>
-          <FiChevronDown
-            className={`transition-transform ${sections.exams ? "rotate-180" : ""}`}
-          />
-        </button>
+        />
 
         {sections.exams && (
           <div className="space-y-3">
             {Object.entries(marksByExam).map(([exam, examMarks]) => {
               const isOpen = openExam === exam;
 
-              const totalObtained = examMarks.reduce(
+              const obtained = examMarks.reduce(
                 (s, m) => s + m.marksObtained,
-                0
+                0,
               );
-              const totalMax = examMarks.reduce(
-                (s, m) => s + m.totalMarks,
-                0
-              );
+              const total = examMarks.reduce((s, m) => s + m.totalMarks, 0);
 
               const pct =
-                totalMax > 0
-                  ? ((totalObtained / totalMax) * 100).toFixed(1)
-                  : "0.0";
+                total > 0 ? ((obtained / total) * 100).toFixed(1) : "0.0";
 
               return (
-                <div key={exam} className="bg-gray-50 rounded px-4">
+                <div key={exam} className="rounded-lg">
                   <button
                     onClick={() => setOpenExam(isOpen ? null : exam)}
                     className="w-full flex justify-between py-3"
                   >
                     <span className="font-medium">
-                      {exam} <span className="text-gray-500">({pct}%)</span>
+                      {exam} <span className="text-slate-500">({pct}%)</span>
                     </span>
+
                     <FiChevronDown
-                      className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+                      className={`transition ${isOpen ? "rotate-180" : ""}`}
                     />
                   </button>
 
                   {isOpen && (
                     <div className="pb-3 text-sm">
                       {examMarks.map((m) => (
-                        <div
-                          key={m._id}
-                          className="flex justify-between py-1"
-                        >
+                        <div key={m._id} className="flex justify-between py-1">
                           <span>{m.subject}</span>
                           <span>
                             {m.marksObtained}/{m.totalMarks}
@@ -140,31 +124,28 @@ export default function MarksPage({
             })}
           </div>
         )}
-      </section>
+      </Card>
 
-      {/* ================= SUBJECT INSIGHTS ================= */}
-      <section>
-        <button
+      {/* SUBJECT PROGRESS */}
+      <Card>
+        <SectionHeader
+          title="Subject Progress"
+          open={sections.subjects}
           onClick={() => toggle("subjects")}
-          className="w-full flex justify-between py-3"
-        >
-          <h2 className="text-lg font-semibold">Subject Progress</h2>
-          <FiChevronDown
-            className={`transition-transform ${sections.subjects ? "rotate-180" : ""}`}
-          />
-        </button>
+        />
 
         {sections.subjects && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {Object.entries(marksBySubject).map(([subject, subjectMarks]) => {
               const sorted = [...subjectMarks].sort(
                 (a, b) =>
                   new Date(a.createdAt).getTime() -
-                  new Date(b.createdAt).getTime()
+                  new Date(b.createdAt).getTime(),
               );
 
               const first =
                 (sorted[0].marksObtained / sorted[0].totalMarks) * 100;
+
               const last =
                 (sorted[sorted.length - 1].marksObtained /
                   sorted[sorted.length - 1].totalMarks) *
@@ -173,29 +154,29 @@ export default function MarksPage({
               const delta = last - first;
 
               return (
-                <div key={subject} className="bg-gray-50 rounded px-4 py-3">
+                <div key={subject} className="rounded-lg  px-4 py-3">
                   <div className="font-medium">{subject}</div>
-                  <div className="text-sm text-gray-500">
-                    {delta > 2 ? "Improving ↑" : delta < -2 ? "Declining ↓" : "Stable →"}
+                  <div className="text-sm text-slate-500">
+                    {delta > 2
+                      ? "Improving ↑"
+                      : delta < -2
+                        ? "Declining ↓"
+                        : "Stable →"}
                   </div>
                 </div>
               );
             })}
           </div>
         )}
-      </section>
+      </Card>
 
-      {/* ================= CHARTS ================= */}
-      <section>
-        <button
+      {/* PERFORMANCE CHART */}
+      <Card>
+        <SectionHeader
+          title="Performance Charts"
+          open={sections.charts}
           onClick={() => toggle("charts")}
-          className="w-full flex justify-between py-3"
-        >
-          <h2 className="text-lg font-semibold">Performance Charts</h2>
-          <FiChevronDown
-            className={`transition-transform ${sections.charts ? "rotate-180" : ""}`}
-          />
-        </button>
+        />
 
         {sections.charts && (
           <div className="space-y-6">
@@ -203,22 +184,51 @@ export default function MarksPage({
             <SubjectProgressChart marks={marks} />
           </div>
         )}
-      </section>
+      </Card>
 
-      {/* ================= ADD EXAM MODAL ================= */}
-    {canEdit && showAddExam && (
-  <AddExamModal
-    student={student}
-    mode={mode}
-    onClose={() => setShowAddExam(false)}
-    onSaved={(newMarks) => {
-      onMarksAdded?.(newMarks); // 🔥 trigger reload
-      setShowAddExam(false);
-    }}
-  />
-)}
-
-
+      {/* ADD MARKS MODAL */}
+      {canEdit && showAddExam && (
+        <AddExamModal
+          student={student}
+          mode={mode}
+          onClose={() => setShowAddExam(false)}
+          onSaved={(newMarks) => {
+            onMarksAdded?.(newMarks);
+            setShowAddExam(false);
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+//UI HELPERS
+
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl bg-white shadow-lg p-5 space-y-4">
+      {children}
+    </div>
+  );
+}
+
+function SectionHeader({
+  title,
+  open,
+  onClick,
+}: {
+  title: string;
+  open: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex justify-between items-center"
+    >
+      <h2 className="text-lg font-semibold">{title}</h2>
+
+      <FiChevronDown className={`transition ${open ? "rotate-180" : ""}`} />
+    </button>
   );
 }

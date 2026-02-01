@@ -8,11 +8,5 @@ export default function StudentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AppLayout
-      sidebarConfig={studentSidebarConfig}
-    >
-      {children}
-    </AppLayout>
-  );
+  return <AppLayout sidebarConfig={studentSidebarConfig}>{children}</AppLayout>;
 }

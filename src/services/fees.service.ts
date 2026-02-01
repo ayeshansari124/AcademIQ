@@ -3,9 +3,7 @@ import FeeRecord from "@/models/FeeRecord";
 import Student from "@/models/Student";
 import Notification from "@/models/Notification";
 import { Types } from "mongoose";
-import {
-  recordUserNotification,
-} from "@/services/notification.service";
+import { recordUserNotification } from "@/services/notification.service";
 import { notifyUser } from "@/services/push.service";
 import User from "@/models/User";
 
@@ -44,19 +42,18 @@ export async function ensureMonthlyFee({
 export async function markFeePaidCash(feeRecordId: string) {
   await connectDB();
 
-  // 1️⃣ Fetch fee
+  //FETCH FEE
   const fee = await FeeRecord.findById(feeRecordId);
   if (!fee) throw new Error("FEE_NOT_FOUND");
   if (fee.status === "PAID") throw new Error("ALREADY_PAID");
 
-  // 2️⃣ Mark as paid
+  //MARK AS PAID
   fee.status = "PAID";
   fee.amountPaid = fee.amountDue;
   fee.paymentMethod = "CASH";
   fee.paidAt = new Date();
   await fee.save();
 
-  // 3️⃣ Resolve student + user (NO populate)
   const student = await Student.findById(fee.studentId);
   if (!student) throw new Error("STUDENT_NOT_FOUND");
 
@@ -65,9 +62,7 @@ export async function markFeePaidCash(feeRecordId: string) {
 
   const amount = fee.amountDue;
 
-  /* --------------------------------------------------
-     STUDENT: DB NOTIFICATION
-  -------------------------------------------------- */
+  //STUDENT DB NOTIFICATION
   await recordUserNotification({
     userId: student.userId.toString(),
     type: "FEES_PAID",
@@ -80,9 +75,7 @@ export async function markFeePaidCash(feeRecordId: string) {
     },
   });
 
-  /* --------------------------------------------------
-     STUDENT: WEB PUSH (BEST EFFORT)
-  -------------------------------------------------- */
+  //STUDENT WEB PUSH
   try {
     await notifyUser(student.userId.toString(), {
       title: "Fee Payment Received",
@@ -92,16 +85,14 @@ export async function markFeePaidCash(feeRecordId: string) {
       },
     });
   } catch {
-    // ❌ Never fail cash marking because of push
+    //  Never fail cash marking because of push
   }
 
-  // 4️⃣ Admin toast is handled by frontend
   return {
     success: true,
     message: "Fee marked as paid successfully",
   };
 }
-
 
 export async function runFeeReminder() {
   await connectDB();
@@ -112,8 +103,9 @@ export async function runFeeReminder() {
   });
 
   for (const fee of fees) {
-    const diff =
-      Math.floor((fee.dueDate.getTime() - today.getTime()) / 86400000);
+    const diff = Math.floor(
+      (fee.dueDate.getTime() - today.getTime()) / 86400000,
+    );
 
     const student = await Student.findById(fee.studentId).select("userId");
     if (!student) continue;

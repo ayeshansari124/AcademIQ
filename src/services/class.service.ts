@@ -10,10 +10,7 @@ export async function getAllClasses() {
 export async function getClassById(id: string) {
   await connectDB();
 
-  const cls = await ClassModel.findById(id).populate(
-    "students",
-    "fullName"
-  );
+  const cls = await ClassModel.findById(id).populate("students", "fullName");
 
   if (!cls) throw new Error("CLASS_NOT_FOUND");
   return cls;
@@ -34,8 +31,7 @@ export async function deleteClass(id: string) {
 
   const cls = await ClassModel.findById(id);
   if (!cls) throw new Error("CLASS_NOT_FOUND");
-  if (cls.students.length > 0)
-    throw new Error("CLASS_HAS_STUDENTS");
+  if (cls.students.length > 0) throw new Error("CLASS_HAS_STUDENTS");
 
   await ClassModel.findByIdAndDelete(id);
 }

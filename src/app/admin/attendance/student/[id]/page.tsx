@@ -8,17 +8,11 @@ export default function AdminStudentAttendancePage() {
   const params = useParams();
   const id = params?.id as string | undefined;
 
-  const { data, loading, error } =
-    useAttendanceReport({ studentId: id });
+  const { data, loading, error } = useAttendanceReport({ studentId: id });
 
   if (loading) return <p className="p-6">Loading…</p>;
   if (error || !data)
     return <p className="p-6 text-red-500">Failed to load attendance</p>;
 
-  return (
-    <AttendancePage
-      data={data}
-      title="Attendance Report"
-    />
-  );
+  return <AttendancePage data={data} title="Attendance Report" />;
 }

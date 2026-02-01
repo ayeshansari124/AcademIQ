@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { error: "Failed to submit marks" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

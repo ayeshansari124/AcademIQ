@@ -26,5 +26,5 @@ export type CreateMarkDTO = {
   subject: string;
   marksObtained: number;
   totalMarks: number;
-   uploadedBy?: "ADMIN" | "STUDENT";
+  uploadedBy?: "ADMIN" | "STUDENT";
 };

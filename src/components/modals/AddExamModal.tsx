@@ -25,7 +25,7 @@ export default function AddExamModal({
   function handleChange(
     subject: string,
     field: "marksObtained" | "totalMarks",
-    value: string
+    value: string,
   ) {
     setMarks((prev) => ({
       ...prev,
@@ -70,9 +70,7 @@ export default function AddExamModal({
     setSaving(true);
 
     const endpoint =
-      mode === "ADMIN"
-        ? "/api/admin/marks/add"
-        : "/api/student/marks/add";
+      mode === "ADMIN" ? "/api/admin/marks/add" : "/api/student/marks/add";
 
     try {
       const savedMarks: any[] = [];
@@ -89,7 +87,7 @@ export default function AddExamModal({
             subject,
             marksObtained: data.marksObtained,
             totalMarks: data.totalMarks,
-            uploadedBy: mode, // 🔥 CORE FIX
+            uploadedBy: mode,
           }),
         });
 
@@ -104,7 +102,7 @@ export default function AddExamModal({
       toast.success(
         mode === "ADMIN"
           ? "Marks added successfully"
-          : "Marks submitted successfully"
+          : "Marks submitted successfully",
       );
 
       await onSaved(savedMarks);
@@ -131,9 +129,7 @@ export default function AddExamModal({
         </h3>
 
         <div className="mb-6 max-w-sm">
-          <label className="block text-sm font-medium mb-1">
-            Exam Name
-          </label>
+          <label className="block text-sm font-medium mb-1">Exam Name</label>
           <input
             value={examName}
             onChange={(e) => setExamName(e.target.value)}
@@ -192,7 +188,7 @@ export default function AddExamModal({
           <button
             onClick={submit}
             disabled={saving}
-            className="bg-blue-600 text-white px-5 py-2 text-sm rounded disabled:opacity-50"
+            className="bg-blue-900 text-white px-5 py-2 text-sm rounded disabled:opacity-50"
           >
             {saving ? "Saving…" : "Submit Marks"}
           </button>

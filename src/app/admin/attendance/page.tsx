@@ -2,6 +2,7 @@
 
 import { useClassAttendance } from "@/hooks/attendance/useClassAttendance";
 import ListCard from "@/components/common/ListCard";
+import { useRouter } from "next/navigation";
 
 export default function AdminAttendancePage() {
   const {
@@ -16,6 +17,7 @@ export default function AdminAttendancePage() {
     saveAttendance,
     loading,
   } = useClassAttendance();
+  const router = useRouter();
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
@@ -60,18 +62,14 @@ export default function AdminAttendancePage() {
           </h2>
 
           {records.length === 0 ? (
-            <p className="text-sm text-slate-500">
-              No attendance marked yet.
-            </p>
+            <p className="text-sm text-slate-500">No attendance marked yet.</p>
           ) : (
             records.map((r) => (
               <div
                 key={r.student._id}
                 className="flex items-center justify-between rounded-lg border px-4 py-2"
               >
-                <span className="font-medium">
-                  {r.student.fullName}
-                </span>
+                <span className="font-medium">{r.student.fullName}</span>
 
                 <button
                   onClick={() => toggleStatus(r.student._id)}
@@ -97,25 +95,24 @@ export default function AdminAttendancePage() {
         </div>
       )}
 
-      {/* STUDENTS LIST — ALWAYS VISIBLE */}
+      {/* STUDENTS LIST */}
       <div className="pt-6 border-t space-y-2">
-        <h2 className="text-lg font-semibold text-blue-900">
-          View Attendance
-        </h2>
+        <h2 className="text-lg font-semibold text-blue-900">View Attendance</h2>
         <p className="text-sm text-slate-500">
           Select a student to view detailed attendance
         </p>
 
         <div className="space-y-3">
           {students.length === 0 ? (
-            <p className="text-sm text-slate-500">
-              No students found
-            </p>
+            <p className="text-sm text-slate-500">No students found</p>
           ) : (
             students.map((s) => (
               <ListCard
                 key={s._id}
                 title={s.fullName}
+                onClick={() =>
+                  router.push(`/admin/attendance/student/${s._id}`)
+                }
               />
             ))
           )}

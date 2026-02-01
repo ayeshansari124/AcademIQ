@@ -37,10 +37,9 @@ const AttendanceSchema = new Schema<IAttendance>(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-// 🔒 Prevent duplicate attendance for same class + date
 AttendanceSchema.index({ class: 1, date: 1 }, { unique: true });
 
 export default mongoose.models.Attendance ||

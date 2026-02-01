@@ -6,8 +6,8 @@ import { saveSubscription } from "@/services/push.service";
 export async function POST(req: Request) {
   await connectDB();
 
-  const cookieStore = await cookies()
-  const token= cookieStore.get("token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
   if (!token) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -17,10 +17,9 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const decoded = jwt.verify(
-    token,
-    process.env.JWT_SECRET!
-  ) as { userId: string };
+  const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+    userId: string;
+  };
 
   await saveSubscription(decoded.userId, subscription);
 

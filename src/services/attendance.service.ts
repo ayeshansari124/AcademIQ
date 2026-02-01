@@ -8,7 +8,7 @@ import { notifyUser } from "@/services/push.service";
 
 const MIN_ATTENDANCE_PERCENTAGE = 75;
 
-// ---------- SUMMARY ----------
+//SUMMARY
 async function calculateSummary(studentId: string) {
   const docs = await Attendance.find({
     "records.student": studentId,
@@ -29,13 +29,13 @@ async function calculateSummary(studentId: string) {
   return { present, absent, total, percentage };
 }
 
-// ---------- NOTIFICATIONS ----------
+//NOTIFICATIONS
 async function notifyAbsent(student: any, date: string, classId: string) {
   await recordUserNotification({
     userId: student.userId,
     type: "ABSENT",
     title: "Absent Marked",
-    message: `You were marked absent on ${date}.`,
+    message: `You were marked absent today`,
     metadata: { date, classId },
   });
 
@@ -70,7 +70,7 @@ async function notifyLowAttendance(student: any, percentage: number) {
   });
 }
 
-// ---------- ADMIN ----------
+// ADMIN
 export async function markAttendance({
   classId,
   date,
@@ -116,7 +116,7 @@ export async function markAttendance({
   return attendance;
 }
 
-// ---------- READ ----------
+//READ
 export async function getClassAttendance({
   classId,
   date,

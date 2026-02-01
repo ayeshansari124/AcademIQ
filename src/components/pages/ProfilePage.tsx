@@ -13,16 +13,17 @@ export default function ProfilePage({
   onDelete?: () => void;
   title?: string;
 }) {
-  const joinedDate = new Date(student.createdAt).toLocaleDateString(
-    "en-IN",
-    { day: "2-digit", month: "long", year: "numeric" }
-  );
+  const joinedDate = new Date(student.createdAt).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <div className="p-6 space-y-10 max-w-3xl mx-auto">
       <header className="flex justify-between rounded-xl px-6 py-5 shadow-sm">
         <div>
-          <h1 className="text-xl font-semibold text-blue-900">
+          <h1 className="text-xl font-bold text-blue-900">
             {student.fullName}
           </h1>
           <p className="text-sm text-slate-500">{title}</p>
@@ -47,21 +48,12 @@ export default function ProfilePage({
 
       <Section title="Academic Information">
         <Info label="Class / Batch" value={student.class?.name} />
-        <Info
-          label="Subjects"
-          value={student.subjects?.join(", ")}
-        />
-        <Info
-          label="Days Attending"
-          value={student.days?.join(", ")}
-        />
+        <Info label="Subjects" value={student.subjects?.join(", ")} />
+        <Info label="Days Attending" value={student.days?.join(", ")} />
       </Section>
 
       <Section title="Fee Information">
-        <Info
-          label="Monthly Fees"
-          value={`₹${student.monthlyFee}`}
-        />
+        <Info label="Monthly Fees" value={`₹${student.monthlyFee}`} />
         <Info label="Admission Date" value={joinedDate} />
       </Section>
     </div>
@@ -77,12 +69,8 @@ function Section({
 }) {
   return (
     <section className="rounded-xl p-6 shadow-sm space-y-4">
-      <h2 className="text-sm font-semibold uppercase text-blue-700">
-        {title}
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {children}
-      </div>
+      <h2 className="text- font-semibold uppercase text-blue-900">{title}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">{children}</div>
     </section>
   );
 }
@@ -99,11 +87,7 @@ function Info({
   return (
     <div>
       <p className="text-sm text-slate-500">{label}</p>
-      <p
-        className={`text-sm font-medium ${
-          mono ? "font-mono" : ""
-        }`}
-      >
+      <p className={`text-sm font-medium ${mono ? "font-mono" : ""}`}>
         {value || "-"}
       </p>
     </div>

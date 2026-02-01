@@ -21,10 +21,8 @@ export interface IFeeRecord extends Document {
   paymentMethod?: PaymentMethod;
   razorpayPaymentId?: string;
 
-  // 🔔 REMINDER TRACKING
   remindersSent: number[];
 }
-
 
 const FeeRecordSchema = new Schema<IFeeRecord>(
   {
@@ -62,20 +60,15 @@ const FeeRecordSchema = new Schema<IFeeRecord>(
 
     razorpayPaymentId: String,
 
-    // ✅ REQUIRED FOR REMINDERS
     remindersSent: {
       type: [Number],
       default: [],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-
-FeeRecordSchema.index(
-  { studentId: 1, month: 1, year: 1 },
-  { unique: true }
-);
+FeeRecordSchema.index({ studentId: 1, month: 1, year: 1 }, { unique: true });
 
 const FeeRecord: Model<IFeeRecord> =
   mongoose.models.FeeRecord ||

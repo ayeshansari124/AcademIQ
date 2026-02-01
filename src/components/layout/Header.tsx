@@ -4,11 +4,7 @@ import { Menu, Power } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-export default function Header({
-  onMenuClick,
-}: {
-  onMenuClick: () => void;
-}) {
+export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const router = useRouter();
 
   async function handleLogout() {
@@ -37,9 +33,7 @@ export default function Header({
       </div>
 
       {/* Brand */}
-      <h1 className="text-lg font-semibold tracking-wide">
-        AcademIQ
-      </h1>
+      <h1 className="text-lg font-semibold tracking-wide">AcademIQ</h1>
 
       {/* Logout */}
       <div

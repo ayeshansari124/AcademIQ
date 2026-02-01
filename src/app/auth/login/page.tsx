@@ -29,17 +29,17 @@ export default function LoginPage() {
           <input
             name="identifier"
             placeholder="Username / Email"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900"
           />
 
           <input
             name="password"
             type="password"
             placeholder="Password"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900"
           />
 
-          <button className="w-full rounded-full bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition">
+          <button className="w-full rounded-full bg-blue-900 py-3 text-sm font-semibold text-white hover:bg-blue-900 transition">
             Login
           </button>
         </form>

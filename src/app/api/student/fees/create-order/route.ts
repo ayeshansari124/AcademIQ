@@ -15,10 +15,7 @@ export async function POST(req: Request) {
   const fee = await FeeRecord.findById(feeRecordId);
 
   if (!fee || fee.status === "PAID") {
-    return NextResponse.json(
-      { error: "Invalid fee record" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid fee record" }, { status: 400 });
   }
 
   const order = await razorpay.orders.create({

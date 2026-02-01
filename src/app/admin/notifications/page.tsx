@@ -8,7 +8,7 @@ import PlusFab from "@/components/common/PlusFab";
 
 export default function AdminNotificationsPage() {
   const { notifications, loading, refetch } = useNotifications(
-    "/api/admin/notifications"
+    "/api/admin/notifications",
   );
   const [open, setOpen] = useState(false);
 
@@ -17,27 +17,20 @@ export default function AdminNotificationsPage() {
       {/* HEADER */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-blue-900">
-            Notifications
-          </h1>
+          <h1 className="text-2xl font-bold text-blue-900">Notifications</h1>
           <p className="mt-1 text-sm text-slate-500">
             View and send announcements to students
           </p>
         </div>
 
-        <PlusFab
-          onClick={() => setOpen(true)}
-          label="Send notification"
-        />
+        <PlusFab onClick={() => setOpen(true)} label="Send notification" />
       </div>
 
       {/* CONTENT */}
       {loading ? (
         <p className="text-sm text-slate-500">Loading…</p>
       ) : notifications.length === 0 ? (
-        <p className="text-sm text-slate-500">
-          No notifications yet.
-        </p>
+        <p className="text-sm text-slate-500">No notifications yet.</p>
       ) : (
         <NotificationPage notifications={notifications} />
       )}

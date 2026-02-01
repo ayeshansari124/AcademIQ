@@ -12,7 +12,7 @@ export async function GET() {
     console.error("[STUDENT_MARKS_GET]", err);
     return NextResponse.json(
       { error: "Failed to load marks" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

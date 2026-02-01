@@ -8,11 +8,7 @@ interface Props {
 
 export default function NotificationPage({ notifications }: Props) {
   if (!notifications.length) {
-    return (
-      <p className="text-sm text-slate-500">
-        No notifications yet.
-      </p>
-    );
+    return <p className="text-sm text-slate-500">No notifications yet.</p>;
   }
 
   return (

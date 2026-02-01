@@ -6,7 +6,7 @@ export async function GET() {
 
   const assignments = await getAssignmentsForStudent(
     student._id.toString(),
-    student.class.toString()
+    student.class.toString(),
   );
 
   return Response.json({ assignments });
