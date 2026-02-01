@@ -29,22 +29,31 @@ export function useAuthLogin() {
       });
 
       const data = await res.json();
-      toast.dismiss(toastId);
 
       if (!res.ok) {
+        toast.dismiss(toastId);
         toast.error(data.error ?? "Invalid credentials");
         return;
       }
 
+      toast.dismiss(toastId);
       toast.success("Welcome back");
-      await registerPush();
 
+      // 🚀 redirect FIRST (login is done)
       router.replace(
-        data.user.role === "ADMIN" ? "/admin/dashboard" : "/student/dashboard",
+        data.user.role === "ADMIN"
+          ? "/admin/dashboard"
+          : "/student/dashboard"
       );
-    } catch {
+
+      // 🔕 push is OPTIONAL and must NEVER break login
+      registerPush().catch(() => {
+        console.warn("Push registration failed (ignored)");
+      });
+    } catch (err) {
       toast.dismiss(toastId);
       toast.error("Login failed. Please try again.");
     }
   };
 }
+
