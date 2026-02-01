@@ -1,33 +1,25 @@
-import { handleGetClass, handleDeleteClass } from "@/controllers/class.controller";
+import { requireAdmin } from "@/guards/requireAdmin";
+import {
+  handleGetClass,
+  handleDeleteClass,
+} from "@/controllers/class.controller";
 
 export async function GET(
-  req: Request,
+  _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
-    const cls = await handleGetClass(id);
-    return Response.json({ class: cls });
-  } catch {
-    return Response.json(
-      { error: "Not found" },
-      { status: 404 }
-    );
-  }
+  await requireAdmin();
+  const { id } = await params;
+  const cls = await handleGetClass(id);
+  return Response.json({ class: cls });
 }
 
 export async function DELETE(
-  req: Request,
+  _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
-    await handleDeleteClass(id);
-    return Response.json({ message: "Class deleted" });
-  } catch (e: any) {
-    return Response.json(
-      { error: e.message },
-      { status: 400 }
-    );
-  }
+  await requireAdmin();
+  const { id } = await params;
+  await handleDeleteClass(id);
+  return Response.json({ message: "Class deleted" });
 }

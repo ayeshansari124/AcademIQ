@@ -1,13 +1,12 @@
-import connectDB from "@/lib/db";
+import { requireAdmin } from "@/guards/requireAdmin";
 import { createMarkController } from "@/controllers/marks.controller";
 
 export async function POST(req: Request) {
-  await connectDB();
-
+  await requireAdmin();
   const body = await req.json();
 
   return createMarkController({
     ...body,
-    uploadedBy: "ADMIN", 
+    uploadedBy: "ADMIN",
   });
 }

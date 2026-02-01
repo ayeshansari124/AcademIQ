@@ -11,7 +11,7 @@ export default function NotificationPage({ notifications }: Props) {
       {notifications.map((n) => (
         <div
           key={n._id}
-          className="rounded-lg p-4 bg-white shadow"
+          className="rounded-lg p-4 bg-white shadow-lg"
         >
           <div className="flex justify-between items-start gap-4">
             <div className="flex-1">

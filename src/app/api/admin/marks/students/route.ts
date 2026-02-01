@@ -1,7 +1,7 @@
-import connectDB from "@/lib/db";
+import { requireAdmin } from "@/guards/requireAdmin";
 import { listStudentsController } from "@/controllers/marks.controller";
 
 export async function GET() {
-  await connectDB();
+  await requireAdmin();
   return listStudentsController();
 }

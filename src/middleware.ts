@@ -6,6 +6,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("token")?.value;
 
+  // 🔓 Public routes
   if (!token) {
     if (pathname.startsWith("/admin") || pathname.startsWith("/student")) {
       return NextResponse.redirect(
@@ -19,15 +20,15 @@ export async function middleware(req: NextRequest) {
   try {
     payload = await verifyEdgeToken(token);
   } catch {
-    const res = NextResponse.redirect(
+    // ❌ Invalid token → force login (NO silent cookie delete)
+    return NextResponse.redirect(
       new URL("/auth/login", req.url)
     );
-    res.cookies.delete("token");
-    return res;
   }
 
   const role = payload.role;
 
+  // Already logged in → block auth pages
   if (pathname.startsWith("/auth") || pathname === "/") {
     return NextResponse.redirect(
       new URL(
@@ -39,6 +40,7 @@ export async function middleware(req: NextRequest) {
     );
   }
 
+  // Role protection
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(
       new URL("/student/dashboard", req.url)

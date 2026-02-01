@@ -1,10 +1,7 @@
-import connectDB from "@/lib/db";
-import { AttendanceController } from "@/controllers/attendance.controller";
 import { requireStudent } from "@/guards/requireStudent";
+import { AttendanceController } from "@/controllers/attendance.controller";
 
 export async function GET() {
-  await connectDB();
-
   const { userId } = await requireStudent();
 
   const report =

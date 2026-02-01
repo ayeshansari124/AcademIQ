@@ -1,9 +1,9 @@
-import connectDB from "@/lib/db";
-import { NextResponse } from "next/server";
+import { requireAdmin } from "@/guards/requireAdmin";
 import { AttendanceController } from "@/controllers/attendance.controller";
+import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-  await connectDB();
+  await requireAdmin();
 
   const { searchParams } = new URL(req.url);
   const classId = searchParams.get("classId")!;
@@ -16,13 +16,13 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  await connectDB();
+  await requireAdmin();
   const body = await req.json();
 
   const attendance =
     await AttendanceController.markAttendance(body);
 
-   return NextResponse.json({
+  return NextResponse.json({
     success: true,
     attendanceId: attendance._id,
   });

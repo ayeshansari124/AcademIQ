@@ -1,10 +1,7 @@
-import connectDB from "@/lib/db";
-import { studentMarksController } from "@/controllers/marks.controller";
 import { requireStudent } from "@/guards/requireStudent";
+import { studentMarksController } from "@/controllers/marks.controller";
 
 export async function GET() {
-  await connectDB();
-
   const { userId } = await requireStudent();
   return studentMarksController(userId);
 }

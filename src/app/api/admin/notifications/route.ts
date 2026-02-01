@@ -1,5 +1,4 @@
-import connectDB from "@/lib/db";
-import getAdmin from "@/guards/getAdmin";
+import { requireAdmin } from "@/guards/requireAdmin";
 import {
   createNotificationController,
   fetchNotificationsForUser,
@@ -11,11 +10,10 @@ import {
 } from "@/services/push.service";
 
 export async function GET() {
-  await connectDB();
-  const admin = await getAdmin();
+  const { userId } = await requireAdmin();
 
   const notifications = await fetchNotificationsForUser({
-    userId: admin.userId,
+    userId,
     role: "ADMIN",
   });
 
@@ -23,9 +21,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  await connectDB();
-  await getAdmin();
-
+  await requireAdmin();
   const body = await req.json();
 
   await createNotificationController(body);
@@ -34,27 +30,16 @@ export async function POST(req: Request) {
   const payload = { title, body: message };
 
   try {
-    if (scope === "ALL") {
-      await notifyAll(payload);
-    }
-
-    if (scope === "ROLE" && role === "ADMIN") {
-      await notifyAdmins(payload);
-    }
-
-    if (scope === "USER" && userId) {
-      await notifyUser(userId, payload);
-    }
-
+    if (scope === "ALL") await notifyAll(payload);
+    if (scope === "ROLE" && role === "ADMIN") await notifyAdmins(payload);
+    if (scope === "USER" && userId) await notifyUser(userId, payload);
     if (scope === "USER" && userIds?.length) {
       await Promise.allSettled(
-        userIds.map((id: string) =>
-          notifyUser(id, payload)
-        )
+        userIds.map((id: string) => notifyUser(id, payload))
       );
     }
   } catch {
-    // push failure should never block DB success
+    // push failures must not break DB success
   }
 
   return Response.json({ success: true });
