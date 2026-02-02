@@ -7,17 +7,29 @@ export default function RegisterPage() {
   const register = useAdminRegister();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
-        <h1 className="text-2xl font-semibold text-center text-slate-800">
+    <div className="min-h-screen bg-slate-50 flex justify-center px-4 py-10">
+      <div
+        className="
+          w-full
+          max-w-xl sm:max-w-2xl lg:max-w-3xl
+          bg-white
+          rounded-2xl
+          shadow-xl
+          px-6 sm:px-10 lg:px-14
+          py-8 sm:py-10
+        "
+      >
+        {/* Header */}
+        <h1 className="text-2xl sm:text-3xl font-semibold text-slate-800">
           Create Admin Account
         </h1>
-        <p className="mt-1 text-center text-sm text-slate-500">
+        <p className="mt-2 text-sm sm:text-base text-slate-500">
           Register yourself to manage your institute
         </p>
 
+        {/* Form */}
         <form
-          className="mt-8 space-y-5"
+          className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-5"
           onSubmit={(e) => {
             e.preventDefault();
             const form = new FormData(e.currentTarget);
@@ -33,36 +45,50 @@ export default function RegisterPage() {
           <input
             name="name"
             placeholder="Full Name"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
+            className="col-span-1 sm:col-span-2 rounded-xl border border-slate-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-900/20"
           />
 
           <input
             name="email"
             type="email"
             placeholder="Email"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
+            className="rounded-xl border border-slate-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-900/20"
           />
 
           <input
             name="password"
             type="password"
             placeholder="Password"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
+            className="rounded-xl border border-slate-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-900/20"
           />
 
           <input
             name="secretKey"
             type="password"
             placeholder="Admin Secret Key"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm"
+            className="col-span-1 sm:col-span-2 rounded-xl border border-slate-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-900/20"
           />
 
-          <button className="w-full rounded-lg bg-blue-900 py-3 text-sm font-semibold text-white hover:bg-blue-900 transition">
+          <button
+            className="
+              col-span-1 sm:col-span-2
+              mt-4
+              rounded-xl
+              bg-blue-900
+              py-3.5
+              text-base
+              font-semibold
+              text-white
+              hover:bg-blue-800
+              transition
+            "
+          >
             Register
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-600">
+        {/* Footer */}
+        <p className="mt-6 text-sm sm:text-base text-slate-600">
           Already registered?{" "}
           <Link
             href="/auth/login"

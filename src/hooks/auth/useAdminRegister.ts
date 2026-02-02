@@ -39,9 +39,11 @@ export function useAdminRegister() {
       }
 
       toast.success("Admin account created");
-      await registerPush();
-      router.push("/admin/dashboard");
-    } catch {
+      registerPush().catch(() => {        console.warn("Push registration skipped");
+      });
+
+      router.replace("/admin/dashboard");
+    } catch (err) {
       toast.dismiss(toastId);
       toast.error("Registration failed. Please try again.");
     }

@@ -20,7 +20,7 @@ export default function PlusFab({ onClick, label }: Props) {
         flex items-center justify-center
         shadow-md hover:shadow-lg
         hover:bg-blue-800
-        transition
+        transition cursor-pointer
       "
     >
       <Plus className="h-6 w-6 sm:h-7 sm:w-7" />
