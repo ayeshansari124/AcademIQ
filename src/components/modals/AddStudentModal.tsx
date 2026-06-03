@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
+
 import { StudentCreationResult } from "@/types/student";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -29,7 +30,9 @@ export default function AddStudentModal({
   });
 
   useEffect(() => {
-    fetch("/api/admin/classes", { credentials: "include" })
+    fetch("/api/admin/classes", {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => setClasses(data.classes || []));
   }, []);
@@ -61,13 +64,16 @@ export default function AddStudentModal({
     }
 
     setLoading(true);
+
     const t = toast.loading("Creating student...");
 
     try {
       const res = await fetch("/api/admin/students", {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           fullName: form.fullName,
           parentName: form.parentName,
@@ -80,9 +86,13 @@ export default function AddStudentModal({
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+
+      if (!res.ok) {
+        throw new Error(data.error);
+      }
 
       toast.success("Student created");
+
       onSuccess({
         student: data.student,
         credentials: data.credentials,
@@ -97,146 +107,311 @@ export default function AddStudentModal({
 
   return (
     <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
+      {/* BACKDROP */}
+      <div
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-      {/* Modal wrapper */}
-      <div className="fixed inset-0 z-50 flex justify-center px-4 py-6">
+      {/* MODAL */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
-          className="
-            w-full max-w-lg
-            max-h-[95vh]
-            overflow-y-auto
-            bg-white rounded-xl shadow-xl
-          "
           onClick={(e) => e.stopPropagation()}
+          className="
+            relative
+            w-full
+            max-w-2xl
+            bg-white
+            rounded-3xl
+            shadow-2xl
+            max-h-[90vh]
+            flex
+            flex-col
+            overflow-hidden
+          "
         >
-          {/* Header */}
-          <header className="flex items-center justify-between px-5 py-4 border-b">
-            <h2 className="text-lg font-semibold">Add Student</h2>
-            <X
-              className="h-6 w-6 cursor-pointer text-slate-600"
-              onClick={onClose}
-            />
-          </header>
-
-          {/* Content */}
-          <form onSubmit={handleSubmit} className="px-5 py-4 space-y-5">
-            {[
-              ["Student Full Name", "fullName"],
-              ["Parent Name", "parentName"],
-              ["Phone Number", "phone"],
-            ].map(([label, key]) => (
-              <div key={key}>
-                <label className="block text-sm font-medium mb-1">
-                  {label}
-                </label>
-                <input
-                  value={(form as any)[key]}
-                  onChange={(e) =>
-                    setForm({ ...form, [key]: e.target.value })
-                  }
-                  className="w-full rounded-lg border px-3 py-2 text-base"
-                />
-              </div>
-            ))}
-
+          {/* HEADER */}
+          <header className="flex items-center justify-between px-6 py-5 border-b shrink-0">
             <div>
-              <label className="block text-sm font-medium mb-1">Class</label>
-              <select
-                value={form.classId}
-                onChange={(e) => {
-                  const cls = classes.find((c) => c._id === e.target.value);
-                  setSelectedClass(cls);
-                  setSubjects([]);
-                  setForm({ ...form, classId: e.target.value });
-                }}
-                className="w-full rounded-lg border px-3 py-2 text-base"
-              >
-                <option value="">Select Class</option>
-                {classes.map((cls) => (
-                  <option key={cls._id} value={cls._id}>
-                    {cls.name}
-                  </option>
-                ))}
-              </select>
+              <h2 className="text-2xl font-bold text-slate-900">Add Student</h2>
+
+              <p className="text-sm text-slate-500 mt-1">
+                Create a new student account and assign subjects.
+              </p>
             </div>
 
-            {selectedClass && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-xl hover:bg-slate-100 transition"
+            >
+              <X className="h-5 w-5 text-slate-600" />
+            </button>
+          </header>
+
+          {/* FORM */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col flex-1 overflow-hidden"
+          >
+            {/* SCROLLABLE CONTENT */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+              {/* STUDENT NAME */}
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  Subjects
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Student Full Name
                 </label>
+
+                <input
+                  value={form.fullName}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      fullName: e.target.value,
+                    })
+                  }
+                  placeholder="Ayesha Ansari"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-300
+                    px-4
+                    py-3
+                    outline-none
+                    focus:ring-2
+                    focus:ring-blue-200
+                  "
+                />
+              </div>
+
+              {/* PARENT */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Parent Name
+                </label>
+
+                <input
+                  value={form.parentName}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      parentName: e.target.value,
+                    })
+                  }
+                  placeholder="Mohammed Ansari"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-300
+                    px-4
+                    py-3
+                    outline-none
+                    focus:ring-2
+                    focus:ring-blue-200
+                  "
+                />
+              </div>
+
+              {/* PHONE */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Phone Number
+                </label>
+
+                <input
+                  value={form.phone}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      phone: e.target.value,
+                    })
+                  }
+                  placeholder="+91 9876543210"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-300
+                    px-4
+                    py-3
+                    outline-none
+                    focus:ring-2
+                    focus:ring-blue-200
+                  "
+                />
+              </div>
+
+              {/* CLASS */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Class
+                </label>
+
+                <select
+                  value={form.classId}
+                  onChange={(e) => {
+                    const cls = classes.find((c) => c._id === e.target.value);
+
+                    setSelectedClass(cls);
+                    setSubjects([]);
+
+                    setForm({
+                      ...form,
+                      classId: e.target.value,
+                    });
+                  }}
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-300
+                    px-4
+                    py-3
+                    outline-none
+                  "
+                >
+                  <option value="">Select Class</option>
+
+                  {classes.map((cls) => (
+                    <option key={cls._id} value={cls._id}>
+                      {cls.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* SUBJECTS */}
+              {selectedClass && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-3">
+                    Subjects
+                  </label>
+
+                  <div className="flex flex-wrap gap-2">
+                    {selectedClass.subjects.map((sub: string) => (
+                      <button
+                        key={sub}
+                        type="button"
+                        onClick={() => toggleItem(sub, subjects, setSubjects)}
+                        className={`
+                          rounded-xl
+                          px-4
+                          py-2
+                          text-sm
+                          border
+                          transition
+                          ${
+                            subjects.includes(sub)
+                              ? "bg-blue-900 text-white border-blue-900"
+                              : "bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+                          }
+                        `}
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* DAYS */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">
+                  Days Attending
+                </label>
+
                 <div className="flex flex-wrap gap-2">
-                  {selectedClass.subjects.map((sub: string) => (
+                  {DAYS.map((day) => (
                     <button
-                      key={sub}
+                      key={day}
                       type="button"
-                      onClick={() => toggleItem(sub, subjects, setSubjects)}
-                      className={`rounded-lg px-4 py-2 text-sm border ${
-                        subjects.includes(sub)
-                          ? "bg-blue-900 text-white"
-                          : "border-slate-300"
-                      }`}
+                      onClick={() => toggleItem(day, days, setDays)}
+                      className={`
+                        rounded-xl
+                        px-4
+                        py-2
+                        text-sm
+                        border
+                        transition
+                        ${
+                          days.includes(day)
+                            ? "bg-blue-900 text-white border-blue-900"
+                            : "bg-white border-slate-300 text-slate-700 hover:bg-slate-50"
+                        }
+                      `}
                     >
-                      {sub}
+                      {day}
                     </button>
                   ))}
                 </div>
               </div>
-            )}
 
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Days Attending
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {DAYS.map((day) => (
-                  <button
-                    key={day}
-                    type="button"
-                    onClick={() => toggleItem(day, days, setDays)}
-                    className={`rounded-lg px-4 py-2 text-sm border ${
-                      days.includes(day)
-                        ? "bg-blue-900 text-white"
-                        : "border-slate-300"
-                    }`}
-                  >
-                    {day}
-                  </button>
-                ))}
+              {/* FEES */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Monthly Fees (₹)
+                </label>
+
+                <input
+                  type="number"
+                  value={form.monthlyFees}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      monthlyFees: e.target.value,
+                    })
+                  }
+                  placeholder="3000"
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-300
+                    px-4
+                    py-3
+                    outline-none
+                    focus:ring-2
+                    focus:ring-blue-200
+                  "
+                />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Monthly Fees (₹)
-              </label>
-              <input
-                type="number"
-                value={form.monthlyFees}
-                onChange={(e) =>
-                  setForm({ ...form, monthlyFees: e.target.value })
-                }
-                className="w-full rounded-lg border px-3 py-2 text-base"
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4">
+            {/* STICKY FOOTER */}
+            <div className="border-t bg-white px-6 py-4 flex justify-end gap-3 shrink-0">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg border px-4 py-2"
+                className="
+                  rounded-xl
+                  border
+                  border-slate-300
+                  px-5
+                  py-2.5
+                  font-medium
+                  hover:bg-slate-50
+                "
               >
                 Cancel
               </button>
+
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-lg bg-blue-900 px-4 py-2 text-white disabled:opacity-60"
+                className="
+                  rounded-xl
+                  bg-blue-900
+                  px-5
+                  py-2.5
+                  text-white
+                  font-medium
+                  hover:bg-blue-800
+                  disabled:opacity-60
+                "
               >
-                Create Student
+                {loading ? "Creating..." : "Create Student"}
               </button>
             </div>
           </form>

@@ -115,85 +115,186 @@ export default function AddExamModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-lg rounded-lg p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-black"
+    <>
+      {/* BACKDROP */}
+      <div
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* MODAL */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="
+            w-full
+            max-w-4xl
+            bg-white
+            rounded-3xl
+            shadow-2xl
+            max-h-[90vh]
+            flex
+            flex-col
+            overflow-hidden
+          "
         >
-          ✕
-        </button>
+          {/* HEADER */}
+          <div className="border-b px-6 py-5 shrink-0">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900">
+                  {mode === "ADMIN" ? "Add Exam Marks" : "Submit Exam Marks"}
+                </h3>
 
-        <h3 className="text-lg font-semibold mb-5">
-          {mode === "ADMIN" ? "Add Exam Marks" : "Submit Exam Marks"}
-        </h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Enter marks for all selected subjects.
+                </p>
+              </div>
 
-        <div className="mb-6 max-w-sm">
-          <label className="block text-sm font-medium mb-1">Exam Name</label>
-          <input
-            value={examName}
-            onChange={(e) => setExamName(e.target.value)}
-            className="w-full border px-3 py-2 text-sm"
-            placeholder="Unit Test / Mid Term / Final"
-          />
-        </div>
+              <button
+                onClick={onClose}
+                className="p-2 rounded-xl hover:bg-slate-100 transition"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
 
-        {examName && (
-          <div className="border-t pt-4">
-            <div className="grid grid-cols-12 text-sm font-medium text-gray-600 mb-2">
-              <div className="col-span-4">Subject</div>
-              <div className="col-span-4">Obtained</div>
-              <div className="col-span-4">Total</div>
+          {/* SCROLLABLE CONTENT */}
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            {/* EXAM NAME */}
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Exam Name
+              </label>
+
+              <input
+                value={examName}
+                onChange={(e) => setExamName(e.target.value)}
+                placeholder="Unit Test / Mid Term / Final Exam"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-300
+                  px-4
+                  py-3
+                  outline-none
+                  focus:ring-2
+                  focus:ring-blue-200
+                "
+              />
             </div>
 
-            {student.subjects.map((subject: string) => (
-              <div
-                key={subject}
-                className="grid grid-cols-12 gap-2 items-center py-2 border-t text-sm"
-              >
-                <div className="col-span-4 font-medium">{subject}</div>
-
-                <div className="col-span-4">
-                  <input
-                    type="number"
-                    className="w-full border px-2 py-1"
-                    onChange={(e) =>
-                      handleChange(subject, "marksObtained", e.target.value)
-                    }
-                  />
+            {examName && (
+              <div>
+                <div className="grid grid-cols-12 gap-3 bg-slate-50 rounded-2xl px-4 py-4 text-sm font-semibold text-slate-700 mb-3">
+                  <div className="col-span-4">Subject</div>
+                  <div className="col-span-4">Marks Obtained</div>
+                  <div className="col-span-4">Total Marks</div>
                 </div>
 
-                <div className="col-span-4">
-                  <input
-                    type="number"
-                    className="w-full border px-2 py-1"
-                    onChange={(e) =>
-                      handleChange(subject, "totalMarks", e.target.value)
-                    }
-                  />
+                <div className="space-y-3">
+                  {student.subjects.map((subject: string) => (
+                    <div
+                      key={subject}
+                      className="
+                        grid
+                        grid-cols-12
+                        gap-3
+                        items-center
+                        p-4
+                        border
+                        rounded-2xl
+                        bg-white
+                      "
+                    >
+                      <div className="col-span-4 font-semibold text-slate-800">
+                        {subject}
+                      </div>
+
+                      <div className="col-span-4">
+                        <input
+                          type="number"
+                          placeholder="0"
+                          className="
+                            w-full
+                            rounded-xl
+                            border
+                            border-slate-300
+                            px-3
+                            py-2.5
+                          "
+                          onChange={(e) =>
+                            handleChange(
+                              subject,
+                              "marksObtained",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="col-span-4">
+                        <input
+                          type="number"
+                          placeholder="100"
+                          className="
+                            w-full
+                            rounded-xl
+                            border
+                            border-slate-300
+                            px-3
+                            py-2.5
+                          "
+                          onChange={(e) =>
+                            handleChange(subject, "totalMarks", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        )}
 
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm border rounded"
-          >
-            Cancel
-          </button>
+          {/* FOOTER */}
+          <div className="border-t bg-white px-6 py-4 flex justify-end gap-3 shrink-0">
+            <button
+              onClick={onClose}
+              className="
+                px-5
+                py-2.5
+                rounded-xl
+                border
+                border-slate-300
+                font-medium
+                hover:bg-slate-50
+              "
+            >
+              Cancel
+            </button>
 
-          <button
-            onClick={submit}
-            disabled={saving}
-            className="bg-blue-900 text-white px-5 py-2 text-sm rounded disabled:opacity-50"
-          >
-            {saving ? "Saving…" : "Submit Marks"}
-          </button>
+            <button
+              onClick={submit}
+              disabled={saving}
+              className="
+                px-5
+                py-2.5
+                rounded-xl
+                bg-blue-900
+                text-white
+                font-medium
+                hover:bg-blue-800
+                disabled:opacity-50
+              "
+            >
+              {saving ? "Saving..." : "Submit Marks"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

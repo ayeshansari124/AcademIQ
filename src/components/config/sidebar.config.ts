@@ -18,8 +18,8 @@ export const adminSidebarConfig: SidebarConfig = {
   subtitle: "Admin Dashboard",
   items: [
     { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
-    { label: "Students", icon: Users, href: "/admin/students" },
     { label: "Classes", icon: BookOpen, href: "/admin/classes" },
+    { label: "Students", icon: Users, href: "/admin/students" },
     { label: "Attendance", icon: ClipboardCheck, href: "/admin/attendance" },
     { label: "Marks", icon: BarChart3, href: "/admin/marks" },
     { label: "Notifications", icon: Bell, href: "/admin/notifications" },
@@ -39,7 +39,6 @@ export const studentSidebarConfig: SidebarConfig = {
     { label: "Fees", icon: IndianRupee, href: "/student/fees" },
     { label: "Attendance", icon: ClipboardCheck, href: "/student/attendance" },
     { label: "Marks", icon: BarChart3, href: "/student/marks" },
-
     { label: "Assignments", icon: NotebookText, href: "/student/assignments" },
     { label: "Notifications", icon: Bell, href: "/student/notifications" },
   ],

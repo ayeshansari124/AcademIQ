@@ -11,17 +11,48 @@ export default function ListCard({ title, subtitle, onClick }: Props) {
     <div
       onClick={onClick}
       className={`
-        rounded-xl bg-white px-4 py-4
-        shadow-lg
-        transition
-        ${onClick ? "cursor-pointer hover:bg-slate-50 hover:shadow-md" : ""}
+        group
+        rounded-2xl
+        border border-slate-200
+        bg-white
+        px-5 py-4
+        shadow-sm
+        transition-all duration-200
+
+        ${
+          onClick
+            ? `
+              cursor-pointer
+              hover:-translate-y-0.5
+              hover:border-blue-200
+              hover:shadow-md
+            `
+            : ""
+        }
       `}
     >
-      <p className="font-semibold text-lg text-black">{title}</p>
+      <p
+        className="
+          text-base
+          font-semibold
+          tracking-tight
+          text-slate-900
+        "
+      >
+        {title}
+      </p>
 
       {subtitle &&
         (Array.isArray(subtitle) ? subtitle : [subtitle]).map((line, i) => (
-          <p key={i} className="mt-0.5 text-sm text-slate-800">
+          <p
+            key={i}
+            className="
+              mt-1
+              text-sm
+              leading-6
+              text-slate-600
+            "
+          >
             {line}
           </p>
         ))}

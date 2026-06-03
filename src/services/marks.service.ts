@@ -1,5 +1,6 @@
 import Marks from "@/models/Marks";
 import Student from "@/models/Student";
+import "@/models/Class";
 import {
   recordUserNotification,
   recordRoleNotification,

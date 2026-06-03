@@ -38,6 +38,7 @@ export default function CreateClassModal({
     e.preventDefault();
 
     const clean = subjects.filter(Boolean);
+
     if (!className || !clean.length) {
       toast.error("Class and subjects required");
       return;
@@ -71,70 +72,94 @@ export default function CreateClassModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-          <header className="mb-6 flex justify-between">
-            <h2 className="text-lg font-semibold">Create Class</h2>
-            <X className="cursor-pointer" onClick={onClose} />
-          </header>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          onClick={onClose}
+        />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <select
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-              className="w-full rounded-lg border px-3 py-2"
-            >
-              <option value="">Select Class</option>
-              {CLASS_OPTIONS.map((c) => (
-                <option key={c} value={c}>
-                  Class {c}
-                </option>
-              ))}
-            </select>
-
-            {subjects.map((sub, i) => (
-              <div key={i} className="flex gap-2">
-                <input
-                  value={sub}
-                  onChange={(e) => updateSubject(i, e.target.value)}
-                  className="flex-1 rounded-lg border px-3 py-2"
-                />
-                {subjects.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSubjects(subjects.filter((_, x) => x !== i))
-                    }
-                    className="cursor-pointer rounded-md border p-2 text-red-600"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                )}
-              </div>
-            ))}
+        <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl max-h-[90vh] flex flex-col">
+          {/* HEADER */}
+          <div className="flex items-center justify-between px-6 py-5 border-b shrink-0">
+            <h2 className="text-2xl font-bold text-slate-900">Create Class</h2>
 
             <button
               type="button"
-              onClick={() => setSubjects([...subjects, ""])}
-              className="flex items-center gap-1 text-sm text-blue-900"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-gray-100"
             >
-              <Plus size={16} /> Add Subject
+              <X size={20} />
             </button>
+          </div>
 
-            <div className="flex justify-end gap-3 pt-4">
+          {/* SCROLLABLE CONTENT */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col flex-1 overflow-hidden"
+          >
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+              <select
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                className="w-full rounded-xl border px-4 py-3"
+              >
+                <option value="">Select Class</option>
+
+                {CLASS_OPTIONS.map((c) => (
+                  <option key={c} value={c}>
+                    Class {c}
+                  </option>
+                ))}
+              </select>
+
+              {subjects.map((sub, i) => (
+                <div key={i} className="flex gap-3">
+                  <input
+                    value={sub}
+                    onChange={(e) => updateSubject(i, e.target.value)}
+                    placeholder={`Subject ${i + 1}`}
+                    className="flex-1 rounded-xl border px-4 py-3"
+                  />
+
+                  {subjects.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSubjects(subjects.filter((_, x) => x !== i))
+                      }
+                      className="h-12 w-12 flex items-center justify-center rounded-xl border border-red-200 text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setSubjects([...subjects, ""])}
+                className="flex items-center gap-2 text-blue-900 font-medium"
+              >
+                <Plus size={16} />
+                Add Subject
+              </button>
+            </div>
+
+            {/* STICKY FOOTER */}
+            <div className="border-t bg-white px-6 py-4 flex justify-end gap-3 shrink-0">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg border px-4 py-2"
+                className="rounded-xl border px-5 py-2.5"
               >
                 Cancel
               </button>
+
               <button
                 disabled={loading}
-                className="rounded-lg bg-blue-900 px-4 py-2 text-white"
+                className="rounded-xl bg-blue-900 text-white px-5 py-2.5 hover:bg-blue-800"
               >
-                Create
+                {loading ? "Creating..." : "Create Class"}
               </button>
             </div>
           </form>

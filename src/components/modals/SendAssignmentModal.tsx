@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { FaPaperPlane } from "react-icons/fa";
+
 import { AssignmentScope, AssignmentCreatePayload } from "@/types/assignment";
 import { useSendAssignment } from "@/hooks/assignment/useSendAssignment";
 
@@ -13,8 +15,10 @@ interface Props {
 export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
   const [content, setContent] = useState("");
   const [scope, setScope] = useState<AssignmentScope>("CLASS");
+
   const [students, setStudents] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
+
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
 
@@ -23,11 +27,15 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
   });
 
   useEffect(() => {
-    fetch("/api/admin/students", { credentials: "include" })
+    fetch("/api/admin/students", {
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((d) => setStudents(d.students ?? []));
 
-    fetch("/api/admin/classes", { credentials: "include" })
+    fetch("/api/admin/classes", {
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((d) => setClasses(d.classes ?? []));
   }, []);
@@ -44,100 +52,234 @@ export default function SendAssignmentModal({ onClose, onSuccess }: Props) {
       content,
       scope,
       ...(scope === "CLASS" && { classId: selectedClass }),
-      ...(scope === "STUDENT" && { studentIds: selectedStudents }),
+      ...(scope === "STUDENT" && {
+        studentIds: selectedStudents,
+      }),
     };
 
     submit(payload);
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-md rounded-xl p-5 space-y-4">
-        <h2 className="font-bold text-lg text-blue-900">Send Assignment</h2>
+    <>
+      {/* BACKDROP */}
+      <div
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-        <textarea
-          className="w-full border rounded-lg px-3 py-2 text-sm"
-          placeholder="New Assignment"
-          rows={4}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-
-        <select
-          className="w-full border rounded-lg px-3 py-2 text-sm"
-          value={scope}
-          onChange={(e) => setScope(e.target.value as AssignmentScope)}
+      {/* MODAL */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="
+            w-full
+            max-w-2xl
+            bg-white
+            rounded-3xl
+            shadow-2xl
+            max-h-[90vh]
+            flex
+            flex-col
+            overflow-hidden
+          "
         >
-          <option value="CLASS">Full Class</option>
-          <option value="STUDENT">Selected Students</option>
-        </select>
+          {/* HEADER */}
+          <header className="flex items-center justify-between px-6 py-5 border-b shrink-0">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">
+                Send Assignment
+              </h2>
 
-        {scope === "CLASS" && (
-          <select
-            className="w-full border rounded-lg px-3 py-2 text-sm"
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-          >
-            <option value="">Select Class</option>
-            {classes.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        )}
+              <p className="text-sm text-slate-500 mt-1">
+                Send assignments to a class or selected students.
+              </p>
+            </div>
 
-        {scope === "STUDENT" && (
-          <div className="max-h-40 overflow-y-auto border rounded p-2 space-y-1">
-            {students.map((s) => (
-              <label key={s._id} className="flex gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={selectedStudents.includes(s._id)}
-                  onChange={(e) =>
-                    setSelectedStudents((prev) =>
-                      e.target.checked
-                        ? [...prev, s._id]
-                        : prev.filter((id) => id !== s._id),
-                    )
-                  }
-                />
-                {s.fullName}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl hover:bg-slate-100 transition"
+            >
+              <X className="h-5 w-5 text-slate-600" />
+            </button>
+          </header>
+
+          {/* CONTENT */}
+          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+            {/* Assignment Text */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Assignment Content
               </label>
-            ))}
+
+              <textarea
+                rows={5}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Write the assignment here..."
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-300
+                  px-4
+                  py-3
+                  outline-none
+                  resize-none
+                  focus:ring-2
+                  focus:ring-blue-200
+                "
+              />
+            </div>
+
+            {/* Scope */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Send To
+              </label>
+
+              <select
+                value={scope}
+                onChange={(e) => setScope(e.target.value as AssignmentScope)}
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-300
+                  px-4
+                  py-3
+                "
+              >
+                <option value="CLASS">Entire Class</option>
+                <option value="STUDENT">Selected Students</option>
+              </select>
+            </div>
+
+            {/* CLASS */}
+            {scope === "CLASS" && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Class
+                </label>
+
+                <select
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-300
+                    px-4
+                    py-3
+                  "
+                >
+                  <option value="">Select Class</option>
+
+                  {classes.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* STUDENTS */}
+            {scope === "STUDENT" && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">
+                  Select Students
+                </label>
+
+                <div
+                  className="
+                    border
+                    rounded-2xl
+                    max-h-72
+                    overflow-y-auto
+                    divide-y
+                  "
+                >
+                  {students.map((s) => (
+                    <label
+                      key={s._id}
+                      className="
+                        flex
+                        items-center
+                        gap-3
+                        px-4
+                        py-3
+                        hover:bg-slate-50
+                        cursor-pointer
+                      "
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedStudents.includes(s._id)}
+                        onChange={(e) =>
+                          setSelectedStudents((prev) =>
+                            e.target.checked
+                              ? [...prev, s._id]
+                              : prev.filter((id) => id !== s._id),
+                          )
+                        }
+                      />
+
+                      <span className="text-sm font-medium text-slate-700">
+                        {s.fullName}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                <p className="mt-2 text-xs text-slate-500">
+                  Selected: {selectedStudents.length} student(s)
+                </p>
+              </div>
+            )}
           </div>
-        )}
 
-        <div className="flex justify-end gap-3">
-          <button onClick={onClose} className="text-sm text-slate-500">
-            Cancel
-          </button>
+          {/* FOOTER */}
+          <footer className="border-t px-6 py-4 flex justify-end gap-3 shrink-0">
+            <button
+              onClick={onClose}
+              className="
+                rounded-xl
+                border
+                border-slate-300
+                px-5
+                py-2.5
+                font-medium
+                hover:bg-slate-50
+              "
+            >
+              Cancel
+            </button>
 
-          <button
-            onClick={handleSubmit}
-            disabled={!isFormValid || loading}
-            className={`
-    flex items-center justify-center
-    gap-2
-    px-4 py-2
-    rounded-lg
-    text-sm font-medium
-    text-white
-    transition
-    ${
-      !isFormValid || loading
-        ? "bg-blue-800 cursor-not-allowed"
-        : "bg-blue-900 hover:bg-blue-800"
-    }
-  `}
-          >
-            <FaPaperPlane className="h-4 w-4 relative top-px" />
-            <span className="leading-none">
-              {loading ? "Sending…" : "Send"}
-            </span>
-          </button>
+            <button
+              onClick={handleSubmit}
+              disabled={!isFormValid || loading}
+              className={`
+                flex items-center gap-2
+                rounded-xl
+                px-5 py-2.5
+                text-white
+                font-medium
+                transition
+                ${
+                  !isFormValid || loading
+                    ? "bg-blue-700 opacity-60 cursor-not-allowed"
+                    : "bg-blue-900 hover:bg-blue-800"
+                }
+              `}
+            >
+              <FaPaperPlane size={14} />
+              {loading ? "Sending..." : "Send Assignment"}
+            </button>
+          </footer>
         </div>
       </div>
-    </div>
+    </>
   );
 }

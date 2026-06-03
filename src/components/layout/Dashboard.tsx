@@ -9,28 +9,40 @@ interface DashboardGridProps {
 export default function DashboardGrid({ title, tiles }: DashboardGridProps) {
   return (
     <main className="flex-1 px-6 py-12">
-      <div className="mb-16 text-center">
-        <h2 className="text-3xl font-bold text-blue-900 tracking-wide">
+      {/* Header */}
+      <div className="mb-20 text-center">
+        <h2 className="text-4xl md:text-5xl font-bold text-blue-900 tracking-tight">
           {title}
         </h2>
+
+        <p className="mt-4 text-slate-500 text-lg">
+          Manage your institution from one central dashboard
+        </p>
       </div>
 
-      <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-14 gap-x-10">
+      {/* Dashboard Tiles */}
+      <div className="mx-auto max-w-5xl">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-12">
           {tiles.map((item) => (
             <Link
               key={item.title}
               href={item.href}
-              className="flex flex-col items-center gap-3 group"
+              className="flex flex-col items-center group"
             >
               <div
-                className={`flex h-16 w-16 items-center justify-center rounded-xl
-                ${item.color} transition group-hover:scale-105`}
+                className={`
+                  flex h-24 w-24 items-center justify-center
+                  rounded-3xl shadow-md
+                  ${item.color}
+                  transition-all duration-300
+                  group-hover:scale-110
+                  group-hover:shadow-xl
+                `}
               >
-                <item.icon className="h-8 w-8 text-white" />
+                <item.icon className="h-10 w-10 text-white" />
               </div>
 
-              <p className="text-sm font-medium text-slate-800 text-center">
+              <p className="mt-4 text-base md:text-lg font-semibold text-slate-800 text-center transition-colors group-hover:text-blue-900">
                 {item.title}
               </p>
             </Link>

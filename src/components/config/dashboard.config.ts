@@ -12,16 +12,16 @@ import {
 
 export const adminDashboardTiles: DashboardTile[] = [
   {
-    title: "Students",
-    icon: Users,
-    color: "bg-blue-900",
-    href: "/admin/students",
-  },
-  {
     title: "Classes",
     icon: BookOpen,
     color: "bg-green-500",
     href: "/admin/classes",
+  },
+  {
+    title: "Students",
+    icon: Users,
+    color: "bg-blue-900",
+    href: "/admin/students",
   },
   {
     title: "Attendance",

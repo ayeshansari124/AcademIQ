@@ -14,15 +14,36 @@ export default function ContentCard({
   metaRight,
 }: Props) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow-lg">
+    <div
+      className="
+        rounded-2xl
+        border border-slate-200
+        bg-white
+        p-5
+        shadow-sm
+        transition-all
+        hover:shadow-md
+      "
+    >
       {title && (
-        <h2 className="font-semibold text-sm text-slate-900">{title}</h2>
+        <h2 className="text-sm font-semibold tracking-tight text-slate-900">
+          {title}
+        </h2>
       )}
 
-      <p className="text-sm text-slate-700 mt-1 leading-relaxed">{content}</p>
+      <p className="mt-2 text-sm leading-7 text-slate-600">{content}</p>
 
       {(metaLeft || metaRight) && (
-        <div className="mt-3 flex justify-between text-xs text-slate-500">
+        <div
+          className="
+            mt-4
+            flex items-center justify-between
+            border-t border-slate-100
+            pt-3
+            text-xs
+            text-slate-500
+          "
+        >
           <span>{metaLeft}</span>
           <span>{metaRight}</span>
         </div>
