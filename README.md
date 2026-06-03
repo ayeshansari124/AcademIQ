@@ -28,12 +28,12 @@ https://academiq-puce.vercel.app
 
 #### 📚 Class Management
 
-* Create Classes
+* Create and Delete Classes 
 * Configure Subjects
 * View Enrolled Students
 * Class-wise Student Tracking
 * Class Overview Dashboard
-* Delete Classes
+
 
 ---
 
@@ -91,10 +91,10 @@ https://academiq-puce.vercel.app
 #### 📢 Notification System
 
 * Broadcast Notifications
-* Global Announcements
-* Attendance Alerts
 * Marks Notifications
 * Assignment Notifications
+* Global Announcements
+* Attendance Alerts
 
 ---
 
@@ -206,72 +206,6 @@ https://academiq-puce.vercel.app
 ### Notifications
 
 * Web Push Notifications
-
----
-
-## 📸 Screenshots
-
-### 🔐 Login Portal
-
-Teacher and Student authentication system with RBAC.
-
-![Login](./screenshots/login.png)
-
----
-
-### 📚 Class Management
-
-Create classes, configure subjects, and manage enrollments.
-
-![Classes](./screenshots/classes.png)
-
----
-
-### 👨‍🎓 Student Management
-
-Create student accounts and generate credentials automatically.
-
-![Students](./screenshots/students.png)
-
----
-
-### 📅 Attendance Management
-
-Mark attendance and view attendance analytics.
-
-![Attendance](./screenshots/attendance.png)
-
----
-
-### 📊 Marks Management
-
-Track student performance and progress.
-
-![Marks](./screenshots/marks.png)
-
----
-
-### 📝 Assignment Management
-
-Send assignments to classes or selected students.
-
-![Assignments](./screenshots/assignments.png)
-
----
-
-### 📢 Notifications
-
-Broadcast announcements across the platform.
-
-![Notifications](./screenshots/notifications.png)
-
----
-
-### 💰 Fees Management
-
-Manage fees and online payments.
-
-![Fees](./screenshots/fees.png)
 
 ---
 
