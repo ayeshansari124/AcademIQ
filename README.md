@@ -10,6 +10,24 @@ https://academiq-puce.vercel.app
 
 ---
 
+## 🎥 Project Demo
+
+### 👨‍🏫 Teacher / Admin Portal
+
+Manage classes, students, attendance, marks, assignments, notifications, fees, and analytics.
+
+[![Admin Demo](./admin-demo-thumbnail.png)](https://ayeshansari124.github.io/AcademIQ/demo.html)
+
+---
+
+### 👨‍🎓 Student Portal
+
+View attendance, marks, assignments, notifications, fees, and academic progress.
+
+[![Student Demo](./student-demo-thumbnail.png)](https://ayeshansari124.github.io/AcademIQ/demo.html)
+
+---
+
 ## 🚀 Features
 
 #### 🔐 Authentication & Security
