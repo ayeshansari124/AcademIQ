@@ -13,17 +13,11 @@ export default function PlusFab({ onClick, label }: Props) {
       onClick={onClick}
       aria-label={label ?? "Add"}
       className="
-        fixed
-        bottom-6
-        right-6
-        z-50
-
         flex items-center justify-center
-
-        h-14 w-14
+        h-12 w-12
         rounded-full
 
-        bg-blue-600
+        bg-blue-800
         text-white
 
         shadow-lg
@@ -32,12 +26,12 @@ export default function PlusFab({ onClick, label }: Props) {
         transition-all duration-200
 
         hover:scale-105
-        hover:bg-blue-700
+        hover:bg-blue-900
 
         active:scale-95
       "
     >
-      <Plus className="h-6 w-6" />
+      <Plus className="h-5 w-5" />
     </button>
   );
 }
